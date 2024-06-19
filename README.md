@@ -20,7 +20,7 @@ custom cluster tech note
  
   - If a sample passes the intact DNA sample QC criteria but when the callrate is significantly lower than other samples, then the sample can be re-experiment is some cases. Call rates were consistently high in the experiment; no samples were excluded at this stage
 
-* Call rate, p10 GC, GenCall Score are available in samples_info.csv 
+* Call rate, p10 GC, GenCall Score are available in phenotypes.tsv 
 * _Call Rate_: Percentage of SNPs (expressed as a decimal) whose GenCall score is greater than the specified threshold.
 * 	_p10 GC_: 10th percentile GenCall score over all SNPs for this sample.
 * 	 GenCall Score_: quality metric that indicates the reliability of each genotype call.
