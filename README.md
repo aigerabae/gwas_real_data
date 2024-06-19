@@ -20,6 +20,7 @@ custom cluster tech note
  
   - If a sample passes the intact DNA sample QC criteria but when the callrate is significantly lower than other samples, then the sample can be re-experiment is some cases. Call rates were consistently high in the experiment; no samples were excluded at this stage
 
+* Call rate, p10 GC, GenCall Score are available in sample_data.csv 
 * _Call Rate_: Percentage of SNPs (expressed as a decimal) whose GenCall score is greater than the specified threshold.
 * 	_p10 GC_: 10th percentile GenCall score over all SNPs for this sample.
 * 	 GenCall Score_: quality metric that indicates the reliability of each genotype call.
@@ -33,10 +34,6 @@ Make a text file that contains the genotype of entire samples and probes.
 **III) Data processing in PLINK**
 1) prepared .map file was used for further analysis
 2) prepared .ped file needed further processing to include phenotypes
-
-        a) phenotypes were made available in excel file
-Phenotypes excel table
-
 
 
    
