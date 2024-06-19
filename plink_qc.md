@@ -1,4 +1,4 @@
-This file has code for command-line processing of HB00001157.ped, HB00001157.map and phenotypes.tsv files 
+This file has code for command-line processing of HB00001157.ped and phenotypes.tsv files to generate the final version .ped file
 
 1) removed header line 
 ```bash
