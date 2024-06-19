@@ -93,3 +93,5 @@ paste kaz4_1.ped phenotypes12.tsv > kaz4_2.ped
 cut -f 6-1532448 kaz3.ped > kaz4_3.ped
 paste kaz4_2.ped kaz4_3.ped > kaz5.ped
 ```
+
+4) Copy to another folder and rename kaz5.ped HB00001157.map as kaz.ped and kaz.map
