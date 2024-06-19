@@ -1,4 +1,4 @@
-This is a pipeline for GWAS study using 300 Kazakh genomes.
+This is a methods section for GWAS study using 300 Kazakh genomes.
 
 **I) Information about sequencing**
 1) 296 Samples, 766221 SNPs were genotyped 
@@ -31,9 +31,8 @@ Make a text file that contains the genotype of entire samples and probes.
 4) Make input files for third party tools: *.ped & *.map files to execute PLINK.
 
 
-**III) Data processing in PLINK**
+**III) Data processing in PLINK** (command-line code in plink_qc)
 1) prepared .map file was used for further analysis
 2) prepared .ped file needed further processing to include phenotypes
-
-
-   
+3) prepared .ped and .map files were processed for quality control
+4) VCF file was generated
