@@ -86,7 +86,7 @@ sed 's/ /\t/g' phenotypes7.tsv > phenotypes8.tsv
 awk '{print NF; exit}' kaz3.ped
 cut -f 1-4 kaz3.ped > kaz4_1.ped
 cut -f 2 phenotypes8.tsv > phenotypes9.tsv
-paste kaz4_1.ped phenotypes12.tsv > kaz4_2.ped
+paste kaz4_1.ped phenotypes9.tsv > kaz4_2.ped
 cut -f 6-1532448 kaz3.ped > kaz4_3.ped
 paste kaz4_2.ped kaz4_3.ped > kaz5.ped
 ```
