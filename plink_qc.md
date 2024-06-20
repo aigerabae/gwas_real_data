@@ -42,9 +42,9 @@ awk '$2 == 1408910' kaz1.ped > diff_1408910_kaz1.ped
 ```bash
 awk '$2 == 1314010' phenotypes3.tsv 
 awk '$2 == 1408910' phenotypes3.tsv 
-so we have 4 patients that are different but have the same indices; 
 ```
 
+so we have 4 patients that are different but have the same indices; 
 3.6) excluding all 4 of them
 ```bash
 awk -F'\t' '$2 != "1314010" && $2 != "1408910"' kaz1.ped > kaz2.ped
