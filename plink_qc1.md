@@ -22,7 +22,7 @@ cat kaz1.ped | wc -l
 cat phenotypes2.tsv | wc -l
 ```
 
-4) only included those tows into phenotypes5.tsv that have counterparts in kaz1.ped
+4) only included those rows into phenotypes2.tsv that have counterparts in kaz1.ped
 ```bash
 awk 'FNR==NR{a[$2]++; next} ($2 in a)' kaz1.ped phenotypes2.tsv > phenotypes3.tsv
 ```
