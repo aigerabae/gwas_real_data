@@ -29,6 +29,8 @@ custom cluster tech note
 Make a text file that contains the genotype of entire samples and probes.
 
 4) Make input files for third party tools: *.ped & *.map files to execute PLINK.
+- HB00001157.ped, HB00001157.map were made available by sequencing provider
+- phenotypes.tsv file that contained patient information was provided separately
 
 
 **III) Data processing in PLINK** (command-line code in plink_qc)
