@@ -77,7 +77,7 @@ perfect!
 2) I  used sex data in column 13 where Sex (1=male; 2=female; other=unknown)
 ```bash
 cat phenotypes5.tsv | cut -f 2,13 > phenotypes6.tsv
-awk -F"\t" '{ if ($2 == "male") $2 = 1; else if ($2 == "female") $2 = 2; print $0; }' phenotypes6.tsv > phenotypes7.tsv
+awk -F"\t" '{ if ($2 == "male") $2 = 1; else if ($2 == "female") $2 = 2; print $1 "\t" $2 "\t" $3 }' phenotypes6.tsv > phenotypes7.tsv
 sed 's/ /\t/g' phenotypes7.tsv > phenotypes8.tsv
 ```
 
