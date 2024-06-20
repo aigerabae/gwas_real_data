@@ -32,13 +32,13 @@ checks if 1 value in 1 table matches 1 value in another
 awk -F'\t' 'FNR==NR{a[$2]++; next} {b[$2]++} END{for (i in a) if (a[i]!=1) print "Value", i, "in phenotypes3.tsv does not have exactly one match in kaz1.ped"; for (j in b) if (b[j]!=1) print "Value", j, "in kaz1.ped matches more than one value in phenotypes3.tsv"}' kaz1.ped phenotypes3.tsv
 ```
 
-3.5) removing duplicates in each table
-saving separately the rows that have more than 1 matching
+3.5) saving separately the rows that have more than 1 matching
 ```bash
 awk '$2 == 1314010' kaz1.ped > diff_1314010_kaz1.ped
 awk '$2 == 1408910' kaz1.ped > diff_1408910_kaz1.ped
 ```
 
+vieweing those patients phenotypic data
 ```bash
 awk '$2 == 1314010' phenotypes3.tsv 
 awk '$2 == 1408910' phenotypes3.tsv 
