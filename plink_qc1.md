@@ -92,3 +92,5 @@ paste kaz4_2.ped kaz4_3.ped > kaz5.ped
 ```
 
 4) Copy to another folder and rename kaz5.ped HB00001157.map as kaz.ped and kaz.map
+
+Further analysis is avilable at plink_qc2.md
