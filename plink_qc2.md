@@ -1,6 +1,7 @@
 This file contains further processing the resulting ped and map files; in this analysis, sex was imputed for some patients; patients and SNPs with high missing rates were excluded; MAFs were calculated
 
 1) ped map to binary
+
 ```bash
 plink --file kaz --make-bed --out kaz1
 Warning: 532649 het. haploid genotypes present (see kaz1.hh ); many commands treat these as missing.
@@ -26,7 +27,7 @@ awk '$5 == "PROBLEM" {print $1, $2}' kaz2.sexcheck > problem_individuals.txt
 plink --bfile kaz2 --remove problem_individuals.txt --make-bed --out kaz3
 ```
 
-3 individuals removed; the rest should have their sex assigned correctly
+3) individuals removed; the rest should have their sex assigned correctly
 
 
 4) let's remove all non-autosomal regions
@@ -47,7 +48,7 @@ plink --bfile kaz6 --maf 0.01 --make-bed --out kaz7
 plink  --bfile kaz7  --freq --out maf_kaz7
 ```
 
-8) crytic relatedness
+7) crytic relatedness
 ```bash
 plink --bfile kaz7 --genome --min 0.2 --out pihat_min0.2
 plink --bfile kaz7 --missing --out missing_report
