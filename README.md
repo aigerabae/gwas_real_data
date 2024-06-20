@@ -35,6 +35,6 @@ Make a text file that contains the genotype of entire samples and probes.
 
 **III) Data processing in PLINK** (command-line code in plink_qc)
 1) prepared .map file was used for further analysis
-2) prepared .ped file needed further processing to include phenotypes
-3) prepared .ped and .map files were processed for quality control
-4) VCF file was generated
+2) prepared .ped file needed further processing to include phenotypes (analysis shown in plink_qc1.md)
+3) prepared .ped and .map files were processed for quality control (analysis shown in plink_qc2.md)
+4) VCF file was generated (analysis shown in plink_qc3.md)
