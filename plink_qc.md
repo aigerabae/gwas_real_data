@@ -3,7 +3,6 @@ This file has code for command-line processing of HB00001157.ped and phenotypes.
 1) removed header line 
 ```bash
 sed 1d phenotypes.tsv > phenotypes1.tsv
-head -n 1 phenotypes1.tsv > header_phenotypes.tsv
 ```
 
 3.1) removed extra spaces and tabs from ped file
@@ -41,7 +40,6 @@ awk '$2 == 1314010' kaz1.ped > diff_1314010_kaz1.ped
 awk '$2 == 1408910' kaz1.ped > diff_1408910_kaz1.ped
 ```
 
-cat header_phenotypes.tsv
 ```bash
 awk '$2 == 1314010' phenotypes3.tsv 
 awk '$2 == 1408910' phenotypes3.tsv 
