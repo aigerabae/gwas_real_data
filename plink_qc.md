@@ -16,11 +16,10 @@ sort -t$'\t' -k2n,2 kaz.ped > kaz1.ped
 sort -t$'\t' -k2n,2 phenotypes1.tsv > phenotypes2.tsv
 ```
 
-view if they have the same number of rows
+view if they have the same number of rows - they don't
 ```bash
 cat kaz1.ped | wc -l
 cat phenotypes2.tsv | wc -l
-they don't! i need to remove those rows from phenotypes for which we don't have data
 ```
 
 3.4) only included those tows into phenotypes5.tsv that have counterparts in kaz1.ped
