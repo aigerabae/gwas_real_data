@@ -11,9 +11,9 @@ extracted yakut, russian, and japanese IDs into their respective files
 awk -F"\t" '{if ($5 == "Yakut") print $1, $2}' metadata.txt > list_yakut.txt
 awk -F"\t" '{if ($5 == "Japanese") print $1, $2}' metadata.txt > list_japanese.txt
 awk -F"\t" '{if ($5 == "Russian") print $1, $2}' metadata.txt > list_russian.txt
-awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print }' list_yakut.txt > list_yakut1.txt
-awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print }' list_russian.txt > list_russian1.txt
-awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print }' list_japanese.txt > list_japanese1.txt
+awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_yakut.txt > list_yakut1.txt
+awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_russian.txt > list_russian1.txt
+awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_japanese.txt > list_japanese1.txt
 
 replaced unnecessary spaces and tabs to make sure formatting is good
 awk -F'\t' '{gsub(/[[:space:]]+/,"\t"); print}' HGDP.txt > HGDP1.txt
@@ -42,12 +42,15 @@ awk 'NR==FNR {a[$1]; next} $1 in a' list_yakut1.txt HGDP2.txt > yakut_SNP.txt
 
 making proper map/ped files from them: 
 merged 3 together
-cat japanese_SNP.txt russian_SNP.txt yakut_SNP.txt > all.ped
-cat list_japanese1.txt list_russian1.txt list_yakut1.txt > all.ped
+cat list_japanese1.txt list_russian1.txt list_yakut1.txt > all_1_1.ped
+cat japanese_SNP.txt russian_SNP.txt yakut_SNP.txt > all_1_2.ped
+cut -f1 all_1_1.ped > temp_column.txt
+paste temp_column.txt all_1_1.ped > all_1_3.ped
+awk '{print $1, $2, 0, 0}' OFS="\t" all_1_3.ped > all_1_4.ped
+paste all_1_4.ped <(cut -f2 all_1_1.ped) <(cut -f3 all_1_4.ped) <(cut -f2- all_1_2.ped) > all_2.ped
+awk '{print $2, $1, 0, $3}' OFS="\t" HGDP_Map.txt > all.map
 
-
-
-
+use --missing-code -9,0,NA,na for conversion to binary!
 
  Simons:
  accessed at https://www.simonsfoundation.org/simons-genome-diversity-project/ via cancer genomics cloud seven bridges
