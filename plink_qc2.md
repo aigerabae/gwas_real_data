@@ -67,3 +67,7 @@ I removed relatives from that list I created manually
 ```bash
 plink --bfile kaz7 --remove 0.2_low_call_rate_pihat.txt --make-bed --out kaz8
 ```
+
+8) remove non-acgt nucleotides; plink binary to vcf
+plink --bfile kaz8 --snps-only 'just-acgt' --make-bed --out kaz9
+plink --bfile kaz9 --recode vcf
