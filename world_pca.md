@@ -44,13 +44,29 @@ making proper map/ped files from them:
 merged 3 together
 cat list_japanese1.txt list_russian1.txt list_yakut1.txt > all_1_1.ped
 cat japanese_SNP.txt russian_SNP.txt yakut_SNP.txt > all_1_2.ped
+
+splitting genotypes into 2 columns
+awk 'BEGIN {FS=OFS="\t"} {for(i=2; i<=NF; i++) {split($i, chars, ""); $i=""; for(j=1; j<=length(chars); j++) $i = $i chars[j] "\t"}} 1' all_1_2.ped > all_1_2_1.ped
+
+removing extra tabs
+awk -F'\t' '{gsub(/[[:space:]]+/,"\t"); print}' all_1_2_1.ped > all_1_2_2.ped
+
 cut -f1 all_1_1.ped > temp_column.txt
 paste temp_column.txt all_1_1.ped > all_1_3.ped
 awk '{print $1, $2, 0, 0}' OFS="\t" all_1_3.ped > all_1_4.ped
-paste all_1_4.ped <(cut -f2 all_1_1.ped) <(cut -f3 all_1_4.ped) <(cut -f2- all_1_2.ped) > all_2.ped
+paste all_1_4.ped <(cut -f2 all_1_1.ped) <(cut -f3 all_1_4.ped) <(cut -f2- all_1_2_2.ped) > all_2.ped
 awk '{print $2, $1, 0, $3}' OFS="\t" HGDP_Map.txt > all.map
 
-use --missing-code -9,0,NA,na for conversion to binary!
+checking if all rows have the same number of fields
+awk '{print NF}' all_2_1.ped
+
+adding missing fields to line 73
+awk 'NR==73 {printf "%s", $0; for(i=1;i<=1321836;i++) printf "\t0"; printf "\n"; next} 1' all_2.ped > all_2_1.ped
+
+to plink binary
+cp all_2_1.ped ./3all.ped
+cp all.map ./3all.map
+plink --file 3all --missing-code -9,0,NA,na --make-bed --out all
 
  Simons:
  accessed at https://www.simonsfoundation.org/simons-genome-diversity-project/ via cancer genomics cloud seven bridges
