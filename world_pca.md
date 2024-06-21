@@ -68,6 +68,42 @@ cp all_2_1.ped ./3all.ped
 cp all.map ./3all.map
 plink --file 3all --missing-code -9,0,NA,na --make-bed --out all
 
+PCA
+plink --bfile all --geno 0.02 --make-bed --out all1
+plink --bfile all1 --mind 0.02 --make-bed --out all2
+plink2 --bfile all2 --pca 10 --out all_pca 
+python plot_eigenvec.py all_pca.eigenvec
+
+where plot_eigenvec.py has script:
+import sys
+import matplotlib.pyplot as plt
+
+# Check if the correct number of arguments are provided
+if len(sys.argv) != 2:
+    print("Usage: python plot_eigenvec.py <eigenvec_file>")
+    sys.exit(1)
+
+# Read the eigenvec file, skipping the first line
+eigenvec_file = sys.argv[1]
+with open(eigenvec_file, 'r') as f:
+    lines = f.readlines()[1:]
+
+# Extract data from the file
+x_values = [float(line.split()[2]) for line in lines]
+y_values = [float(line.split()[3]) for line in lines]
+
+# Create a scatter plot
+plt.figure(figsize=(8, 6))
+plt.scatter(x_values, y_values, marker='.', color='b')
+plt.xlabel('PC1')
+plt.ylabel('PC2')
+plt.title('Principal Component Analysis')
+plt.grid(True)
+plt.show()
+
+
+# problem - HGDP data uses 36 build and my data = 38 build. thus the SNPs are not really overlapping. need to come up with something or use a different dataset with the same build. let's see!
+
  Simons:
  accessed at https://www.simonsfoundation.org/simons-genome-diversity-project/ via cancer genomics cloud seven bridges
  accessed metadata at https://www.nature.com/articles/nature18964#Sec10 Supplementary Table 1
