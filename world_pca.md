@@ -181,7 +181,7 @@ data = {
 df = pd.DataFrame(data)
 
 # Create interactive scatter plot
-fig = px.scatter(df, x='x', y='y', color='ethnicity', hover_data=['sample_id', 'ethnicity'])
+fig = px.scatter(df, x='PC1', y='PC2', color='ethnicity', hover_data=['sample_id', 'ethnicity'])
 
 # Save the plot as an HTML file
 fig.write_html('interactive_plot.html')
