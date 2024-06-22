@@ -6,16 +6,9 @@ This file contains information about making PCA with world data:
 To do:
 1) extract only IDs into lists
 2) plot PCA for Russian, Yakut, Japanese
+3) let's add Uygur, Sardinian, Adygei, Hazara, Mongolian, Northern Han
 
-extracted yakut, russian, and japanese IDs into their respective files
-awk -F"\t" '{if ($5 == "Yakut") print $1, $2}' metadata.txt > list_yakut.txt
-awk -F"\t" '{if ($5 == "Japanese") print $1, $2}' metadata.txt > list_japanese.txt
-awk -F"\t" '{if ($5 == "Russian") print $1, $2}' metadata.txt > list_russian.txt
-awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_yakut.txt > list_yakut1.txt
-awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_russian.txt > list_russian1.txt
-awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_japanese.txt > list_japanese1.txt
-
-replaced unnecessary spaces and tabs to make sure formatting is good
+replaced unnecessary spaces and tabs to make sure formatting is good in original pedigree file
 awk -F'\t' '{gsub(/[[:space:]]+/,"\t"); print}' HGDP.txt > HGDP1.txt
 
 manually added word SNP as the first field of the first column -it was missing
@@ -35,15 +28,44 @@ for i in {1..8}; do sed -i '' 's/-/0/g' gtReport${i}_transposed.tsv; done
 paste gtReport{1..8}_transposed.tsv > concatenated_transposed.tsv
 mv concatenated_transposed.tsv ./HGDP2.txt
 
+extracted yakut, russian, and japanese IDs into their respective files
+awk -F"\t" '{if ($5 == "Yakut") print $1, $2}' metadata.txt > list_yakut.txt
+awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_yakut.txt > list_yakut1.txt
+awk -F"\t" '{if ($5 == "Japanese") print $1, $2}' metadata.txt > list_japanese.txt
+awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_japanese.txt > list_japanese1.txt
+awk -F"\t" '{if ($5 == "Russian") print $1, $2}' metadata.txt > list_russian.txt
+awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_russian.txt > list_russian1.txt
+awk -F"\t" '{if ($5 == "Uygur") print $1, $2}' metadata.txt > list_uyghur.txt
+awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_uygur.txt > list_uygur1.txt
+awk -F"\t" '{if ($5 == "Sardinian") print $1, $2}' metadata.txt > list_sardinian.txt
+awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_sardinian.txt > list_sardinian1.txt
+awk -F"\t" '{if ($5 == "Adygei") print $1, $2}' metadata.txt > list_adygei.txt
+awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_adygei.txt > list_adygei1.txt
+awk -F"\t" '{if ($5 == "Hazara") print $1, $2}' metadata.txt > list_hazara.txt
+awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_hazara.txt > list_hazara1.txt
+awk -F"\t" '{if ($5 == "Mongolian") print $1, $2}' metadata.txt > list_mongolian.txt
+awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_mongolian.txt > list_mongolian1.txt
+awk -F"\t" '{if ($5 == "Northern Han") print $1, $2}' metadata.txt > list_northernhan.txt
+awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_northernhan.txt > list_northernhan1.txt
+awk -F"\t" '{if ($5 == "French") print $1, $2}' metadata.txt > list_french.txt
+awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_french.txt > list_french1.txt
+
 got those rows corresponding to sample IDs in lists:
 awk 'NR==FNR {a[$1]; next} $1 in a' list_japanese1.txt HGDP2.txt > japanese_SNP.txt
 awk 'NR==FNR {a[$1]; next} $1 in a' list_russian1.txt HGDP2.txt > russian_SNP.txt
 awk 'NR==FNR {a[$1]; next} $1 in a' list_yakut1.txt HGDP2.txt > yakut_SNP.txt
+awk 'NR==FNR {a[$1]; next} $1 in a' list_uygur1.txt HGDP2.txt > uygur_SNP.txt
+awk 'NR==FNR {a[$1]; next} $1 in a' list_sardinian1.txt HGDP2.txt > sardinian_SNP.txt
+awk 'NR==FNR {a[$1]; next} $1 in a' list_adygei1.txt HGDP2.txt > adygei_SNP.txt
+awk 'NR==FNR {a[$1]; next} $1 in a' list_hazara1.txt HGDP2.txt > hazara_SNP.txt
+awk 'NR==FNR {a[$1]; next} $1 in a' list_mongolian1.txt HGDP2.txt > mongolian_SNP.txt
+awk 'NR==FNR {a[$1]; next} $1 in a' list_northernhan1.txt HGDP2.txt > northernhan_SNP.txt
+awk 'NR==FNR {a[$1]; next} $1 in a' list_french1.txt HGDP2.txt > french_SNP.txt
 
 making proper map/ped files from them: 
 merged 3 together
-cat list_japanese1.txt list_russian1.txt list_yakut1.txt > all_1_1.ped
-cat japanese_SNP.txt russian_SNP.txt yakut_SNP.txt > all_1_2.ped
+cat list_japanese1.txt list_russian1.txt list_yakut1.txt list_uygur1.txt list_sardinian1.txt list_adygei1.txt list_hazara1.txt list_mongolian1.txt list_northernhan1.txt list_french1.txt > all_1_1.ped
+cat japanese_SNP.txt russian_SNP.txt yakut_SNP.txt uygur_SNP.txt sardinian_SNP.txt adygei_SNP.txt hazara_SNP.txt mongolian_SNP.txt northernhan_SNP.txt french_SNP.txt > all_1_2.ped
 
 splitting genotypes into 2 columns
 awk 'BEGIN {FS=OFS="\t"} {for(i=2; i<=NF; i++) {split($i, chars, ""); $i=""; for(j=1; j<=length(chars); j++) $i = $i chars[j] "\t"}} 1' all_1_2.ped > all_1_2_1.ped
@@ -51,6 +73,7 @@ awk 'BEGIN {FS=OFS="\t"} {for(i=2; i<=NF; i++) {split($i, chars, ""); $i=""; for
 removing extra tabs
 awk -F'\t' '{gsub(/[[:space:]]+/,"\t"); print}' all_1_2_1.ped > all_1_2_2.ped
 
+adding family id, maternal ID, paternal ID, and phenotype
 cut -f1 all_1_1.ped > temp_column.txt
 paste temp_column.txt all_1_1.ped > all_1_3.ped
 awk '{print $1, $2, 0, 0}' OFS="\t" all_1_3.ped > all_1_4.ped
@@ -58,15 +81,18 @@ paste all_1_4.ped <(cut -f2 all_1_1.ped) <(cut -f3 all_1_4.ped) <(cut -f2- all_1
 awk '{print $2, $1, 0, $3}' OFS="\t" HGDP_Map.txt > all.map
 
 checking if all rows have the same number of fields
-awk '{print NF}' all_2_1.ped
+awk '{print NF}' all_2.ped
 
-adding missing fields to line 73
-awk 'NR==73 {printf "%s", $0; for(i=1;i<=1321836;i++) printf "\t0"; printf "\n"; next} 1' all_2.ped > all_2_1.ped
+adding missing fields to lines that have less fields
+awk 'NR==1 {num_fields=NF; line=$0; next} {while(NF<num_fields) {$0=$0"\t0"} print} END {if (NR>1) print line}' all_2.ped > all_2_1.ped
+
+checking if all rows have the same number of fields
+awk '{print NF}' all_2_1.ped
 
 to plink binary
 cp all_2_1.ped ./3all.ped
 cp all.map ./3all.map
-plink --file 3all --missing-code -9,0,NA,na --make-bed --out all
+plink --file 3all --missing-code -9,0,NA,na --make-bed --out all2
 
 merging my dataset with world dataset
 awk 'NR==FNR{a[$1];next}($2 in a){print $2,$4}' all2_rsids.txt kaz9.bim > mapped_rsids.txt
@@ -80,10 +106,6 @@ kaz10.bed       kaz10.bim       kaz10.fam
 plink --bfile all4 --merge-list merge_list.txt --make-bed --out merged_dataset 
 
 PCA
-plink --bfile all --geno 0.02 --make-bed --out all1
-plink --bfile all1 --mind 0.02 --make-bed --out all2
-plink2 --bfile all2 --pca 10 --out all_pca 
-python plot_eigenvec.py all_pca.eigenvec
 
 plink --bfile merged_dataset --geno 0.02 --make-bed --out merged_dataset1
 plink --bfile merged_dataset1 --mind 0.02 --make-bed --out merged_dataset2
@@ -93,7 +115,7 @@ cat metadata.txt | cut -f 1,5 > ethicities.txt
 cat kaz10.fam | cut -f 1 -d ' ' >> temp_ethicities.txt 
 cat temp_ethicities.txt | awk '{$2 = "\tkazakh"; print }' >> ethicities.txt
 
-python plot_eigenvec.py all_pca.eigenvec
+python plot_eigenvec.py all_pca.eigenvec ethicities.txt
 
 where plot_eigenvec.py has script:
 import sys
