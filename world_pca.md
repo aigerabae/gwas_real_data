@@ -172,8 +172,8 @@ with open(ethnicities_file, 'r') as f:
 
 # Extract data from the file
 data = {
-    'x': [float(line.split()[2]) for line in lines],
-    'y': [float(line.split()[3]) for line in lines],
+    'PC1': [float(line.split()[2]) for line in lines],
+    'PC2': [float(line.split()[3]) for line in lines],
     'sample_id': [line.split()[0] for line in lines],
     'ethnicity': [ethnicities[line.split()[0]] for line in lines]
 }
