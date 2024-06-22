@@ -79,7 +79,7 @@ cat japanese_SNP.txt russian_SNP.txt yakut_SNP.txt uygur_SNP.txt sardinian_SNP.t
 
 splitting genotypes into 2 columns
 ```bash
-awk 'BEGIN {FS=OFS="\t"} {for(i=2; i<=NF; i++) {split($i, chars, ""); $i=""; for(j=1; j<=length(chars); j++) $i = $i chars[j] "\t"}} 1' all_1_2.ped > all_1_2_1.ped
+awk 'BEGIN {FS=OFS="\t"} {for(i=2; i<=NF; i++) gsub(/./,"\t&",$i)} 1' all_1_2.ped > all_1_2_1.ped
 ```
 
 removing extra tabs
