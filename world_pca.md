@@ -5,8 +5,7 @@ This file contains information about making PCA with world data:
  accessed metadata at https://www.internationalgenome.org/data-portal/data-collection/hgdp
 To do:
 1) extract only IDs into lists
-2) plot PCA for Russian, Yakut, Japanese
-3) let's add Uygur, Sardinian, Adygei, Hazara, Mongolian, Northern Han
+2) plot PCA for Russian, Yakut, Japanese, Uygur, Sardinian, Adygei, Hazara, Mongolian, Northern Han + Kazakh
 
 replaced unnecessary spaces and tabs to make sure formatting is good in original pedigree file
 ```bash
@@ -190,12 +189,13 @@ fig.write_html('interactive_plot.html')
 fig.show()
 ```
 
- Simons:
- accessed at https://www.simonsfoundation.org/simons-genome-diversity-project/ via cancer genomics cloud seven bridges
- accessed metadata at https://www.nature.com/articles/nature18964#Sec10 Supplementary Table 1
+To do: include other populations for central asian PCA - Pathan, Uygur, Yakut, Russian,Mongolian,Hazara,Adygei,Mongolian
 
- 1000 genomes
- accessed at https://www.internationalgenome.org/data-portal/population
+More data to use for PCA:
 
-To do:
-1) figure out if my VCF file is good
+Simons:
+can be accessed at https://www.simonsfoundation.org/simons-genome-diversity-project/ via cancer genomics cloud seven bridges
+metadata can be accessed at https://www.nature.com/articles/nature18964#Sec10 Supplementary Table 1
+
+1000 genomes
+can be accessed at https://www.internationalgenome.org/data-portal/population
