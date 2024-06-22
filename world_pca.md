@@ -103,7 +103,9 @@ awk '{print NF}' all_2.ped
 
 adding missing fields to lines that have less fields
 ```bash
-awk 'NR==1 {num_fields=NF; line=$0; next} {while(NF<num_fields) {$0=$0"\t0"} print} END {if (NR>1) print line}' all_2.ped > all_2_1.ped
+awk 'NR==1 {num_fields=NF; header=$0; next} 
+{for (i=NF+1; i<=num_fields; i++) $i=0; print} 
+END {print header}' all_2.ped > all_2_1.ped
 ```
 
 checking if all rows have the same number of fields
