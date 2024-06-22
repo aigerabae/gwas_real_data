@@ -84,7 +84,7 @@ awk 'BEGIN {FS=OFS="\t"} {for(i=2; i<=NF; i++) gsub(/./,"\t&",$i)} 1' all_1_2.pe
 
 removing extra tabs
 ```bash
-awk -F'\t' '{gsub(/[[:space:]]+/,"\t"); print}' all_1_2_1.ped > all_1_2_2.ped
+$ tr -s '[:space:]' '\t' < all_1_2_1.ped > all_1_2_2.ped
 ```
 
 adding family id, maternal ID, paternal ID, and phenotype
