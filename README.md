@@ -39,3 +39,6 @@ Make a text file that contains the genotype of entire samples and probes.
 3) prepared .ped and .map files were processed for quality control (analysis shown in plink_qc2.md)
 4) VCF file was generated (analysis shown in plink_qc3.md)
 5) PCA was performed using other populations from Human Genome Diversity Project (HGDP) (analysis shown in world_pca.md)
+
+Output of all steps can be accessed under ./output
+Input can be accessed under ./initial_files
