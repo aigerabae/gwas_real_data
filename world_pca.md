@@ -68,19 +68,41 @@ cp all_2_1.ped ./3all.ped
 cp all.map ./3all.map
 plink --file 3all --missing-code -9,0,NA,na --make-bed --out all
 
+merging my dataset with world dataset
+awk 'NR==FNR{a[$1];next}($2 in a){print $2,$4}' all2_rsids.txt kaz9.bim > mapped_rsids.txt
+plink --bfile kaz9 --extract  mapped_rsids.txt --make-bed --out kaz10
+plink --bfile all2 --extract  mapped_rsids.txt --make-bed --out all3
+plink --bfile all3 --update-map mapped_rsids.txt --make-bed --out all4
+
+nano merge_list.txt
+kaz10.bed       kaz10.bim       kaz10.fam
+
+plink --bfile all4 --merge-list merge_list.txt --make-bed --out merged_dataset 
+
 PCA
 plink --bfile all --geno 0.02 --make-bed --out all1
 plink --bfile all1 --mind 0.02 --make-bed --out all2
 plink2 --bfile all2 --pca 10 --out all_pca 
 python plot_eigenvec.py all_pca.eigenvec
 
+plink --bfile merged_dataset --geno 0.02 --make-bed --out merged_dataset1
+plink --bfile merged_dataset1 --mind 0.02 --make-bed --out merged_dataset2
+plink2 --bfile merged_dataset2 --pca 10 --out all_pca 
+
+cat metadata.txt | cut -f 1,5 > ethicities.txt
+cat kaz10.fam | cut -f 1 -d ' ' >> temp_ethicities.txt 
+cat temp_ethicities.txt | awk '{$2 = "\tkazakh"; print }' >> ethicities.txt
+
+python plot_eigenvec.py all_pca.eigenvec
+
 where plot_eigenvec.py has script:
 import sys
 import matplotlib.pyplot as plt
+from collections import defaultdict
 
 # Check if the correct number of arguments are provided
-if len(sys.argv) != 2:
-    print("Usage: python plot_eigenvec.py <eigenvec_file>")
+if len(sys.argv) != 3:
+    print("Usage: python plot_eigenvec.py <eigenvec_file> <ethnicities_file>")
     sys.exit(1)
 
 # Read the eigenvec file, skipping the first line
@@ -88,21 +110,37 @@ eigenvec_file = sys.argv[1]
 with open(eigenvec_file, 'r') as f:
     lines = f.readlines()[1:]
 
+# Read the ethnicities file
+ethnicities_file = sys.argv[2]
+with open(ethnicities_file, 'r') as f:
+    ethnicities = {line.split()[0]: line.split()[1] for line in f.readlines()}
+
 # Extract data from the file
 x_values = [float(line.split()[2]) for line in lines]
 y_values = [float(line.split()[3]) for line in lines]
 
+# Group samples by ethnicity
+colors = defaultdict(lambda: len(colors))
+c_values = [colors[ethnicities[line.split()[0]]] for line in lines]
+
 # Create a scatter plot
 plt.figure(figsize=(8, 6))
-plt.scatter(x_values, y_values, marker='.', color='b')
+scatter = plt.scatter(x_values, y_values, c=c_values, cmap='tab20', marker='.')
+
+# Create a legend
+handles = []
+labels = []
+for ethnicity, color_index in colors.items():
+    handles.append(plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=plt.cm.tab20(color_index), markersize=10))
+    labels.append(ethnicity)
+
+plt.legend(handles, labels, loc='upper right', title='Ethnicity')
+
 plt.xlabel('PC1')
 plt.ylabel('PC2')
 plt.title('Principal Component Analysis')
 plt.grid(True)
 plt.show()
-
-
-# problem - HGDP data uses 36 build and my data = 38 build. thus the SNPs are not really overlapping. need to come up with something or use a different dataset with the same build. let's see!
 
  Simons:
  accessed at https://www.simonsfoundation.org/simons-genome-diversity-project/ via cancer genomics cloud seven bridges
