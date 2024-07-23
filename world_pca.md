@@ -118,6 +118,7 @@ plink --file 3all --missing-code -9,0,NA,na --make-bed --out all2
 
 merging my dataset with world dataset
 ```bash
+??? awk '{print $2}' all2.bim > all2_rsids.txt
 awk 'NR==FNR{a[$1];next}($2 in a){print $2,$4}' all2_rsids.txt kaz9.bim > mapped_rsids.txt
 plink --bfile kaz9 --extract  mapped_rsids.txt --make-bed --out kaz10
 plink --bfile all2 --extract  mapped_rsids.txt --make-bed --out all3
