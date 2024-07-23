@@ -51,8 +51,6 @@ awk -F"\t" '{if ($5 == "Mongolian") print $1, $2}' metadata.txt > list_mongolian
 awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_mongolian.txt > list_mongolian1.txt
 awk -F"\t" '{if ($5 == "Northern Han") print $1, $2}' metadata.txt > list_northernhan.txt
 awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_northernhan.txt > list_northernhan1.txt
-awk -F"\t" '{if ($5 == "French") print $1, $2}' metadata.txt > list_french.txt
-awk '{ if ($2 == "female") $2 = 2; else if ($2 == "male") $2 = 1; print $1 "\t" $2 }' list_french.txt > list_french1.txt
 ```
 
 got those rows corresponding to sample IDs in lists:
@@ -66,14 +64,13 @@ awk 'NR==FNR {a[$1]; next} $1 in a' list_adygei1.txt HGDP2.txt > adygei_SNP.txt
 awk 'NR==FNR {a[$1]; next} $1 in a' list_hazara1.txt HGDP2.txt > hazara_SNP.txt
 awk 'NR==FNR {a[$1]; next} $1 in a' list_mongolian1.txt HGDP2.txt > mongolian_SNP.txt
 awk 'NR==FNR {a[$1]; next} $1 in a' list_northernhan1.txt HGDP2.txt > northernhan_SNP.txt
-awk 'NR==FNR {a[$1]; next} $1 in a' list_french1.txt HGDP2.txt > french_SNP.txt
 ```
 
 making proper map/ped files from them: 
 merged 3 together
 ```bash
-cat list_japanese1.txt list_russian1.txt list_yakut1.txt list_uygur1.txt list_sardinian1.txt list_adygei1.txt list_hazara1.txt list_mongolian1.txt list_northernhan1.txt list_french1.txt > all_1_1.ped
-cat japanese_SNP.txt russian_SNP.txt yakut_SNP.txt uygur_SNP.txt sardinian_SNP.txt adygei_SNP.txt hazara_SNP.txt mongolian_SNP.txt northernhan_SNP.txt french_SNP.txt > all_1_2.ped
+cat list_japanese1.txt list_russian1.txt list_yakut1.txt list_uygur1.txt list_sardinian1.txt list_adygei1.txt list_hazara1.txt list_mongolian1.txt list_northernhan1.txt > all_1_1.ped
+cat japanese_SNP.txt russian_SNP.txt yakut_SNP.txt uygur_SNP.txt sardinian_SNP.txt adygei_SNP.txt hazara_SNP.txt mongolian_SNP.txt northernhan_SNP.txt > all_1_2.ped
 ```
 
 splitting genotypes into 2 columns
@@ -189,7 +186,7 @@ fig.write_html('interactive_plot.html')
 fig.show()
 ```
 
-To do: include other populations for central asian PCA - Pathan, Uygur, Yakut, Russian,Mongolian,Hazara,Adygei,Mongolian
+To do: include other populations for central asian PCA - Pathan, Uygur
 
 More data to use for PCA:
 
