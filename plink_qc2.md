@@ -127,19 +127,38 @@ I removed relatives from that list I created manually
 plink --bfile kaz6 --remove 0.2_low_call_rate_pihat.txt --make-bed --out kaz7
 ```
 
-7) let's remove all non-autosomal regions
+7) remove non-acgt nucleotides
 ```bash
-awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' kaz7.bim > snp_1_22.txt
-plink --bfile kaz7 --extract snp_1_22.txt --make-bed --out kaz8
+plink --bfile kaz7 --snps-only 'just-acgt' --make-bed --out kaz8
+```  
+
+8) let's remove all non-autosomal regions
+```bash
+awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' kaz8.bim > snp_1_22.txt
+plink --bfile kaz8 --extract snp_1_22.txt --make-bed --out kaz9_autosomal
 ```
 
-8) create table of MAFs
+let's take out Y chromosome and mitochondrial SNPs; keep in mind that X=23,Y=24,XY=25,MT=26:
 ```bash
-plink  --bfile kaz7  --freq --out maf_kaz7
+awk '{ if ($1 == 26) print $2 }' kaz8.bim > snp_mitoch.txt
+plink --bfile kaz8 --extract snp_mitoch.txt --make-bed --out kaz9_mitoch
+awk '{ if ($1 == 24) print $2 }' kaz8.bim > snp_y.txt
+plink --bfile kaz8 --extract snp_y.txt --make-bed --out kaz9_y_chr
+```
+Warning: 1 het. haploid genotype present (see kaz9_y_chr.hh ); many commands
+treat these as missing.
+Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
+treat these as missing.
+
+10) create table of MAFs
+```bash
+plink  --bfile kaz9  --freq --out maf_kaz9
 ```
 
-9) remove non-acgt nucleotides; plink binary to vcf
+10) plink binary to vcf
  ```bash
-plink --bfile kaz8 --snps-only 'just-acgt' --make-bed --out kaz9
 plink --bfile kaz9 --recode vcf
+plink --bfile kaz9_mitoch --recode vcf
+plink --bfile kaz9_y_chr --recode vcf
 ```
+
