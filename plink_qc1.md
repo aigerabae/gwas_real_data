@@ -7,7 +7,7 @@ sed 1d phenotypes.tsv > phenotypes1.tsv
 
 2) removed extra spaces and tabs from ped file
 ```bash
-awk -F'\t' '{gsub(/[[:space:]]+/,"\t"); print}' HB00001157.ped > kaz.ped
+sed 's/[[:space:]]\+/\t/g' HB00001157.ped > kaz.ped
 ```
 
 3) sorting phenotypes file and kaz.ped so that both are ordered the same according to ID column (2)
