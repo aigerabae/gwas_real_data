@@ -3,11 +3,54 @@ This file contains further processing the resulting ped and map files; in this a
 1) ped map to binary
 
 ```bash
-plink --file kaz --make-bed --out kaz1
+plink --file kaz --make-bed --out kaz
 ```
 "Warning: 532649 het. haploid genotypes present (see kaz1.hh ); many commands treat these as missing.
 Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands treat these as missing.
 This warning means this data file has wrongfully assigned phenotypes"
+
+- create histogram of calling rate and remove individuals with low calling rate using phenotypes.tsv
+```bash
+awk 'FNR==NR {fam[$1]; next} $2 in fam {print $2, $5}' kaz1.fam phenotypes.tsv > calling_rate.txt
+```
+
+Let's write a script that would plot the histogram for us in a pdf file
+```bash
+nano create_histogram.py 
+```
+
+```python
+#!/usr/bin/env python3
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import sys
+
+def main():
+    # Read the data from the file
+    data = pd.read_csv('calling_rate.txt', delim_whitespace=True, header=None, names=['Column1', 'Column2'])
+
+    # Create a histogram of the values in column 1
+    plt.figure(figsize=(10, 6))
+    plt.hist(data['Column2'], bins=50, edgecolor='black')
+    plt.xlabel('Samples')
+    plt.ylabel('Frequency')
+    plt.title('Histogram of Calling Rate of Samples')
+
+    # Save the histogram as a PDF
+    plt.savefig('calling_rate_hist.pdf')
+    plt.close()
+```
+
+```bash
+chmod +x create_histogram.py
+./create_histogram.py
+```
+
+Viewing the histogram - there are some low calling individuals; let's remove them from out binary kaz files
+awk '$2 < 0.9 {print $1,$1}' calling_rate.txt > low_calling_rate.txt
+plink --bfile kaz --remove low_calling_rate.txt --make-bed --out kaz1
+
 
 2) let's view X chromosome inbreeding (homozygosity) estimate F, plot it, and then impute sex
 ```bash
