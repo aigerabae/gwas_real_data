@@ -1,0 +1,27 @@
+PLINK v1.90b7.2 64-bit (11 Dec 2023)
+Options in effect:
+  --bfile kaz1
+  --check-sex
+
+Hostname: Aygerims-MacBook-Pro.local
+Working directory: /Users/aygera/biostar/gwas/redo_july/p2
+Start time: Wed Jul 24 14:03:52 2024
+
+Random number seed: 1721811832
+8192 MB RAM detected; reserving 4096 MB for main workspace.
+766221 variants loaded from .bim file.
+262 people (133 males, 129 females) loaded from .fam.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 262 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Warning: 52344 het. haploid genotypes present (see plink.hh ); many commands
+treat these as missing.
+Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
+treat these as missing.
+Total genotyping rate is 0.984513.
+766221 variants and 262 people pass filters and QC.
+Note: No phenotypes present.
+--check-sex: 25140 Xchr and 0 Ychr variant(s) scanned, 11 problems detected.
+Report written to plink.sexcheck .
+
+End time: Wed Jul 24 14:03:52 2024
