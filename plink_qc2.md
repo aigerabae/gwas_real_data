@@ -162,3 +162,21 @@ plink --bfile kaz9_mitoch --recode vcf
 plink --bfile kaz9_y_chr --recode vcf
 ```
 
+figuring out names of SNPs:
+awk '$2 !~ /^rs/ {print}' kaz8.bim | sort -k2,2 > non_rs_SNP.txt
+
+list of different namings:
+awk '$2 ~ /^seq_rs/' non_rs_SNP.txt | wc -l
+awk '$2 ~ /^GSA-/' non_rs_SNP.txt | wc -l
+awk '$2 ~ /^kgp/' non_rs_SNP.txt | wc -l
+awk '$2 ~ /^ilmnseq_rs/' non_rs_SNP.txt | wc -l
+awk '$2 ~ /^ilmnseq_/' non_rs_SNP.txt | wc -l
+awk '$2 ~ /^exm/' non_rs_SNP.txt | wc -l
+awk '$2 ~ /^chr/' non_rs_SNP.txt | wc -l
+awk '$2 ~ /^X:/' non_rs_SNP.txt | wc -l
+awk '$2 ~ /^Y:/' non_rs_SNP.txt | wc -l
+awk '$2 ~ /^TOP-rs/' non_rs_SNP.txt | wc -l
+awk '$2 ~ /^TOP2-rs/' non_rs_SNP.txt | wc -l
+awk '$2 ~ /^Mito/' non_rs_SNP.txt | wc -l
+awk '$2 ~ /^MTReverse/' non_rs_SNP.txt | wc -l
+awk '$2 ~ /^JHU_/' non_rs_SNP.txt | wc -l
