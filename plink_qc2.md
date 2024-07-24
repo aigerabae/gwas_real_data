@@ -72,46 +72,73 @@ plink --bfile kaz2 --remove problem_individuals.txt --make-bed --out kaz3
 
 3) individuals removed; the rest should have their sex assigned correctly
 
-
-4) let's remove all non-autosomal regions
+4) remove missing
 ```bash
-awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' kaz3.bim > snp_1_22.txt
-plink --bfile kaz3 --extract snp_1_22.txt --make-bed --out kaz4
+plink --bfile kaz3 --geno 0.02 --make-bed --out kaz4
+plink --bfile kaz4 --mind 0.02 --make-bed --out kaz5
 ```
+5) remove low MAFs
+plink --bfile kaz5 --maf 0.001 --make-bed --out kaz6
 
-5) remove missing
+6) crytic relatedness
 ```bash
-plink --bfile kaz4 --geno 0.02 --make-bed --out kaz5
-plink --bfile kaz5 --mind 0.02 --make-bed --out kaz6
-```
-
-6) remove low MAFs; create table of MAFs
-```bash
-plink --bfile kaz6 --maf 0.01 --make-bed --out kaz7
-plink  --bfile kaz7  --freq --out maf_kaz7
-```
-
-7) crytic relatedness
-```bash
-plink --bfile kaz7 --genome --min 0.2 --out pihat_min0.2
-plink --bfile kaz7 --missing --out missing_report
+plink --bfile kaz6 --genome --min 0.2 --out pihat_min0.2
+plink --bfile kaz6 --missing --out missing_report
 awk '$10 > 0.2 {print $1, $2, $3, $4}' pihat_min0.2.genome > related_pairs.txt
 ```
+I manually sorted through that file to keep as many individuals with the lowest missingness scores as possible while removing relatives; I put relatives that should be removed in 0.2_low_call_rate_pihat.txt: 
+5	5
+6	6
+8	8
+16	16
+20	20
+22	22
+25	25
+73	73
+81	81
+82	82
+100	100
+104	104
+105	105
+107	107
+108	108
+117	117
+122	122
+125	125
+126	126
+142	142
+WE019	WE019
+WE058	WE058
+WE070	WE070
+WE091	WE091
+WE092	WE092
 
-I manually sorted through that file to keep as many individuals with the lowest missingness scores as possible while removing relatives; I put relatives that should be removed in 0.2_low_call_rate_pihat.txt
 search for F value: 
 
 ```bash
-id=WE002 
+id=WE002
+# example ID
 awk -v id="$id" '$2 == id {print $6}' missing_report.imiss
+# prints its respective missingness rate
 ```
 
 I removed relatives from that list I created manually
 ```bash
-plink --bfile kaz7 --remove 0.2_low_call_rate_pihat.txt --make-bed --out kaz8
+plink --bfile kaz6 --remove 0.2_low_call_rate_pihat.txt --make-bed --out kaz7
 ```
 
-8) remove non-acgt nucleotides; plink binary to vcf
+7) let's remove all non-autosomal regions
+```bash
+awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' kaz7.bim > snp_1_22.txt
+plink --bfile kaz7 --extract snp_1_22.txt --make-bed --out kaz8
+```
+
+8) create table of MAFs
+```bash
+plink  --bfile kaz7  --freq --out maf_kaz7
+```
+
+9) remove non-acgt nucleotides; plink binary to vcf
  ```bash
 plink --bfile kaz8 --snps-only 'just-acgt' --make-bed --out kaz9
 plink --bfile kaz9 --recode vcf
