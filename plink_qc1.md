@@ -72,9 +72,7 @@ cat phenotypes5.tsv | wc -l
 ```
 perfect!
 
-7) I create a table phenotypes9.tsv that has numeric representations of data in phenotype8.tsv. 
-1) I used Sample ID from column 2
-2) I  used sex data in column 13 where Sex (1=male; 2=female; other=unknown)
+7) encode sex data from column 13 where 1=male; 2=female; other=unknown
 ```bash
 cat phenotypes5.tsv | cut -f 2,13 > phenotypes6.tsv
 awk -F"\t" 'BEGIN {OFS="\t"} { $2 = ($2 ~ /^ *male *$/) ? 1 : ($2 ~ /^ *female *$/) ? 2 : $2; print }' phenotypes6.tsv > phenotypes7.tsv
