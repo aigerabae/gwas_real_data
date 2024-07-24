@@ -9,7 +9,6 @@ plink --file kaz --make-bed --out kaz1
 Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands treat these as missing.
 This warning means this data file has wrongfully assigned phenotypes"
 
-
 2) let's view X chromosome inbreeding (homozygosity) estimate F, plot it, and then impute sex
 ```bash
 plink --bfile kaz1 --check-sex
