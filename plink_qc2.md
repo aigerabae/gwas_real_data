@@ -53,13 +53,14 @@ plink --bfile kaz --remove low_calling_rate.txt --make-bed --out kaz1
 
 
 2) let's view X chromosome inbreeding (homozygosity) estimate F, plot it, and then impute sex
+
 ```bash
 plink --bfile kaz1 --check-sex
 Rscript --no-save gender_check.R
 ```
 
-some individuals are clearly just misgendered and 3 are unclear (intermediate values)
-Let's impute those who are just assigned wrong sex
+3) some individuals are clearly just misgendered and 3 are unclear (intermediate values); let's get misgendered individuals removed; the rest should have their sex assigned correctly
+
 ```bash
 plink --bfile kaz1 --impute-sex --make-bed --out kaz2
 ```
@@ -69,8 +70,6 @@ plink --bfile kaz2 --check-sex --out kaz2
 awk '$5 == "PROBLEM" {print $1, $2}' kaz2.sexcheck > problem_individuals.txt
 plink --bfile kaz2 --remove problem_individuals.txt --make-bed --out kaz3
 ```
-
-3) individuals removed; the rest should have their sex assigned correctly
 
 4) remove missing
 ```bash
@@ -130,20 +129,30 @@ plink --bfile kaz6 --remove 0.2_low_call_rate_pihat.txt --make-bed --out kaz7
 7) remove non-acgt nucleotides
 ```bash
 plink --bfile kaz7 --snps-only 'just-acgt' --make-bed --out kaz8
-```  
+```
 
-8) let's remove all non-autosomal regions
+8) figuring out names of SNPs:
+
+Let's convert them to standard names using Illumina Infinium Global Screening Array v2.0 Loci Name to rsID Conversion File (https://support.illumina.com/downloads/infinium-global-screening-array-v2-0-support-files.html) and exclude those SNPs that couldn't be converted to standard names
+
 ```bash
-awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' kaz8.bim > snp_1_22.txt
-plink --bfile kaz8 --extract snp_1_22.txt --make-bed --out kaz9_autosomal
+plink --bfile kaz8 --update-name GSA-24v2-0_A1_b150_rsids.txt --make-bed --out kaz9
+awk '$2 !~ /^rs/ {print}' kaz9.bim | sort -k2,2 > non_rs_SNP.txt
+plink --bfile kaz9 --exclude non_rs_SNP.txt --make-bed --out kaz10
+```
+
+9) let's remove all non-autosomal regions
+```bash
+awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' kaz10.bim > snp_1_22.txt
+plink --bfile kaz10 --extract snp_1_22.txt --make-bed --out kaz10_autosomal
 ```
 
 let's take out Y chromosome and mitochondrial SNPs; keep in mind that X=23,Y=24,XY=25,MT=26:
 ```bash
-awk '{ if ($1 == 26) print $2 }' kaz8.bim > snp_mitoch.txt
-plink --bfile kaz8 --extract snp_mitoch.txt --make-bed --out kaz9_mitoch
-awk '{ if ($1 == 24) print $2 }' kaz8.bim > snp_y.txt
-plink --bfile kaz8 --extract snp_y.txt --make-bed --out kaz9_y_chr
+awk '{ if ($1 == 26) print $2 }' kaz10.bim > snp_mitoch.txt
+plink --bfile kaz10 --extract snp_mitoch.txt --make-bed --out kaz10_mitoch
+awk '{ if ($1 == 24) print $2 }' kaz10.bim > snp_y.txt
+plink --bfile kaz10 --extract snp_y.txt --make-bed --out kaz10_y_chr
 ```
 Warning: 1 het. haploid genotype present (see kaz9_y_chr.hh ); many commands
 treat these as missing.
@@ -152,31 +161,13 @@ treat these as missing.
 
 10) create table of MAFs
 ```bash
-plink  --bfile kaz9  --freq --out maf_kaz9
+plink  --bfile kaz10  --freq --out maf_kaz10
+plink  --bfile kaz10_autosomal  --freq --out maf_kaz10_autosomal
 ```
 
-10) plink binary to vcf
+11) plink binary to vcf
  ```bash
-plink --bfile kaz9 --recode vcf
-plink --bfile kaz9_mitoch --recode vcf
-plink --bfile kaz9_y_chr --recode vcf
+plink --bfile kaz10_autosomal --recode vcf
+plink --bfile kaz10_mitoch --recode vcf
+plink --bfile kaz10_y_chr --recode vcf
 ```
-
-figuring out names of SNPs:
-awk '$2 !~ /^rs/ {print}' kaz8.bim | sort -k2,2 > non_rs_SNP.txt
-
-list of different namings:
-awk '$2 ~ /^seq_rs/' non_rs_SNP.txt | wc -l
-awk '$2 ~ /^GSA-/' non_rs_SNP.txt | wc -l
-awk '$2 ~ /^kgp/' non_rs_SNP.txt | wc -l
-awk '$2 ~ /^ilmnseq_rs/' non_rs_SNP.txt | wc -l
-awk '$2 ~ /^ilmnseq_/' non_rs_SNP.txt | wc -l
-awk '$2 ~ /^exm/' non_rs_SNP.txt | wc -l
-awk '$2 ~ /^chr/' non_rs_SNP.txt | wc -l
-awk '$2 ~ /^X:/' non_rs_SNP.txt | wc -l
-awk '$2 ~ /^Y:/' non_rs_SNP.txt | wc -l
-awk '$2 ~ /^TOP-rs/' non_rs_SNP.txt | wc -l
-awk '$2 ~ /^TOP2-rs/' non_rs_SNP.txt | wc -l
-awk '$2 ~ /^Mito/' non_rs_SNP.txt | wc -l
-awk '$2 ~ /^MTReverse/' non_rs_SNP.txt | wc -l
-awk '$2 ~ /^JHU_/' non_rs_SNP.txt | wc -l
