@@ -3,15 +3,16 @@ This file contains further processing the resulting ped and map files; in this a
 1) ped map to binary
 
 ```bash
-plink --file kaz --make-bed --out kaz
+plink --file kaz --make-bed --out kaz1
 ```
-"Warning: 532649 het. haploid genotypes present (see kaz1.hh ); many commands treat these as missing.
-Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands treat these as missing.
-This warning means this data file has wrongfully assigned phenotypes"
+"Warning: 52344 het. haploid genotypes present (see kaz1.hh ); many commands treat these as missing.
+Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands treat these as missing"
+
+This warning means this data file has wrongfully assigned phenotypes (or low quality reads)
 
 - create histogram of calling rate and remove individuals with low calling rate using phenotypes.tsv
 ```bash
-awk 'FNR==NR {fam[$1]; next} $2 in fam {print $2, $5}' kaz.fam phenotypes.tsv > calling_rate.txt
+awk 'FNR==NR {fam[$1]; next} $2 in fam {print $2, $5}' kaz1.fam phenotypes.tsv > calling_rate.txt
 ```
 
 Let's write a script that would plot the histogram for us in a pdf file
@@ -27,10 +28,16 @@ import matplotlib.pyplot as plt
 import sys
 
 def main():
-    # Read the data from the file
-    data = pd.read_csv('calling_rate.txt', delim_whitespace=True, header=None, names=['Column1', 'Column2'])
+    if len(sys.argv) != 2:
+        print("Usage: ./script_name.py <input_file>")
+        sys.exit(1)
 
-    # Create a histogram of the values in column 1
+    input_file = sys.argv[1]
+
+    # Read the data from the file
+    data = pd.read_csv(input_file, delim_whitespace=True, header=None, names=['Column1', 'Column2'])
+
+    # Create a histogram of the values in column 2
     plt.figure(figsize=(10, 6))
     plt.hist(data['Column2'], bins=50, edgecolor='black')
     plt.xlabel('Samples')
@@ -40,36 +47,34 @@ def main():
     # Save the histogram as a PDF
     plt.savefig('calling_rate_hist.pdf')
     plt.close()
+
+if __name__ == "__main__":
+    main()
 ```
 
 ```bash
 chmod +x create_histogram.py
-./create_histogram.py
+./create_histogram.py calling_rate.txt
 ```
 
 Viewing the histogram - there are some low calling individuals; let's remove them from out binary kaz files
 ```bash
 awk '$2 < 0.9 {print $1,$1}' calling_rate.txt > low_calling_rate.txt
-plink --bfile kaz --remove low_calling_rate.txt --make-bed --out kaz1
+plink --bfile kaz1 --remove low_calling_rate.txt --make-bed --out kaz2
 ```
 
 2) let's view X chromosome inbreeding (homozygosity) estimate F, plot it, and then impute sex
 
 ```bash
-plink --bfile kaz1 --check-sex
+plink --bfile kaz2 --check-sex
 Rscript --no-save gender_check.R
 ```
 
-3) some individuals are clearly just misgendered and 3 are unclear (intermediate values); let's get misgendered individuals removed; the rest should have their sex assigned correctly
+If we use ycount option we can see that females (as seen by their X chromosome F) have non-zero Y chromosome count (around 1000) while males have it around 6000
 
+3) let's impute sex for those 7 who were misgendered
 ```bash
-plink --bfile kaz1 --impute-sex --make-bed --out kaz2
-```
-
-```bash
-plink --bfile kaz2 --check-sex --out kaz2
-awk '$5 == "PROBLEM" {print $1, $2}' kaz2.sexcheck > problem_individuals.txt
-plink --bfile kaz2 --remove problem_individuals.txt --make-bed --out kaz3
+plink --bfile kaz2 --impute-sex --make-bed --out kaz23
 ```
 
 4) remove missing
