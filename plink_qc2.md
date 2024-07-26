@@ -148,13 +148,24 @@ plink --bfile kaz7 --snps-only 'just-acgt' --make-bed --out kaz8
 
 8) figuring out names of SNPs:
 
-Let's convert them to standard names using Illumina Infinium Global Screening Array v2.0 Loci Name to rsID Conversion File (https://support.illumina.com/downloads/infinium-global-screening-array-v2-0-support-files.html) and exclude those SNPs that couldn't be converted to standard names
+Let's convert them to standard names using Illumina Infinium Global Screening Array v2.0 Loci Name to rsID Conversion File (https://support.illumina.com/downloads/infinium-global-screening-array-v2-0-support-files.html) and exclude those SNPs that couldn't be converted to standard names; but first let's remove duplicates and names with more than 1 rsID (separated by comma)
 
 ```bash
-plink --bfile kaz8 --update-name GSA-24v2-0_A1_b150_rsids.txt --make-bed --out kaz9
-awk '$2 !~ /^rs/ {print}' kaz9.bim | sort -k2,2 > non_rs_SNP.txt
+awk -F'\t' '!seen[$2]++' GSA-24v2-0_A1_b150_rsids.txt | awk -F'\t' '$2 !~ /,/' > GSA-dictionary.txt
+```
+
+```bash
+plink --bfile kaz8 --update-name GSA-dictionary.txt --make-bed --out kaz9
+awk '$2 !~ /^rs/' kaz9.bim | sort -k2,2 > non_rs_SNP.txt
 plink --bfile kaz9 --exclude non_rs_SNP.txt --make-bed --out kaz10
 ```
+
+checking if any non standard names remain
+```bash
+awk '$2 !~ /^rs/ {print}' kaz10.bim | sort -k2,2 
+```
+
+Nope! all clean
 
 9) let's remove all non-autosomal regions
 ```bash
