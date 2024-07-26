@@ -11,7 +11,7 @@ This warning means this data file has wrongfully assigned phenotypes"
 
 - create histogram of calling rate and remove individuals with low calling rate using phenotypes.tsv
 ```bash
-awk 'FNR==NR {fam[$1]; next} $2 in fam {print $2, $5}' kaz1.fam phenotypes.tsv > calling_rate.txt
+awk 'FNR==NR {fam[$1]; next} $2 in fam {print $2, $5}' kaz.fam phenotypes.tsv > calling_rate.txt
 ```
 
 Let's write a script that would plot the histogram for us in a pdf file
