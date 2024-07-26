@@ -94,6 +94,12 @@ plink --bfile kaz6 --missing --out missing_report
 awk '$10 > 0.2 {print $1, $2, $3, $4}' pihat_min0.2.genome > related_pairs.txt
 ```
 I manually sorted through that file to keep as many individuals with the lowest missingness scores as possible while removing relatives; I put relatives that should be removed in 0.2_low_call_rate_pihat.txt: 
+
+```bash
+nano 0.2_low_call_rate_pihat.txt
+```
+
+```bash
 5	5
 6	6
 8	8
@@ -119,6 +125,7 @@ WE058	WE058
 WE070	WE070
 WE091	WE091
 WE092	WE092
+```
 
 search for F value: 
 
