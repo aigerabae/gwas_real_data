@@ -48,9 +48,10 @@ chmod +x create_histogram.py
 ```
 
 Viewing the histogram - there are some low calling individuals; let's remove them from out binary kaz files
+```bash
 awk '$2 < 0.9 {print $1,$1}' calling_rate.txt > low_calling_rate.txt
 plink --bfile kaz --remove low_calling_rate.txt --make-bed --out kaz1
-
+```
 
 2) let's view X chromosome inbreeding (homozygosity) estimate F, plot it, and then impute sex
 
