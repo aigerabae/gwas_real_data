@@ -74,7 +74,7 @@ If we use ycount option we can see that females (as seen by their X chromosome F
 
 3) let's impute sex for those 7 who were misgendered
 ```bash
-plink --bfile kaz2 --impute-sex --make-bed --out kaz23
+plink --bfile kaz2 --impute-sex --make-bed --out kaz3
 ```
 
 4) remove missing
