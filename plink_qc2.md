@@ -151,7 +151,7 @@ plink --bfile kaz7 --snps-only 'just-acgt' --make-bed --out kaz8
 Let's convert them to standard names using Illumina Infinium Global Screening Array v2.0 Loci Name to rsID Conversion File (https://support.illumina.com/downloads/infinium-global-screening-array-v2-0-support-files.html) and exclude those SNPs that couldn't be converted to standard names; but first let's remove duplicates and names with more than 1 rsID (separated by comma)
 
 ```bash
-awk -F'\t' '!seen[$2]++' GSA-24v2-0_A1_b150_rsids.txt | awk -F'\t' '$2 !~ /,/' > GSA-dictionary.txt
+awk -F'\t' '!seen[$1]++' GSA-24v2-0_A1_b150_rsids.txt | awk -F'\t' '!seen[$2]++' | awk -F'\t' '$2 !~ /,/' > GSA-dictionary.txt
 ```
 
 ```bash
@@ -164,36 +164,41 @@ checking if any non standard names remain
 ```bash
 awk '$2 !~ /^rs/ {print}' kaz10.bim | sort -k2,2 
 ```
-
 Nope! all clean
+
+let's remove any duplicates and return it in plink1.9 version
+```bash
+plink2 --bfile kaz10 --rm-dup exclude-all --make-bed --out kaz11
+plink --bfile kaz11 --make-bed --out kaz12
+```
 
 9) let's remove all non-autosomal regions
 ```bash
-awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' kaz10.bim > snp_1_22.txt
-plink --bfile kaz10 --extract snp_1_22.txt --make-bed --out kaz10_autosomal
+awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' kaz12.bim > snp_1_22.txt
+plink --bfile kaz12 --extract snp_1_22.txt --make-bed --out kaz12_autosomal
 ```
 
 let's take out Y chromosome and mitochondrial SNPs; keep in mind that X=23,Y=24,XY=25,MT=26:
 ```bash
-awk '{ if ($1 == 26) print $2 }' kaz10.bim > snp_mitoch.txt
-plink --bfile kaz10 --extract snp_mitoch.txt --make-bed --out kaz10_mitoch
-awk '{ if ($1 == 24) print $2 }' kaz10.bim > snp_y.txt
-plink --bfile kaz10 --extract snp_y.txt --make-bed --out kaz10_y_chr
+awk '{ if ($1 == 26) print $2 }' kaz12.bim > snp_mitoch.txt
+plink --bfile kaz12 --extract snp_mitoch.txt --make-bed --out kaz12_mitoch
+awk '{ if ($1 == 24) print $2 }' kaz12.bim > snp_y.txt
+plink --bfile kaz12 --extract snp_y.txt --make-bed --out kaz12_y_chr
 ```
-Warning: 1 het. haploid genotype present (see kaz9_y_chr.hh ); many commands
-treat these as missing.
-Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
-treat these as missing.
 
 10) create table of MAFs
 ```bash
-plink  --bfile kaz10  --freq --out maf_kaz10
-plink  --bfile kaz10_autosomal  --freq --out maf_kaz10_autosomal
+plink2 --bfile kaz12  --freq --out maf_kaz12
+plink2 --bfile kaz12_autosomal  --freq --out maf_kaz12_autosomal
+plink2 --bfile kaz12_mitoch  --freq --out maf_kaz12_mitoch
+plink2 --bfile kaz12_y_chr --freq --out maf_kaz12_y_chr
 ```
 
 11) plink binary to vcf
  ```bash
-plink --bfile kaz10_autosomal --recode vcf
-plink --bfile kaz10_mitoch --recode vcf
-plink --bfile kaz10_y_chr --recode vcf
+plink --bfile kaz12_autosomal --recode vcf --out kaz12_autosomal
+plink --bfile kaz12_mitoch --recode vcf --out kaz12_mitoch
+plink --bfile kaz12_y_chr --recode vcf --out kaz12_y_chr
 ```
+
+12) annovar
