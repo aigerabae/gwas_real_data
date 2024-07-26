@@ -83,7 +83,9 @@ plink --bfile kaz3 --geno 0.02 --make-bed --out kaz4
 plink --bfile kaz4 --mind 0.02 --make-bed --out kaz5
 ```
 5) remove low MAFs
+```bash
 plink --bfile kaz5 --maf 0.001 --make-bed --out kaz6
+```
 
 6) crytic relatedness
 ```bash
