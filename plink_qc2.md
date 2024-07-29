@@ -201,4 +201,13 @@ plink --bfile kaz12_mitoch --recode vcf --out kaz12_mitoch
 plink --bfile kaz12_y_chr --recode vcf --out kaz12_y_chr
 ```
 
-12) annovar
+12) adding additional info to vcf file (MAF and allele count)
+bcftools view -h kaz12_autosomal.vcf > kaz_a1.vcf
+bcftools view -H kaz12_autosomal.vcf > kaz_a2.vcf
+cat maf_kaz12_autosomal.afreq | tail -n +2 | cut -f 6,7 > added_info.txt
+cat maf_kaz12_autosomal.afreq | head -n 1 | cut -f 6,7 > added_header.txt
+(cat kaz_a1.vcf | sed '$d'; paste <(tail -n 1 kaz_a1.vcf) added_header.txt) > kaz_a4.vcf
+paste kaz_a2.vcf added_info.txt > kaz_a3.vcf
+cat kaz_a4.vcf kaz_a3.vcf > kaz_a5.vcf
+
+14) annovar
