@@ -231,6 +231,7 @@ awk '{print $1"\t" $1"\t" "0\t" "0\t" $2"\t" "-9\t"}' metadata.txt | tail -n +2 
 awk -F'\t' '{ if ($5 == "male") $5 = 1; else if ($5 == "female") $5 = 2; print }' OFS='\t' HGDP0.ped > HGDP1.ped
 
 
+NEED to transpose!! Task #1!!
 
 sort -k1,1 HGDP_transposed.txt > HGDP_sorted.txt
 sort -k1,1 HGDP1.ped > HGDP1_sorted.ped
