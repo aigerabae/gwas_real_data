@@ -215,4 +215,13 @@ cat kaz_a4.vcf kaz_a3.vcf > kaz_a5.vcf
 
 now the header has bcftools in it.. need to remove? 
 
+12) runs of homozygosity (ROH)
+
+plink --bfile kaz12_autosomal --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
+
+make HGDP into plink binary file
+
+
+use all populations from HDGP and SGDP for ROH and Fst and only selected eurasian populations for PCA
+
 12) annovar
