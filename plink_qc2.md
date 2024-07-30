@@ -72,22 +72,23 @@ Rscript --no-save gender_check.R
 
 If we use ycount option we can see that females (as seen by their X chromosome F) have non-zero Y chromosome count (around 1000) while males have it around 6000
 
-3) let's impute sex for those 7 who were misgendered
+Let's impute sex for those 7 who were misgendered
 ```bash
 plink --bfile kaz2 --impute-sex --make-bed --out kaz3
 ```
 
-4) remove missing
+3) remove missing
 ```bash
 plink --bfile kaz3 --geno 0.02 --make-bed --out kaz4
 plink --bfile kaz4 --mind 0.02 --make-bed --out kaz5
 ```
-5) remove low MAFs
+
+4) remove low MAFs
 ```bash
 plink --bfile kaz5 --maf 0.001 --make-bed --out kaz6
 ```
 
-6) crytic relatedness
+5) crytic relatedness
 ```bash
 plink --bfile kaz6 --genome --min 0.2 --out pihat_min0.2
 plink --bfile kaz6 --missing --out missing_report
@@ -141,12 +142,12 @@ I removed relatives from that list I created manually
 plink --bfile kaz6 --remove 0.2_low_call_rate_pihat.txt --make-bed --out kaz7
 ```
 
-7) remove non-acgt nucleotides
+6) remove non-acgt nucleotides
 ```bash
 plink --bfile kaz7 --snps-only 'just-acgt' --make-bed --out kaz8
 ```
 
-8) figuring out names of SNPs:
+7) figuring out names of SNPs:
 
 Let's convert them to standard names using Illumina Infinium Global Screening Array v2.0 Loci Name to rsID Conversion File (https://support.illumina.com/downloads/infinium-global-screening-array-v2-0-support-files.html) and exclude those SNPs that couldn't be converted to standard names; but first let's remove duplicates and names with more than 1 rsID (separated by comma)
 
@@ -172,7 +173,7 @@ plink2 --bfile kaz10 --rm-dup exclude-all --make-bed --out kaz11
 plink --bfile kaz11 --make-bed --out kaz12
 ```
 
-9) let's remove all non-autosomal regions
+8) let's remove all non-autosomal regions
 ```bash
 awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' kaz12.bim > snp_1_22.txt
 plink --bfile kaz12 --extract snp_1_22.txt --make-bed --out kaz12_autosomal
@@ -186,7 +187,7 @@ awk '{ if ($1 == 24) print $2 }' kaz12.bim > snp_y.txt
 plink --bfile kaz12 --extract snp_y.txt --make-bed --out kaz12_y_chr
 ```
 
-10) create table of MAFs
+9) create table of MAFs
 ```bash
 plink2 --bfile kaz12  --freq --out maf_kaz12
 plink2 --bfile kaz12_autosomal  --freq --out maf_kaz12_autosomal
@@ -194,14 +195,14 @@ plink2 --bfile kaz12_mitoch  --freq --out maf_kaz12_mitoch
 plink2 --bfile kaz12_y_chr --freq --out maf_kaz12_y_chr
 ```
 
-11) plink binary to vcf
+10) plink binary to vcf
  ```bash
 plink --bfile kaz12_autosomal --recode vcf --out kaz12_autosomal
 plink --bfile kaz12_mitoch --recode vcf --out kaz12_mitoch
 plink --bfile kaz12_y_chr --recode vcf --out kaz12_y_chr
 ```
 
-12) adding additional info to vcf file (MAF and allele count)
+11) adding additional info to vcf file (MAF and allele count)
 ```bash
 bcftools view -h kaz12_autosomal.vcf > kaz_a1.vcf
 bcftools view -H kaz12_autosomal.vcf > kaz_a2.vcf
@@ -214,4 +215,4 @@ cat kaz_a4.vcf kaz_a3.vcf > kaz_a5.vcf
 
 now the header has bcftools in it.. need to remove? 
 
-14) annovar
+12) annovar
