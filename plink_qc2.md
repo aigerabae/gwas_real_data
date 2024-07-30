@@ -200,6 +200,7 @@ plink2 --bfile kaz12_y_chr --freq --out maf_kaz12_y_chr
 plink --bfile kaz12_autosomal --recode vcf --out kaz12_autosomal
 plink --bfile kaz12_mitoch --recode vcf --out kaz12_mitoch
 plink --bfile kaz12_y_chr --recode vcf --out kaz12_y_chr
+plink --bfile kaz12 --recode vcf --out kaz12_all
 ```
 
 11) adding additional info to vcf file (MAF and allele count)
