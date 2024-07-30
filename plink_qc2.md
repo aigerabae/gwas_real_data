@@ -221,8 +221,39 @@ now the header has bcftools in it.. need to remove?
 plink --bfile kaz12_autosomal --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
 
 make HGDP into plink binary file
+Build 36.1 to 38
 
+Map file
+```bash
+awk '{print $2"\t" $1 "\t0\t" $3}' HGDP_Map.txt > HGDP.map
+```
 
+Ped file
+```bash
+awk '{print $1"\t" $1"\t" "0\t" "0\t" $2"\t" "-9\t"}' metadata.txt | tail -n +2 > HGDP0.ped
+awk -F'\t' '{ if ($5 == "male") $5 = 1; else if ($5 == "female") $5 = 2; print }' OFS='\t' HGDP0.ped > HGDP1.ped
+transpose -t HGDP.txt > HGDP_transposed.txt
+sort -k1,1 HGDP_transposed.txt > HGDP_sorted.txt
+sort -k1,1 HGDP1.ped > HGDP1_sorted.ped
+join -t$'\t' HGDP1_sorted.ped HGDP_sorted.txt > HGDP2.ped
+awk 'BEGIN{OFS="\t"} {printf "%s\t%s\t%s\t%s\t%s\t%s", $1, $2, $3, $4, $5, $6"\t"; for (i=7; i<=NF; i++) {for (j=1; j<=length($i); j++) {printf "%s\t", substr($i, j, 1)}}; print ""}' HGDP2.ped > HGDP3.ped
+sed 's/\t\t*/\t/g' HGDP3.ped > HGDP4.ped
+```
+
+Ped/map to plink binary
+```bash
+plink --ped HGDP3.ped --map HGDP.map --make-bed --out HGDP
+```
+
+Problem! There are only 784 lines and map file has 1 line more than expected (is that sample names?)
+
+installing transpose! available at https://sourceforge.net/projects/transpose/
+```bash
+cp ~/tools/transpose-2.0/src/transpose.c ~/bin/
+cd ~/bin
+gcc -o transpose transpose.c
+```
+
+ped file: FID, ID, PID, MID, Sex, Phenotype (space-separated),genotypes
 use all populations from HDGP and SGDP for ROH and Fst and only selected eurasian populations for PCA
 
-12) annovar
