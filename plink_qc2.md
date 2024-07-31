@@ -282,6 +282,23 @@ e) Ped/map to plink binary
 plink --file HGDP --missing-code -9,0,NA,na,- --make-bed --out HGDP
 ```
 
-ped file: FID, ID, PID, MID, Sex, Phenotype (space-separated),genotypes
+f) remap 36.1 to 38 build (for some reason cut wasnt working properly with chromosomes; i dont know why)
+comm -12 <(awk '{print $1}' dictionary_pos | sort) <(awk '{print $2}' HGDP.bim | sort) > common_snps.txt
+cat kaz12_autosomal.bim | awk '{print $2"\t" $1}' > dictionary_chr
+cat kaz12_autosomal.bim | cut -f 2,4 > dictionary_pos
+plink --bfile HGDP --extract common_snps.txt --make-bed --out HGDP1
+plink --bfile HGDP1 --update-chr dictionary_chr --make-bed --out HGDP2
+plink --bfile HGDP2 --update-map dictionary_pos --make-bed --out HGDP3
+
+?
+sort -k4,4n -t$'\t' HGDP3.bim > HGDP4.bim
+cp HGDP3.bed ./HGDP4.bed
+cp HGDP3.fam ./HGDP4.fam
+?
+
+Problem! Need to update the binary bed file using info in bed/fam files? Or just keep it unsorted? 
+
+Now need to do proper QC of these data and then do ROH and Fst analysis and also extract their ethicities and red PCA...
+
 use all populations from HDGP and SGDP for ROH and Fst and only selected eurasian populations for PCA
 
