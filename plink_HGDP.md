@@ -83,6 +83,7 @@ awk '$10 > 0.2 {print $1, $2, $3, $4}' pihat_min0.2.genome > related_pairs.txt
 nano remove_relatives.sh
 ```
 
+This script will remove relatives
 ```bash
 #!/bin/bash
 
