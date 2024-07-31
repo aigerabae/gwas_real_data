@@ -223,23 +223,58 @@ plink --bfile kaz12_autosomal --homozyg-density 60 --homozyg-gap 500 --homozyg-w
 make HGDP into plink binary file
 Build 36.1 to 38
 
-Map file
-
 Ped file
+a) getting p1 from phenotypes metadata, encoding male and female as 1 and 2, sorting
 ```bash
-awk '{print $1"\t" $1"\t" "0\t" "0\t" $2"\t" "-9\t"}' metadata.txt | tail -n +2 > HGDP0.ped
-awk -F'\t' '{ if ($5 == "male") $5 = 1; else if ($5 == "female") $5 = 2; print }' OFS='\t' HGDP0.ped > HGDP1.ped
+awk '{print $1"\t" $1"\t" "0\t" "0\t" $2"\t" "-9\t"}' metadata.txt | tail -n +2 > HGDP_p1_1.txt
+awk -F'\t' '{ if ($5 == "male") $5 = 1; else if ($5 == "female") $5 = 2; print }' OFS='\t' HGDP_p1_1.ped > HGDP_p1_2.txt
+sort -k1,1 HGDP_p1_2.txt > HGDP1_p1_3.txt
+```
 
+b) Transposing for p2 (genotypes)
+```bash
+split -l 90000 HGDP1.txt file_
+```
 
-NEED to transpose!! Task #1!!
+I renamed them to gtReport1 to gtReport8:
+```bash
+mv file_aa ./gtReport1
+mv file_ab ./gtReport2
+mv file_ac ./gtReport3
+mv file_ad ./gtReport4
+mv file_ae ./gtReport5
+mv file_af ./gtReport6
+mv file_ag ./gtReport7
+mv file_ah ./gtReport8
+```
 
-sort -k1,1 HGDP_transposed.txt > HGDP_sorted.txt
-sort -k1,1 HGDP1.ped > HGDP1_sorted.ped
-join -t$'\t' HGDP1_sorted.ped HGDP_sorted.txt > HGDP2.ped
-awk 'BEGIN{OFS="\t"} {printf "%s\t%s\t%s\t%s\t%s\t%s", $1, $2, $3, $4, $5, $6"\t"; for (i=7; i<=NF; i++) {for (j=1; j<=length($i); j++) {printf "%s\t", substr($i, j, 1)}}; print ""}' HGDP2.ped > HGDP3.ped
+then using the code below removed spaces and replaced them with tabs, then transposed it, sorted the file, removed empty lines from genotypes file, removed all intermediate files
+(takes about 1 hour to run)
+
+```bash
+process_file() {
+  file=$1
+  awk '{printf $1"\t"; for(i=2;i<=NF;i++){printf $i"\t"}; print ""}' "$file" > "${file}_converted.tsv"
+  awk -F'\t' 'NF' "${file}_converted.tsv" > "${file}_converted_cleaned.tsv"
+  datamash transpose < "${file}_converted_cleaned.tsv" > "${file}_transposed.tsv"
+}
+export -f process_file
+parallel -j 8 process_file ::: gtReport{1..8}
+for i in {1..8}; do sed -i '' 's/-/0/g' gtReport${i}_transposed.tsv; done
+paste gtReport{1..8}_transposed.tsv > HGDP_transposed.txt
+sort -k1,1 HGDP_transposed.txt | tail -n +2 > HGDP_p2_1.txt
+HGDP_p2_1 add tabs between characters
+rm *gtRe*
+```
+
+c) joining p1 and p2
+```bash
+join -t$'\t' HGDP_p1_3.txt HGDP_p2.txt > HGDP.ped
 sed 's/\t\t*/\t/g' HGDP3.ped > HGDP4.ped
 ```
 
+
+Map file
 ```bash
 awk '{print $2"\t" $1 "\t0\t" $3}' HGDP_Map.txt > HGDP4.map
 ```
