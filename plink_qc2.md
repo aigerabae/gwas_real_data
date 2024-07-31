@@ -283,12 +283,14 @@ plink --file HGDP --missing-code -9,0,NA,na,- --make-bed --out HGDP
 ```
 
 f) remap 36.1 to 38 build (for some reason cut wasnt working properly with chromosomes; i dont know why)
+```bash
 comm -12 <(awk '{print $1}' dictionary_pos | sort) <(awk '{print $2}' HGDP.bim | sort) > common_snps.txt
 cat kaz12_autosomal.bim | awk '{print $2"\t" $1}' > dictionary_chr
 cat kaz12_autosomal.bim | cut -f 2,4 > dictionary_pos
 plink --bfile HGDP --extract common_snps.txt --make-bed --out HGDP1
 plink --bfile HGDP1 --update-chr dictionary_chr --make-bed --out HGDP2
 plink --bfile HGDP2 --update-map dictionary_pos --make-bed --out HGDP3
+```
 
 ?
 sort -k4,4n -t$'\t' HGDP3.bim > HGDP4.bim
