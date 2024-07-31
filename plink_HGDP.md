@@ -138,3 +138,5 @@ tasks for thursday:
 - redo PCA: include only chosen populations into the final dataset, see how many of them will be present, rewrite the python script for making the PCA graph
 
 use all populations from HDGP and SGDP for ROH and Fst and only selected eurasian populations for PCA
+
+Find ALDH2 gene in kazakh and other populations and see whether we absorb alcohol better or rose than other central asians or europeans
