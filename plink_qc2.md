@@ -227,8 +227,8 @@ Ped file
 a) getting p1 from phenotypes metadata, encoding male and female as 1 and 2, sorting
 ```bash
 awk '{print $1"\t" $1"\t" "0\t" "0\t" $2"\t" "-9\t"}' metadata.txt | tail -n +2 > HGDP_p1_1.txt
-awk -F'\t' '{ if ($5 == "male") $5 = 1; else if ($5 == "female") $5 = 2; print }' OFS='\t' HGDP_p1_1.ped > HGDP_p1_2.txt
-sort -k1,1 HGDP_p1_2.txt > HGDP1_p1_3.txt
+awk -F'\t' '{ if ($5 == "male") $5 = 1; else if ($5 == "female") $5 = 2; print }' OFS='\t' HGDP_p1_1.txt > HGDP_p1_2.txt
+sort -k1,1 HGDP_p1_2.txt > HGDP_p1_3.txt
 ```
 
 b) Transposing for p2 (genotypes)
@@ -263,29 +263,24 @@ parallel -j 8 process_file ::: gtReport{1..8}
 for i in {1..8}; do sed -i '' 's/-/0/g' gtReport${i}_transposed.tsv; done
 paste gtReport{1..8}_transposed.tsv > HGDP_transposed.txt
 sort -k1,1 HGDP_transposed.txt | tail -n +2 > HGDP_p2_1.txt
-HGDP_p2_1 add tabs between characters
+sed -E 's/([^\t]+)\t/\1\t/;s/\t(.)/\t\1\t/g' HGDP_p2_1.txt > HGDP_p2_2.txt
 rm *gtRe*
 ```
 
 c) joining p1 and p2
 ```bash
-join -t$'\t' HGDP_p1_3.txt HGDP_p2.txt > HGDP.ped
-sed 's/\t\t*/\t/g' HGDP3.ped > HGDP4.ped
+join -t$'\t' HGDP_p1_3.txt HGDP_p2_2.txt | sed 's/\t\t*/\t/g' > HGDP.ped
 ```
 
-
-Map file
+d) Map file
 ```bash
-awk '{print $2"\t" $1 "\t0\t" $3}' HGDP_Map.txt > HGDP4.map
+awk '{print $2"\t" $1 "\t0\t" $3}' HGDP_Map.txt > HGDP.map
 ```
 
-Ped/map to plink binary
+e) Ped/map to plink binary
 ```bash
-plink --file HGDP4 --missing-code -9,0,NA,na,- --make-bed --out HGDP
+plink --file HGDP --missing-code -9,0,NA,na,- --make-bed --out HGDP
 ```
-
-Problem! There are only 784 lines and map file has 1 line more than expected (is that sample names?)
-
 
 ped file: FID, ID, PID, MID, Sex, Phenotype (space-separated),genotypes
 use all populations from HDGP and SGDP for ROH and Fst and only selected eurasian populations for PCA
