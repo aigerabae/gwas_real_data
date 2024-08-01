@@ -95,8 +95,6 @@ plink --bfile HGDP8 --keep selected_ethnicities.txt --biallelic-only strict --ma
 ```
 
 Merging kazakh and HGDP data (first - deal with multiallelic variants) and doing PCA;
-
-Problem - need to merge it in a way that avoids the multiallelic problem
 ```bash
 
 plink --bfile kaz12_autosomal --bmerge HGDP9.bed HGDP9.bim HGDP9.fam --make-bed --out merged1
