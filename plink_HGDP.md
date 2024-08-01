@@ -127,7 +127,110 @@ plink --bfile HGDP6 --remove to_remove.txt --make-bed --out HGDP7
 plink --bfile HGDP7 --snps-only 'just-acgt' --make-bed --out HGDP8
 ```
 
-4) runs of homozygosity (ROH)
+4) PCA
+
+Only keeping selected ethicities
+```bash
+cut -f 1,5 metadata.txt > ethicities.txt
+awk 'NR==FNR {ids[$1]; next} $1 in ids {print $1"\t" $2}' HGDP8.fam ethicities.txt > matching_ethnicities.txt
+cat matching_ethnicities.txt | grep -e "Uygur" -e "Hazara" -e "Russian" -e "French" -e "Basque" -e "Bergamo" -e "Pathan" -e "Sindhi" -e "Kalash" -e "Adygei" -e "Bedouin" -e "Mozabite" -e "Japanese" -e "Northern" -e "Mongolian" -e "Yakut" -e "Han" | cut -f 1 | awk '{print $1"\t" $1}' > selected_ethnicities.txt
+plink --bfile HGDP8 --keep selected_ethnicities.txt --biallelic-only strict --make-bed --out HGDP9
+
+```
+
+Merging kazakh and HGDP data (first - deal with multiallelic variants) and doing PCA;
+
+Problem - need to merge it in a way that avoids the multiallelic problem
+```bash
+plink --bfile HGDP9 --recode vcf --out HGDP9
+plink --bfile kaz12_autosomal --recode vcf --out kaz12_autosomal
+bgzip HGDP9.vcf
+bgzip kaz12_autosomal.vcf
+bcftools index kaz12_autosomal.vcf.gz
+bcftools index HGDP9.vcf.gz
+
+bcftools merge -m none -o merged.vcf.gz kaz12_autosomal.vcf.gz HGDP9.vcf.gz
+bcftools view -M2 -v snps merged1.vcf.gz -o final_merged2.vcf
+plink --vcf final_merged2.vcf --make-bed --out merged3
+plink --bfile merged3 --geno 0.02 --make-bed --out merged4
+plink --bfile merged4 --mind 0.02 --make-bed --out merged5
+
+echo "kaz12_autosomal.bed kaz12_autosomal.bim kaz12_autosomal.fam" > merge_list.txt
+plink --bfile HGDP9 --merge-list merge_list.txt --make-bed --out merged_dataset
+
+```bash
+nano plot_eigenvec.py 
+```
+
+```python
+import sys
+import pandas as pd
+import plotly.express as px
+
+# Check if the correct number of arguments are provided
+if len(sys.argv) != 3:
+    print("Usage: python plot_eigenvec.py <eigenvec_file> <ethnicities_file>")
+    sys.exit(1)
+
+# Read the eigenvec file, skipping the first line
+eigenvec_file = sys.argv[1]
+with open(eigenvec_file, 'r') as f:
+    lines = f.readlines()[1:]
+
+# Read the ethnicities file
+ethnicities_file = sys.argv[2]
+with open(ethnicities_file, 'r') as f:
+    ethnicities = {line.split()[0]: line.split()[1] for line in f.readlines()}
+
+# Extract data from the file
+data = {
+    'PC1': [float(line.split()[2]) for line in lines],
+    'PC2': [float(line.split()[3]) for line in lines],
+    'sample_id': [line.split()[0] for line in lines],
+    'ethnicity': [ethnicities[line.split()[0]] for line in lines]
+}
+
+df = pd.DataFrame(data)
+
+# Define marker shapes based on ethnicity
+shape_map = {
+    'Uygur': 'circle', 'Kazakh': 'circle', 'Hazara': 'circle',
+    'Russian': 'square', 'French': 'square', 'Basque': 'square', 'Bergamo': 'square',
+    'Pathan': 'triangle-up', 'Sindhi': 'triangle-up', 'Kalash': 'triangle-up',
+    'Adygei': 'diamond',
+    'Bedouin': 'square-open', 'Mozabite': 'square-open',
+    'Japanese': 'triangle-down', 'Northern': 'triangle-down', 'Mongolian': 'triangle-down', 'Yakut': 'triangle-down', 'Han': 'triangle-down'
+}
+
+# Create interactive scatter plot
+fig = px.scatter(df, x='PC1', y='PC2', color='ethnicity', symbol='ethnicity', hover_data=['sample_id', 'ethnicity'])
+
+# Update marker shapes based on ethnicity
+for ethnicity, shape in shape_map.items():
+    fig.update_traces(marker=dict(symbol=shape), selector=dict(name=ethnicity))
+
+# Update layout for larger font sizes
+fig.update_layout(
+    title='PCA Plot',
+    title_font_size=24,
+    xaxis_title='PC1',
+    xaxis_title_font_size=20,
+    yaxis_title='PC2',
+    yaxis_title_font_size=20,
+    legend_title_font_size=18,
+    font=dict(size=16)
+)
+
+# Save the plot as an HTML file
+fig.write_html('interactive_plot.html')
+
+# Show the plot in a browser
+fig.show()
+```
+
+
+
+6) runs of homozygosity (ROH)
 plink --bfile kaz12_autosomal --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
 plink --bfile HGDP7 --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
 
