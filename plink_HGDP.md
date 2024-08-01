@@ -106,9 +106,9 @@ plink --bfile merged3 --mind 0.02 --make-bed --out merged4
 echo -e "rs9267522\nrs11229\nrs75412302\nrs12660719" > duplicates.txt
 plink --bfile merged4 --exclude duplicates.txt --make-bed --out merged5
 
-cat kaz12_autosomal.fam | cut -f 1 -d ' ' >> temp_ethicities.txt 
-cat temp_ethicities.txt | awk '{$2 = "\tKazakh"; print }' >> ethicities.txt
-rm temp_ethicities.txt
+cat kaz12_autosomal.fam | cut -f 1 -d ' ' >> temp_ethnicities.txt 
+cat temp_ethnicities.txt | awk '{$2 = "\tKazakh"; print }' >> ethnicities.txt
+rm temp_ethnicities.txt
 ```
 
 ```bash
@@ -134,13 +134,18 @@ plink2 --bfile merged6 --pca 10 --out all_pca
 ```
 
 ```bash
-python plot_eigenvec.py all_pca.eigenvec ethicities.txt
+python plot_eigenvec.py all_pca.eigenvec ethnicities.txt
 ```
 
-6) runs of homozygosity (ROH)
+6) runs of homozygosity (ROH) and Fst
 ```bash
-plink --bfile kaz12_autosomal --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
-plink --bfile HGDP7 --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
+plink --bfile merged6 --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
+
+cut -f 1,5 metadata.txt > metadata1.txt
+awk '{print $2, "Kazakh"}' kaz12_autosomal.fam | sort >> metadata1.txt
+awk 'NR==FNR {ids[$1]; next} $1 in ids {print $1"\t" $2}' merged6.fam metadata1.txt > metadata2.txt
+awk '{print $1"\t" $1"\t" $2}' metadata2.txt > metadata3.txt
+plink --bfile merged6 --within metadata3.txt --double-id --fst --out fst_output
 ```
 
 tasks for thursday:
