@@ -141,25 +141,41 @@ Merging kazakh and HGDP data (first - deal with multiallelic variants) and doing
 
 Problem - need to merge it in a way that avoids the multiallelic problem
 ```bash
-plink --bfile HGDP9 --recode vcf --out HGDP9
-plink --bfile kaz12_autosomal --recode vcf --out kaz12_autosomal
-bgzip HGDP9.vcf
-bgzip kaz12_autosomal.vcf
-bcftools index kaz12_autosomal.vcf.gz
-bcftools index HGDP9.vcf.gz
 
-bcftools merge -m none -o merged.vcf.gz kaz12_autosomal.vcf.gz HGDP9.vcf.gz
-bcftools view -M2 -v snps merged1.vcf.gz -o final_merged2.vcf
-plink --vcf final_merged2.vcf --make-bed --out merged3
-plink --bfile merged3 --geno 0.02 --make-bed --out merged4
-plink --bfile merged4 --mind 0.02 --make-bed --out merged5
-
-echo "kaz12_autosomal.bed kaz12_autosomal.bim kaz12_autosomal.fam" > merge_list.txt
-plink --bfile HGDP9 --merge-list merge_list.txt --make-bed --out merged_dataset
+plink --bfile kaz12_autosomal --bmerge HGDP9.bed HGDP9.bim HGDP9.fam --make-bed --out merged1
+plink --bfile HGDP9 --exclude merged_dataset-merge.missnp --biallelic-only strict --make-bed --out HGDP10
+plink --bfile kaz12_autosomal --exclude merged_dataset-merge.missnp --biallelic-only strict --make-bed --out kaz13_autosomal
+plink --bfile kaz13_autosomal --bmerge HGDP10.bed HGDP10.bim HGDP10.fam --make-bed --out merged2
+plink --bfile merged2 --geno 0.02 --make-bed --out merged3
+plink --bfile merged3 --mind 0.02 --make-bed --out merged4
+echo -e "rs9267522\nrs11229\nrs75412302\nrs12660719" > duplicates.txt
+plink --bfile merged4 --exclude duplicates.txt --make-bed --out merged5
 
 cat kaz12_autosomal.fam | cut -f 1 -d ' ' >> temp_ethicities.txt 
 cat temp_ethicities.txt | awk '{$2 = "\tKazakh"; print }' >> ethicities.txt
 rm temp_ethicities.txt
+```
+
+```bash
+nano outliers.txt
+```
+
+```bash
+1210510 1210510
+HGDP00621       HGDP00621
+HGDP01270       HGDP01270
+HGDP01271       HGDP01271
+HGDP00175       HGDP00175
+HGDP00953       HGDP00953
+HGDP00949       HGDP00949
+HGDP00969       HGDP00969
+HGDP00959       HGDP00959
+HGDP00621       HGDP00621
+```
+
+```bash
+plink --bfile merged5 --remove outliers.txt --make-bed --out merged6
+plink2 --bfile merged6 --pca 10 --out all_pca 
 ```
 
 ```bash
@@ -170,6 +186,9 @@ nano plot_eigenvec.py
 import sys
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
+from scipy.spatial import ConvexHull
+import numpy as np
 
 # Check if the correct number of arguments are provided
 if len(sys.argv) != 3:
@@ -196,9 +215,9 @@ data = {
 
 df = pd.DataFrame(data)
 
-# Define marker shapes based on ethnicity
+# Define marker shapes and colors based on ethnicity
 shape_map = {
-    'Uygur': 'circle', 'Kazakh': 'circle', 'Hazara': 'circle',
+    'Uygur': 'circle-open', 'Kazakh': 'circle-open', 'Hazara': 'circle-open',
     'Russian': 'square', 'French': 'square', 'Basque': 'square', 'Bergamo': 'square',
     'Pathan': 'triangle-up', 'Sindhi': 'triangle-up', 'Kalash': 'triangle-up',
     'Adygei': 'diamond',
@@ -206,12 +225,54 @@ shape_map = {
     'Japanese': 'triangle-down', 'Northern': 'triangle-down', 'Mongolian': 'triangle-down', 'Yakut': 'triangle-down', 'Han': 'triangle-down'
 }
 
+color_map = {
+    'circle-open': 'rgba(150,0,100,0.6)',   # Darker Pink
+    'square': 'rgba(100,100,0,0.6)',        # Darker Blue
+    'triangle-up': 'rgba(100,0,150,0.6)',    # Darker Green
+    'diamond': 'rgba(0,150,50,0.6)',       # Darker Yellow
+    'square-open': 'rgba(50,200,100,0.6)',   # Darker Beige
+    'triangle-down': 'rgba(200,200,100,0.6)'  # Darker Khaki
+}
+
 # Create interactive scatter plot
 fig = px.scatter(df, x='PC1', y='PC2', color='ethnicity', symbol='ethnicity', hover_data=['sample_id', 'ethnicity'])
 
-# Update marker shapes based on ethnicity
+# Update marker shapes and colors based on ethnicity
 for ethnicity, shape in shape_map.items():
     fig.update_traces(marker=dict(symbol=shape), selector=dict(name=ethnicity))
+
+# Function to add convex hulls with custom names
+def add_convex_hull(df, shape, color, legend_name):
+    shape_df = df[df['ethnicity'].map(lambda x: shape_map[x] == shape)]
+    if shape_df.shape[0] < 3:  # Need at least 3 points to form a convex hull
+        return
+    
+    points = shape_df[['PC1', 'PC2']].values
+    try:
+        hull = ConvexHull(points)
+        # Add convex hull trace
+        hull_points = np.append(points[hull.vertices], [points[hull.vertices][0]], axis=0)  # close the hull
+        fig.add_trace(go.Scatter(
+            x=hull_points[:, 0],
+            y=hull_points[:, 1],
+            mode='lines',
+            line=dict(color=color, width=1),  # Thinner lines
+            name=legend_name  # Set custom legend name
+        ))
+    except:
+        print(f"Warning: Convex hull computation failed for shape: {shape}")
+
+# Add convex hulls for each shape type with custom legend names
+shape_legends = {
+    'circle-open': 'Central Asia',
+    'square': 'Europe',
+    'triangle-up': 'South Asia',
+    'triangle-down': 'East Asia',
+    'square-open': 'Middle East'
+}
+
+for shape, legend_name in shape_legends.items():
+    add_convex_hull(df, shape, color_map[shape], legend_name)
 
 # Update layout for larger font sizes
 fig.update_layout(
