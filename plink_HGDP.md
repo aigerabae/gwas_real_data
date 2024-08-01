@@ -135,7 +135,6 @@ cut -f 1,5 metadata.txt > ethicities.txt
 awk 'NR==FNR {ids[$1]; next} $1 in ids {print $1"\t" $2}' HGDP8.fam ethicities.txt > matching_ethnicities.txt
 cat matching_ethnicities.txt | grep -e "Uygur" -e "Hazara" -e "Russian" -e "French" -e "Basque" -e "Bergamo" -e "Pathan" -e "Sindhi" -e "Kalash" -e "Adygei" -e "Bedouin" -e "Mozabite" -e "Japanese" -e "Northern" -e "Mongolian" -e "Yakut" -e "Han" | cut -f 1 | awk '{print $1"\t" $1}' > selected_ethnicities.txt
 plink --bfile HGDP8 --keep selected_ethnicities.txt --biallelic-only strict --make-bed --out HGDP9
-
 ```
 
 Merging kazakh and HGDP data (first - deal with multiallelic variants) and doing PCA;
@@ -157,6 +156,11 @@ plink --bfile merged4 --mind 0.02 --make-bed --out merged5
 
 echo "kaz12_autosomal.bed kaz12_autosomal.bim kaz12_autosomal.fam" > merge_list.txt
 plink --bfile HGDP9 --merge-list merge_list.txt --make-bed --out merged_dataset
+
+cat kaz12_autosomal.fam | cut -f 1 -d ' ' >> temp_ethicities.txt 
+cat temp_ethicities.txt | awk '{$2 = "\tKazakh"; print }' >> ethicities.txt
+rm temp_ethicities.txt
+```
 
 ```bash
 nano plot_eigenvec.py 
@@ -228,11 +232,15 @@ fig.write_html('interactive_plot.html')
 fig.show()
 ```
 
-
+```bash
+python plot_eigenvec.py all_pca.eigenvec ethicities.txt
+```
 
 6) runs of homozygosity (ROH)
+```bash
 plink --bfile kaz12_autosomal --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
 plink --bfile HGDP7 --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
+```
 
 tasks for thursday:
 - understand whats Fst
