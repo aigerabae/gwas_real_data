@@ -145,15 +145,9 @@ cut -f 1,5 metadata.txt > metadata1.txt
 awk '{print $2, "Kazakh"}' kaz12_autosomal.fam | sort >> metadata1.txt
 awk 'NR==FNR {ids[$1]; next} $1 in ids {print $1"\t" $2}' merged6.fam metadata1.txt > metadata2.txt
 awk '{print $1"\t" $1"\t" $2}' metadata2.txt > metadata3.txt
-plink --bfile merged6 --within metadata3.txt --double-id --fst --out fst_output
+plink2 --bfile merged6 --fst CATPHENO --within metadata3.txt --double-id --out fst_output
+chmod +x plot_fst_heatmap.py
+./plot_fst_heatmap.py fst_output.fst.summary
 ```
-
-tasks for thursday:
-- understand whats Fst
-- check how to visualize ROH
-- check how to combine HGDP and kaz data
-- redo PCA: include only chosen populations into the final dataset, see how many of them will be present, rewrite the python script for making the PCA graph
-
-use all populations from HDGP and SGDP for ROH and Fst and only selected eurasian populations for PCA
 
 Find ALDH2 gene in kazakh and other populations and see whether we absorb alcohol better or rose than other central asians or europeans
