@@ -148,4 +148,9 @@ chmod +x plot_fst_heatmap.py
 ./plot_fst_heatmap.py fst_output.fst.summary
 ```
 
+7) admixture
+for K in 1 2 3 4 5 6 7 8 9 10; \
+do admixture --cv merged6.bed $K | tee log${K}.out; done
+grep -h CV log*.out
+
 Find ALDH2 gene in kazakh and other populations and see whether we absorb alcohol better or rose than other central asians or europeans
