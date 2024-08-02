@@ -1,3 +1,5 @@
+HGDP: accessed at https://www.hagsc.org/hgdp/files.html accessed metadata at https://www.internationalgenome.org/data-portal/data-collection/hgdp 
+
 1) make HGDP into plink binary file with 38 build
 
 Ped file
