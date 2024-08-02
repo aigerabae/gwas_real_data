@@ -154,3 +154,8 @@ do admixture --cv merged6.bed $K | tee log${K}.out; done
 grep -h CV log*.out
 
 Find ALDH2 gene in kazakh and other populations and see whether we absorb alcohol better or rose than other central asians or europeans
+More data to use for PCA:
+
+Simons: can be accessed at https://www.simonsfoundation.org/simons-genome-diversity-project/ via cancer genomics cloud seven bridges metadata can be accessed at https://www.nature.com/articles/nature18964#Sec10 Supplementary Table 1
+
+1000 genomes can be accessed at https://www.internationalgenome.org/data-portal/population
