@@ -56,6 +56,9 @@ fig = px.scatter(df, x='PC1', y='PC2', color='ethnicity', symbol='ethnicity', ho
 for ethnicity, shape in shape_map.items():
     fig.update_traces(marker=dict(symbol=shape), selector=dict(name=ethnicity))
 
+# Update marker size for Kazakh points
+fig.update_traces(marker=dict(size=9), selector=dict(name='Kazakh'))
+
 # Function to add convex hulls with custom names
 def add_convex_hull(df, shape, color, legend_name):
     shape_df = df[df['ethnicity'].map(lambda x: shape_map[x] == shape)]
@@ -89,7 +92,7 @@ shape_legends = {
 for shape, legend_name in shape_legends.items():
     add_convex_hull(df, shape, color_map[shape], legend_name)
 
-# Update layout for larger font sizes
+# Update layout for larger font sizes and remove the grid
 fig.update_layout(
     title='PCA Plot',
     title_font_size=24,
@@ -98,8 +101,15 @@ fig.update_layout(
     yaxis_title='PC2',
     yaxis_title_font_size=20,
     legend_title_font_size=18,
-    font=dict(size=16)
+    font=dict(size=16),
+    xaxis=dict(showgrid=False, zeroline=False),
+    yaxis=dict(showgrid=False, zeroline=False),
+    plot_bgcolor='rgba(0,0,0,0)'  # Make background transparent
 )
+
+# Rotate the plot 180 degrees
+fig.update_xaxes(autorange='reversed')
+fig.update_yaxes(autorange='reversed')
 
 # Save the plot as an HTML file
 fig.write_html('interactive_plot.html')
