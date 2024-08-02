@@ -88,9 +88,10 @@ plink --bfile HGDP7 --snps-only 'just-acgt' --make-bed --out HGDP8
 
 Only keeping selected ethicities
 ```bash
-cut -f 1,5 metadata.txt > ethicities.txt
-awk 'NR==FNR {ids[$1]; next} $1 in ids {print $1"\t" $2}' HGDP8.fam ethicities.txt > matching_ethnicities.txt
-cat matching_ethnicities.txt | grep -e "Uygur" -e "Hazara" -e "Russian" -e "French" -e "Basque" -e "Bergamo" -e "Pathan" -e "Sindhi" -e "Kalash" -e "Adygei" -e "Bedouin" -e "Mozabite" -e "Japanese" -e "Northern" -e "Mongolian" -e "Yakut" -e "Han" | cut -f 1 | awk '{print $1"\t" $1}' > selected_ethnicities.txt
+cut -f 1,5 metadata.txt > ethnicities1.txt
+awk 'NR==FNR {ids[$1]; next} $1 in ids {print $1"\t" $2}' HGDP8.fam ethnicities.txt > ethnicities2.txt
+cat ethnicities2.txt <(awk '{print $1 "\tKazakh"}' kaz12_autosomal.fam) > ethnicities3.txt
+cat ethnicities3.txt | grep -e "Kazakh" -e "Uygur" -e "Hazara" -e "Russian" -e "French" -e "Basque" -e "Bergamo" -e "Pathan" -e "Sindhi" -e "Kalash" -e "Adygei" -e "Bedouin" -e "Mozabite" -e "Japanese" -e "Northern" -e "Mongolian" -e "Yakut" -e "Han" | awk '{print $1"\t" $2}' > ethnicities4.txt
 plink --bfile HGDP8 --keep selected_ethnicities.txt --biallelic-only strict --make-bed --out HGDP9
 ```
 
@@ -105,10 +106,6 @@ plink --bfile merged2 --geno 0.02 --make-bed --out merged3
 plink --bfile merged3 --mind 0.02 --make-bed --out merged4
 echo -e "rs9267522\nrs11229\nrs75412302\nrs12660719" > duplicates.txt
 plink --bfile merged4 --exclude duplicates.txt --make-bed --out merged5
-
-cat kaz12_autosomal.fam | cut -f 1 -d ' ' >> temp_ethnicities.txt 
-cat temp_ethnicities.txt | awk '{$2 = "\tKazakh"; print }' >> ethnicities.txt
-rm temp_ethnicities.txt
 ```
 
 ```bash
@@ -134,7 +131,7 @@ plink2 --bfile merged6 --pca 10 --out all_pca
 ```
 
 ```bash
-python plot_eigenvec.py all_pca.eigenvec ethnicities.txt
+python plot_eigenvec.py all_pca.eigenvec ethnicities4.txt
 ```
 
 6) runs of homozygosity (ROH) and Fst
