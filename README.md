@@ -33,12 +33,8 @@ Make a text file that contains the genotype of entire samples and probes.
 - phenotypes.tsv file that contained patient information was provided separately
 
 
-**III) Data processing in PLINK** (command-line code in plink_qc)
+**III) Data processing in PLINK** 
 1) prepared .map file was used for further analysis
 2) prepared .ped file needed further processing to include phenotypes (analysis shown in plink_qc1.md)
 3) prepared .ped and .map files were processed for quality control (analysis shown in plink_qc2.md)
-4) VCF file was generated (analysis shown in plink_qc3.md)
-5) PCA was performed using other populations from Human Genome Diversity Project (HGDP) (analysis shown in world_pca.md)
-
-Output of all steps can be accessed under ./output
-Input can be accessed under ./initial_files
+4) PCA, ROH, Fst and ADMIXTURE analyses were performed using other populations from Human Genome Diversity Project (HGDP) (analysis shown in plink_HGDP.md)
