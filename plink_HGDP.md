@@ -151,11 +151,13 @@ chmod +x plot_fst_heatmap.py
 
 7) admixture
 First - LD pruning:
+```bash
 plink --bfile merged6 --indep-pairwise 50 5 0.2 --out pruned_data
 plink --bfile merged6 --extract pruned_data.prune.in --make-bed --out merged7
 
 awk 'BEGIN {OFS="\t"} {if ($2 == "Kazakh" || $2 == "Hazara" || $2 == "Uygur") region = "Central_asia"; else if ($2 == "Bergamo" || $2 == "French" || $2 == "Basque" || $2 == "Russian") region = "Europe"; else if ($2 == "Adygei") region = "Caucasus"; else if ($2 == "Pathan" || $2 == "Sindhi" || $2 == "Kalash") region = "South_asia"; else if ($2 == "Han" || $2 == "Northern" || $2 == "Japanese" || $2 == "Mongolian" || $2 == "Yakut") region = "East_asia"; else if ($2 == "Bedouin" || $2 == "Mozabite") region = "Middle_east"; else region = "Unknown"; print $1, $2, region;}' ethnicities4.txt > ethnicities5.txt
 grep -v -f <(awk '{print $1}' outliers.txt | sort | uniq) ethnicities5.txt > ethnicities6.txt
+```
 
 ```bash
 for K in 5 6 7 8 9 10; \
@@ -171,3 +173,10 @@ More data to use for PCA:
 Simons: can be accessed at https://www.simonsfoundation.org/simons-genome-diversity-project/ via cancer genomics cloud seven bridges metadata can be accessed at https://www.nature.com/articles/nature18964#Sec10 Supplementary Table 1
 
 1000 genomes can be accessed at https://www.internationalgenome.org/data-portal/population
+
+
+Getting alzheimer rsID:
+plink --bfile kaz12 --extract rsID_table --make-bed --out AD_table 
+plink --bfile kaz12 --extract rsID_study --make-bed --out AD_study 
+plink2 --bfile AD_table --freq --out AD_table
+plink2 --bfile AD_study --freq --out AD_study
