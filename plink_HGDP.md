@@ -124,7 +124,6 @@ HGDP00953       HGDP00953
 HGDP00949       HGDP00949
 HGDP00969       HGDP00969
 HGDP00959       HGDP00959
-HGDP00621       HGDP00621
 1302810  1302810
 ```
 
@@ -151,10 +150,19 @@ chmod +x plot_fst_heatmap.py
 ```
 
 7) admixture
+First - LD pruning:
+plink --bfile merged6 --indep-pairwise 50 5 0.2 --out pruned_data
+plink --bfile merged6 --extract pruned_data.prune.in --make-bed --out merged7
+
+awk 'BEGIN {OFS="\t"} {if ($2 == "Kazakh" || $2 == "Hazara" || $2 == "Uygur") region = "Central_asia"; else if ($2 == "Bergamo" || $2 == "French" || $2 == "Basque" || $2 == "Russian") region = "Europe"; else if ($2 == "Adygei") region = "Caucasus"; else if ($2 == "Pathan" || $2 == "Sindhi" || $2 == "Kalash") region = "South_asia"; else if ($2 == "Han" || $2 == "Northern" || $2 == "Japanese" || $2 == "Mongolian" || $2 == "Yakut") region = "East_asia"; else if ($2 == "Bedouin" || $2 == "Mozabite") region = "Middle_east"; else region = "Unknown"; print $1, $2, region;}' ethnicities4.txt > ethnicities5.txt
+grep -v -f <(awk '{print $1}' outliers.txt | sort | uniq) ethnicities5.txt > ethnicities6.txt
+
 ```bash
 for K in 5 6 7 8 9 10; \
-do admixture --cv kaz12_autosomal.bed $K | tee log${K}.out; done
+do admixture --cv merged7.bed -j8 $K | tee log${K}.out; done
 grep -h CV log*.out
+
+admixture --cv merged7.bed -j8 3
 ```
 
 Find ALDH2 gene in kazakh and other populations and see whether we absorb alcohol better or rose than other central asians or europeans
