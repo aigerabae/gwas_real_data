@@ -136,10 +136,11 @@ plink2 --bfile merged6 --pca 10 --out all_pca
 python plot_eigenvec.py all_pca.eigenvec ethnicities4.txt
 ```
 
-6) runs of homozygosity (ROH) and Fst
+6) runs of homozygosity (ROH)
 ```bash
-plink --bfile merged6 --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
+plink --bfile kaz12_autosomal --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
 
+7) Fst
 cut -f 1,5 metadata.txt > metadata1.txt
 awk '{print $2, "Kazakh"}' kaz12_autosomal.fam | sort >> metadata1.txt
 awk 'NR==FNR {ids[$1]; next} $1 in ids {print $1"\t" $2}' merged6.fam metadata1.txt > metadata2.txt
@@ -149,7 +150,7 @@ chmod +x plot_fst_heatmap.py
 ./plot_fst_heatmap.py fst_output.fst.summary
 ```
 
-7) admixture
+8) admixture
 First - LD pruning:
 ```bash
 plink --bfile merged6 --indep-pairwise 50 5 0.2 --out pruned_data
