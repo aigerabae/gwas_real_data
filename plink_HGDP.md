@@ -139,8 +139,10 @@ python plot_eigenvec.py all_pca.eigenvec ethnicities4.txt
 6) runs of homozygosity (ROH)
 ```bash
 plink --bfile kaz12_autosomal --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
+```
 
 7) Fst
+```bash
 cut -f 1,5 metadata.txt > metadata1.txt
 awk '{print $2, "Kazakh"}' kaz12_autosomal.fam | sort >> metadata1.txt
 awk 'NR==FNR {ids[$1]; next} $1 in ids {print $1"\t" $2}' merged6.fam metadata1.txt > metadata2.txt
@@ -170,6 +172,7 @@ admixture --cv merged7.bed -j8 3
 
 remove some kazakhs and bedouin to see if it works with even samples
 
+```bash
 awk -F'\t' '$2 == "Kazakh" {print NR, $0}' ethnicities6.txt | sort -k1,1n | head -n 200 | cut -d' ' -f2- > selected_kazakh.txt
 awk -F'\t' '$2 == "Bedouin" {print NR, $0}' ethnicities6.txt | sort -k1,1n | head -n 20 | cut -d' ' -f2- > selected_bedouin.txt
 cat selected_kazakh.txt selected_bedouin.txt > selected_individuals.txt
@@ -178,11 +181,23 @@ awk 'NR==FNR {remove[$1]; next} !($1 in remove)' selected_individuals.txt ethnic
 plink --bfile merged7 --remove selected_to_remove.txt --make-bed --out merged8
 admixture --cv merged8.bed -j8 5
 python plot_admixture.py merged8.5.Q ethnicities7.txt 
-
+```
 
 plotting in R
-awk 'NR==FNR {ethnicity[FNR]=$2; population[FNR]=$3; next} {for (i=1; i<=5; i++) print ethnicity[FNR], population[FNR], $i, i}' ethnicities7.txt merged8.5.Q > equal_samples.tsv 
+For less kazakhs:
+```bash
+awk 'NR==FNR {ethnicity[FNR]=$2; population[FNR]=$3; sampleID[FNR]=$1; next} {for (i=1; i<=NF; i++) print sampleID[FNR], ethnicity[FNR], population[FNR], $i, i}' ethnicities7.txt merged8.5.Q > equal_samples.tsv
+```
 
+Regular number k=5:
+```bash
+awk 'NR==FNR {ethnicity[FNR]=$2; population[FNR]=$3; sampleID[FNR]=$1; next} {for (i=1; i<=NF; i++) print sampleID[FNR], ethnicity[FNR], population[FNR], $i, i}' ethnicities6.txt merged7.5.Q > equal_samples.tsv
+```
+
+Regular number k=3:
+```bash
+awk 'NR==FNR {ethnicity[FNR]=$2; population[FNR]=$3; sampleID[FNR]=$1; next} {for (i=1; i<=NF; i++) print sampleID[FNR], ethnicity[FNR], population[FNR], $i, i}' ethnicities6.txt merged7.3.Q > equal_samples.tsv
+```
 
 Find ALDH2 gene in kazakh and other populations and see whether we absorb alcohol better or rose than other central asians or europeans
 More data to use for PCA:
@@ -193,7 +208,9 @@ Simons: can be accessed at https://www.simonsfoundation.org/simons-genome-divers
 
 
 Getting alzheimer rsID:
+```bash
 plink --bfile kaz12 --extract rsID_table --make-bed --out AD_table 
 plink --bfile kaz12 --extract rsID_study --make-bed --out AD_study 
 plink2 --bfile AD_table --freq --out AD_table
 plink2 --bfile AD_study --freq --out AD_study
+```
