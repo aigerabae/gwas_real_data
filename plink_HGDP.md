@@ -156,7 +156,7 @@ First - LD pruning:
 plink --bfile merged6 --indep-pairwise 50 5 0.2 --out pruned_data
 plink --bfile merged6 --extract pruned_data.prune.in --make-bed --out merged7
 
-awk 'BEGIN {OFS="\t"} {if ($2 == "Kazakh" || $2 == "Hazara" || $2 == "Uygur") region = "Central_asia"; else if ($2 == "Bergamo" || $2 == "French" || $2 == "Basque" || $2 == "Russian") region = "Europe"; else if ($2 == "Adygei") region = "Caucasus"; else if ($2 == "Pathan" || $2 == "Sindhi" || $2 == "Kalash") region = "South_asia"; else if ($2 == "Han" || $2 == "Northern" || $2 == "Japanese" || $2 == "Mongolian" || $2 == "Yakut") region = "East_asia"; else if ($2 == "Bedouin" || $2 == "Mozabite") region = "Middle_east"; else region = "Unknown"; print $1, $2, region;}' ethnicities4.txt > ethnicities5.txt
+awk 'BEGIN {OFS="\t"} {if ($2 == "Kazakh" || $2 == "Hazara" || $2 == "Uygur") region = "Central_asia"; else if ($2 == "Bergamo Italia" || $2 == "French" || $2 == "Basque" || $2 == "Russian") region = "Europe"; else if ($2 == "Adygei") region = "Caucasus"; else if ($2 == "Pathan" || $2 == "Sindhi" || $2 == "Kalash") region = "South_asia"; else if ($2 == "Han" || $2 == "Northern" || $2 == "Japanese" || $2 == "Mongolian" || $2 == "Yakut") region = "East_asia"; else if ($2 == "Bedouin" || $2 == "Mozabite") region = "Middle_east"; else region = "Unknown"; print $1, $2, region;}' ethnicities4.txt > ethnicities5.txt
 grep -v -f <(awk '{print $1}' outliers.txt | sort | uniq) ethnicities5.txt > ethnicities6.txt
 ```
 
@@ -167,6 +167,22 @@ grep -h CV log*.out
 
 admixture --cv merged7.bed -j8 3
 ```
+
+remove some kazakhs and bedouin to see if it works with even samples
+
+awk -F'\t' '$2 == "Kazakh" {print NR, $0}' ethnicities6.txt | sort -k1,1n | head -n 200 | cut -d' ' -f2- > selected_kazakh.txt
+awk -F'\t' '$2 == "Bedouin" {print NR, $0}' ethnicities6.txt | sort -k1,1n | head -n 20 | cut -d' ' -f2- > selected_bedouin.txt
+cat selected_kazakh.txt selected_bedouin.txt > selected_individuals.txt
+cat selected_individuals.txt | awk '{print $1"\t" $1}' > selected_to_remove.txt
+awk 'NR==FNR {remove[$1]; next} !($1 in remove)' selected_individuals.txt ethnicities6.txt > ethnicities7.txt
+plink --bfile merged7 --remove selected_to_remove.txt --make-bed --out merged8
+admixture --cv merged8.bed -j8 5
+python plot_admixture.py merged8.5.Q ethnicities7.txt 
+
+
+plotting in R
+awk 'NR==FNR {ethnicity[FNR]=$2; population[FNR]=$3; next} {for (i=1; i<=5; i++) print ethnicity[FNR], population[FNR], $i, i}' ethnicities7.txt merged8.5.Q > equal_samples.tsv 
+
 
 Find ALDH2 gene in kazakh and other populations and see whether we absorb alcohol better or rose than other central asians or europeans
 More data to use for PCA:
