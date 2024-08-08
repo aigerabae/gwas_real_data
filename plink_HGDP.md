@@ -111,11 +111,31 @@ plink --bfile merged4 --exclude duplicates.txt --make-bed --out merged5
 ```
 
 ```bash
-nano outliers.txt
+nano outliers_kazakh.txt
+```
+
+Attention: This includes potential outliers (starting with number 3) that I am thinking about excluding based on PCA but haven't decided yet
+```bash
+1210510 1210510
+1302810  1302810
+1413810  1413810  
+WE016  WE016
+WE128  WE128
+211  211
+88  88
+1407010  1407010
+2  2
+1217910  1217910
+113  113
+33  33
+240  240
 ```
 
 ```bash
-1210510 1210510
+nano outliers_HGDP.txt
+```
+
+```bash
 HGDP00621       HGDP00621
 HGDP01270       HGDP01270
 HGDP01271       HGDP01271
@@ -124,7 +144,10 @@ HGDP00953       HGDP00953
 HGDP00949       HGDP00949
 HGDP00969       HGDP00969
 HGDP00959       HGDP00959
-1302810  1302810
+```
+
+```bash
+cat outliers_kazakh.txt outliers_HGDP.txt > outliers.txt
 ```
 
 ```bash
