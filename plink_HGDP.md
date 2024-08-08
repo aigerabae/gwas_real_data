@@ -178,11 +178,11 @@ chmod +x plot_fst_heatmap.py
 8) admixture
 First - LD pruning:
 ```bash
-plink --bfile merged6 --indep-pairwise 50 5 0.2 --out pruned_data
+plink --bfile merged6 --indep-pairwise 1000 150 0.4 --out pruned_data
 plink --bfile merged6 --extract pruned_data.prune.in --make-bed --out merged7
 
 awk 'BEGIN {OFS="\t"} {if ($2 == "Kazakh" || $2 == "Hazara" || $2 == "Uygur") region = "Central_asia"; else if ($2 == "Bergamo Italia" || $2 == "French" || $2 == "Basque" || $2 == "Russian") region = "Europe"; else if ($2 == "Adygei") region = "Caucasus"; else if ($2 == "Pathan" || $2 == "Sindhi" || $2 == "Kalash") region = "South_asia"; else if ($2 == "Han" || $2 == "Northern" || $2 == "Japanese" || $2 == "Mongolian" || $2 == "Yakut") region = "East_asia"; else if ($2 == "Bedouin" || $2 == "Mozabite") region = "Middle_east"; else region = "Unknown"; print $1, $2, region;}' ethnicities4.txt > ethnicities5.txt
-grep -v -f <(awk '{print $1}' outliers.txt | sort | uniq) ethnicities5.txt > ethnicities6.txt
+awk 'NR==FNR {a[$1]; next} !($1 in a)' outliers.txt ethnicities5.txt > ethnicities6.txt
 ```
 
 ```bash
@@ -190,36 +190,64 @@ for K in 5 6 7 8 9 10; \
 do admixture --cv merged7.bed -j8 $K | tee log${K}.out; done
 grep -h CV log*.out
 
-admixture --cv merged7.bed -j8 3
+admixture --cv merged6.bed -j8 12
+grep -v -f <(awk '{print $1}' outliers.txt | sort | uniq) ethnicities5.txt > ethnicities6.txt
+
 ```
 
-remove some kazakhs and bedouin to see if it works with even samples
+Downloading turkic data from Estonian Biocentre:
+wget https://evolbio.ut.ee/turkic/turkic.fam
+wget https://evolbio.ut.ee/turkic/turkic.bim
+wget https://evolbio.ut.ee/caucasus/caucasus_paper_data_dbSNP-b131_pos-b37_1KG_strand.bim
+wget https://evolbio.ut.ee/caucasus/caucasus_paper_data_dbSNP-b131_pos-b37_1KG_strand.fam
+wget https://evolbio.ut.ee/sakha/sakha_paper_data_dbSNP-b131_pos-b37_1KG_strand.bim
+wget https://evolbio.ut.ee/sakha/sakha_paper_data_dbSNP-b131_pos-b37_1KG_strand.fam
+wget https://evolbio.ut.ee/jew/jew_paper_data_dbSNP-b131_pos-b37_1KG_strand.bim
+wget https://evolbio.ut.ee/jew/jew_paper_data_dbSNP-b131_pos-b37_1KG_strand.fam
 
+Getting PCA:
+plink --bfile caucasus_paper_data_dbSNP-b131_pos-b37_1KG_strand --bmerge jew_paper_data_dbSNP-b131_pos-b37_1KG_strand --make-bed --out all1
+plink --bfile all1 --bmerge sakha_paper_data_dbSNP-b131_pos-b37_1KG_strand --make-bed --out all2
+plink --bfile all2 --bmerge turkic --make-bed --out all3
+
+metadata.txt contains 3 columns: ID, ethnicity, region
+cat metadata.txt | awk '{print $1 "\t" $1}' > ethnic.txt 
+plink --bfile all3 --keep ethnic.txt --make-bed --out all4
+
+Now I want to merge it with my kazakh + HGDP data:
+cp ../../p3/ethnicities6.txt ./metadata_kaz.txt
+cp ../../p3/*merged6* ./
+
+Changing build from 37 to 38:
+comm -12 <(awk '{print $2}' merged6.bim | sort) <(awk '{print $2}' all4.bim | sort) > common_snps.txt
+cat merged6.bim | awk '{print $2"\t" $1}' > dictionary_chr
+cat merged6.bim | cut -f 2,4 > dictionary_pos
+plink --bfile all4 --extract common_snps.txt --make-bed --out all5
+plink2 --bfile all5 --update-chr dictionary_chr --update-map dictionary_pos --sort-vars --make-pgen --out all6
+plink2 --pfile all6 --make-bed --out all7
+plink --bfile all7 --exclude all8-merge.missnp --make-bed --out all8
+plink --bfile merged6 --exclude all8-merge.missnp --make-bed --out merged7
+plink --bfile merged7 --bmerge all8 --make-bed --out all9
+cat metadata.txt metadata_kaz.txt > ethnic1.txt
+
+QC:
 ```bash
-awk -F'\t' '$2 == "Kazakh" {print NR, $0}' ethnicities6.txt | sort -k1,1n | head -n 200 | cut -d' ' -f2- > selected_kazakh.txt
-awk -F'\t' '$2 == "Bedouin" {print NR, $0}' ethnicities6.txt | sort -k1,1n | head -n 20 | cut -d' ' -f2- > selected_bedouin.txt
-cat selected_kazakh.txt selected_bedouin.txt > selected_individuals.txt
-cat selected_individuals.txt | awk '{print $1"\t" $1}' > selected_to_remove.txt
-awk 'NR==FNR {remove[$1]; next} !($1 in remove)' selected_individuals.txt ethnicities6.txt > ethnicities7.txt
-plink --bfile merged7 --remove selected_to_remove.txt --make-bed --out merged8
-admixture --cv merged8.bed -j8 5
-python plot_admixture.py merged8.5.Q ethnicities7.txt 
+plink --bfile all9 --geno 0.02 --make-bed --out all10
+plink --bfile all10 --mind 0.02 --make-bed --out all11
+plink --bfile all11 --maf 0.001 --make-bed --out all12
+plink --bfile all12 --genome --min 0.2 --out pihat_min0.2
+plink --bfile all12 --missing --out missing_report
+awk '$10 > 0.2 {print $1, $2, $3, $4}' pihat_min0.2.genome > related_pairs.txt
+plink --bfile all12 --snps-only 'just-acgt' --make-bed --out all13
 ```
 
-plotting in R
-For less kazakhs:
-```bash
-awk 'NR==FNR {ethnicity[FNR]=$2; population[FNR]=$3; sampleID[FNR]=$1; next} {for (i=1; i<=NF; i++) print sampleID[FNR], ethnicity[FNR], population[FNR], $i, i}' ethnicities7.txt merged8.5.Q > equal_samples.tsv
-```
+PCA:
+plink2 --bfile all13 --pca 10 --out all_pca
+python plot_eigenvec.py all_pca.eigenvec ethnic1.txt
 
 Regular number k=5:
 ```bash
 awk 'NR==FNR {ethnicity[FNR]=$2; population[FNR]=$3; sampleID[FNR]=$1; next} {for (i=1; i<=NF; i++) print sampleID[FNR], ethnicity[FNR], population[FNR], $i, i}' ethnicities6.txt merged7.5.Q > equal_samples.tsv
-```
-
-Regular number k=3:
-```bash
-awk 'NR==FNR {ethnicity[FNR]=$2; population[FNR]=$3; sampleID[FNR]=$1; next} {for (i=1; i<=NF; i++) print sampleID[FNR], ethnicity[FNR], population[FNR], $i, i}' ethnicities6.txt merged7.3.Q > equal_samples.tsv
 ```
 
 Find ALDH2 gene in kazakh and other populations and see whether we absorb alcohol better or rose than other central asians or europeans
