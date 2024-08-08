@@ -192,33 +192,50 @@ grep -h CV log*.out
 
 admixture --cv merged6.bed -j8 12
 grep -v -f <(awk '{print $1}' outliers.txt | sort | uniq) ethnicities5.txt > ethnicities6.txt
-
 ```
 
-Downloading turkic data from Estonian Biocentre:
+For plotting in R
+```bash
+awk 'NR==FNR {ethnicity[FNR]=$2; population[FNR]=$3; sampleID[FNR]=$1; next} {for (i=1; i<=NF; i++) print sampleID[FNR], ethnicity[FNR], population[FNR], $i, i}' ethnicities6.txt merged7.5.Q > equal_samples.tsv
+```
+
+Problem: ADMIXTURE plot doesn't look like there is much different between anyone
+Potential solutin: adding data from other sources
+
+a) Downloading turkic,siberian,caucasus,jewish (has uzbek) data from Estonian Biocentre:
+```bash
 wget https://evolbio.ut.ee/turkic/turkic.fam
 wget https://evolbio.ut.ee/turkic/turkic.bim
+wget https://evolbio.ut.ee/turkic/turkic.bed
 wget https://evolbio.ut.ee/caucasus/caucasus_paper_data_dbSNP-b131_pos-b37_1KG_strand.bim
 wget https://evolbio.ut.ee/caucasus/caucasus_paper_data_dbSNP-b131_pos-b37_1KG_strand.fam
+wget https://evolbio.ut.ee/caucasus/caucasus_paper_data_dbSNP-b131_pos-b37_1KG_strand.bed
 wget https://evolbio.ut.ee/sakha/sakha_paper_data_dbSNP-b131_pos-b37_1KG_strand.bim
 wget https://evolbio.ut.ee/sakha/sakha_paper_data_dbSNP-b131_pos-b37_1KG_strand.fam
+wget https://evolbio.ut.ee/sakha/sakha_paper_data_dbSNP-b131_pos-b37_1KG_strand.bed
 wget https://evolbio.ut.ee/jew/jew_paper_data_dbSNP-b131_pos-b37_1KG_strand.bim
 wget https://evolbio.ut.ee/jew/jew_paper_data_dbSNP-b131_pos-b37_1KG_strand.fam
+wget https://evolbio.ut.ee/jew/jew_paper_data_dbSNP-b131_pos-b37_1KG_strand.bed
+```
 
-Getting PCA:
+b) Merging estonian data together:
+```bash
 plink --bfile caucasus_paper_data_dbSNP-b131_pos-b37_1KG_strand --bmerge jew_paper_data_dbSNP-b131_pos-b37_1KG_strand --make-bed --out all1
 plink --bfile all1 --bmerge sakha_paper_data_dbSNP-b131_pos-b37_1KG_strand --make-bed --out all2
 plink --bfile all2 --bmerge turkic --make-bed --out all3
+```
 
-metadata.txt contains 3 columns: ID, ethnicity, region
+c) I made metadata.txt in excel that contains 3 columns: ID, ethnicity, region
+```bash
 cat metadata.txt | awk '{print $1 "\t" $1}' > ethnic.txt 
 plink --bfile all3 --keep ethnic.txt --make-bed --out all4
+```
 
-Now I want to merge it with my kazakh + HGDP data:
+d) Now I want to merge it with my kazakh + HGDP data; copying 
 cp ../../p3/ethnicities6.txt ./metadata_kaz.txt
 cp ../../p3/*merged6* ./
 
-Changing build from 37 to 38:
+e) Changing build from 37 to 38 and merging datasets and their metadata:
 comm -12 <(awk '{print $2}' merged6.bim | sort) <(awk '{print $2}' all4.bim | sort) > common_snps.txt
 cat merged6.bim | awk '{print $2"\t" $1}' > dictionary_chr
 cat merged6.bim | cut -f 2,4 > dictionary_pos
@@ -230,7 +247,7 @@ plink --bfile merged6 --exclude all8-merge.missnp --make-bed --out merged7
 plink --bfile merged7 --bmerge all8 --make-bed --out all9
 cat metadata.txt metadata_kaz.txt > ethnic1.txt
 
-QC:
+f) QC:
 ```bash
 plink --bfile all9 --geno 0.02 --make-bed --out all10
 plink --bfile all10 --mind 0.02 --make-bed --out all11
@@ -241,13 +258,29 @@ awk '$10 > 0.2 {print $1, $2, $3, $4}' pihat_min0.2.genome > related_pairs.txt
 plink --bfile all12 --snps-only 'just-acgt' --make-bed --out all13
 ```
 
-PCA:
-plink2 --bfile all13 --pca 10 --out all_pca
-python plot_eigenvec.py all_pca.eigenvec ethnic1.txt
-
-Regular number k=5:
+Remove individuals that don't have a counterpart in fam file from metadata
 ```bash
-awk 'NR==FNR {ethnicity[FNR]=$2; population[FNR]=$3; sampleID[FNR]=$1; next} {for (i=1; i<=NF; i++) print sampleID[FNR], ethnicity[FNR], population[FNR], $i, i}' ethnicities6.txt merged7.5.Q > equal_samples.tsv
+awk '{print $1}' all13.fam | grep -Fwf - ethnic1.txt > ethnic2.txt
+```
+
+g) PCA:
+```bash
+plink2 --bfile all13 --pca 10 --out all_pca
+python plot_eigenvec.py all_pca.eigenvec ethnic2.txt
+```
+
+h) ADMIXTURE
+```bash
+plink --bfile all13 --indep-pairwise 1000 150 0.4 --out pruned_data
+plink --bfile all13 --extract pruned_data.prune.in --make-bed --out all14
+admixture --cv all14.bed -j8 5
+```
+
+i) Fst
+```bash
+plink2 --bfile all14 --fst CATPHENO --within ethnic2.txt --double-id --out fst_output
+chmod +x plot_fst_heatmap.py
+./plot_fst_heatmap.py fst_output.fst.summary
 ```
 
 Find ALDH2 gene in kazakh and other populations and see whether we absorb alcohol better or rose than other central asians or europeans
