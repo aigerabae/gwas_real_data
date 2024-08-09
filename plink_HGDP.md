@@ -277,9 +277,7 @@ h) ADMIXTURE
 plink --bfile all13 --indep-pairwise 1000 150 0.4 --out pruned_data
 plink --bfile all13 --extract pruned_data.prune.in --make-bed --out all14
 python safe_plot_admixture.py all14.10.Q ethnic2.txt
-for K in 5 6 7 8 9 10 11 12 13 14 15; \
-admixture --cv all14.bed -j8 $K | tee log${K}.out; done
-grep -h CV log*.out
+for K in 5 6 7 8 9 10 11 12 13 14 15; do admixture --cv all14.bed -j8 $K | tee log${K}.out; done
 ```
 
 i) Fst
