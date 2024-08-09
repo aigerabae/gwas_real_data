@@ -272,12 +272,21 @@ plink2 --bfile all13 --pca 10 --out all_pca
 python plot_eigenvec.py all_pca.eigenvec ethnic2.txt
 ```
 
-h) ADMIXTURE
+h) ADMIXTURE - don't fotget to run 2,3,4 and 13,14,15 and plot them
 ```bash
 plink --bfile all13 --indep-pairwise 1000 150 0.4 --out pruned_data
 plink --bfile all13 --extract pruned_data.prune.in --make-bed --out all14
+for K in 13 14 15; do admixture --cv all14.bed -j8 $K | tee log${K}.out; done
+for K in 2 3 4; do admixture --cv all14.bed -j8 $K | tee log${K}.out; done
+
+python safe_plot_admixture.py all14.5.Q ethnic2.txt
+python safe_plot_admixture.py all14.6.Q ethnic2.txt
+python safe_plot_admixture.py all14.7.Q ethnic2.txt
+python safe_plot_admixture.py all14.8.Q ethnic2.txt
+python safe_plot_admixture.py all14.9.Q ethnic2.txt
 python safe_plot_admixture.py all14.10.Q ethnic2.txt
-for K in 5 6 7 8 9 10 11 12 13 14 15; do admixture --cv all14.bed -j8 $K | tee log${K}.out; done
+python safe_plot_admixture.py all14.11.Q ethnic2.txt
+python safe_plot_admixture.py all14.12.Q ethnic2.txt
 ```
 
 i) Fst
