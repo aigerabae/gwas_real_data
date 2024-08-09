@@ -22,7 +22,7 @@ ethnicities = ethnicities_df.set_index('sample_id').to_dict()['ethnicity']
 # Extract data from the eigenvec file
 data = {
     'PC1': [-float(line.split()[2]) for line in lines],
-    'PC2': [float(line.split()[3]) for line in lines],
+    'PC2': [-float(line.split()[3]) for line in lines],
     'sample_id': [line.split()[0] for line in lines],
     'ethnicity': [ethnicities[line.split()[0]] for line in lines],
     'region': [ethnicities_df[ethnicities_df['sample_id'] == line.split()[0]]['region'].values[0] for line in lines]
