@@ -192,6 +192,7 @@ grep -h CV log*.out
 
 admixture --cv merged6.bed -j8 12
 grep -v -f <(awk '{print $1}' outliers.txt | sort | uniq) ethnicities5.txt > ethnicities6.txt
+python safe_plot_admixture.py merged6.12.Q ethnicities6.txt
 ```
 
 For plotting in R
@@ -273,12 +274,14 @@ h) ADMIXTURE
 ```bash
 plink --bfile all13 --indep-pairwise 1000 150 0.4 --out pruned_data
 plink --bfile all13 --extract pruned_data.prune.in --make-bed --out all14
-admixture --cv all14.bed -j8 5
+admixture --cv all14.bed -j8 10
+python safe_plot_admixture.py all14.10.Q ethnic2.txt
 ```
 
 i) Fst
 ```bash
-plink2 --bfile all14 --fst CATPHENO --within ethnic2.txt --double-id --out fst_output
+cat ethnic2.txt | awk '{print $1 "\t" $1 "\t" $2}' > ethnic3.txt
+plink2 --bfile all14 --fst CATPHENO --within ethnic3.txt --double-id --out fst_output
 chmod +x plot_fst_heatmap.py
 ./plot_fst_heatmap.py fst_output.fst.summary
 ```
