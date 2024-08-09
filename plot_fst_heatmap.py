@@ -11,11 +11,11 @@ def main(file_path):
     df = pd.read_csv(file_path, sep='\t', header=0)
 
     # Ensure that both Pop1 and Pop2 are treated as categorical variables
-    df['POP1'] = df['POP1'].astype('category')
+    df['POP1'] = df['#POP1'].astype('category')
     df['POP2'] = df['POP2'].astype('category')
 
     # Get the list of all unique populations
-    populations = sorted(set(df['POP1']).union(set(df['POP2'])))
+    populations = list(df['POP1'].cat.categories.union(df['POP2'].cat.categories))
 
     # Pivot the DataFrame to create a matrix suitable for a heatmap
     heatmap_data = df.pivot(index='POP1', columns='POP2', values='HUDSON_FST')
@@ -29,24 +29,30 @@ def main(file_path):
     # Optional: Fill NaN values with 0 for visualization if necessary
     heatmap_data = heatmap_data.fillna(0)
 
-    # Sort the values to ensure increasing order in the heatmap
-    sorted_columns = heatmap_data.mean().sort_values().index
-    heatmap_data = heatmap_data[sorted_columns].reindex(sorted_columns)
+    # Sort the rows and columns based on the mean or sum of their values
+    sorted_idx = heatmap_data.mean(axis=1).sort_values().index
+    heatmap_data = heatmap_data.loc[sorted_idx, sorted_idx]
 
     # Create the heatmap using seaborn with three decimal places and smaller font size
     plt.figure(figsize=(10, 8))
-    sns.heatmap(
+    ax = sns.heatmap(
         heatmap_data,
         annot=True,
         fmt=".3f",
         cmap="YlGnBu",
         cbar=True,
         square=True,
-        annot_kws={"size": 8}  # Adjust the font size here
+        annot_kws={"size": 2}  # Adjust the font size here
     )
     plt.title('Pairwise Fst Heatmap')
     plt.xlabel('POP2')
     plt.ylabel('POP1')
+
+    # Manually set the tick positions and labels
+    ax.set_xticks(np.arange(len(sorted_idx)) + 0.5)
+    ax.set_yticks(np.arange(len(sorted_idx)) + 0.5)
+    ax.set_xticklabels(sorted_idx, fontsize=4, rotation=90)
+    ax.set_yticklabels(sorted_idx, fontsize=4, rotation=0)
 
     # Save the plot to a file
     plt.savefig('fst_heatmap_sorted.png')
@@ -59,4 +65,3 @@ if __name__ == "__main__":
     
     file_path = sys.argv[1]
     main(file_path)
-
