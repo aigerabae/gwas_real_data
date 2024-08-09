@@ -1,7 +1,6 @@
 import sys
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import numpy as np
 
 # Check if the correct number of arguments are provided
@@ -30,6 +29,9 @@ data = {
 
 df = pd.DataFrame(data)
 
+# Add a new column for marker size
+df['marker_size'] = np.where(df['ethnicity'] == 'Kazakh', 14, 6)  # 14 for 'Kazakh', 6 for others
+
 # Determine unique areas and create dynamic mappings
 unique_regions = df['region'].unique()
 unique_ethnicities = df['ethnicity'].unique()
@@ -46,13 +48,11 @@ color_palette = px.colors.qualitative.Plotly
 shape_map = dict(zip(unique_regions, shape_symbols[:len(unique_regions)]))
 color_map = dict(zip(unique_ethnicities, color_palette[:len(unique_ethnicities)]))
 
-# Debug print statements
-print("Shape Map:", shape_map)
-print("Color Map:", color_map)
-
-# Create interactive scatter plot
+# Create interactive scatter plot with dynamic marker size
 fig = px.scatter(df, x='PC1', y='PC2', color='ethnicity', symbol='region', 
-                 hover_data={'sample_id': True, 'ethnicity': True})  # Display ethnicity on hover
+                 hover_data={'sample_id': True, 'ethnicity': True},
+                 size='marker_size',  # Use the marker_size column to adjust sizes
+                 size_max=14)  # Maximum size for Kazakh
 
 # Update marker shapes and colors based on dynamic mapping
 for region, shape in shape_map.items():
