@@ -276,8 +276,10 @@ h) ADMIXTURE
 ```bash
 plink --bfile all13 --indep-pairwise 1000 150 0.4 --out pruned_data
 plink --bfile all13 --extract pruned_data.prune.in --make-bed --out all14
-admixture --cv all14.bed -j8 10
 python safe_plot_admixture.py all14.10.Q ethnic2.txt
+for K in 5 6 7 8 9 10 11 12 13 14 15; \
+admixture --cv all14.bed -j8 $K | tee log${K}.out; done
+grep -h CV log*.out
 ```
 
 i) Fst
@@ -291,8 +293,7 @@ chmod +x plot_fst_heatmap.py
 Find ALDH2 gene in kazakh and other populations and see whether we absorb alcohol better or rose than other central asians or europeans
 SNPs:
 
-Alcohol-related SNPs
-nano alcohol_snps.txt
+Alcohol-related SNPs (only 1 present in kazakh dataset and none in merged)
 rs2018417
 rs28626993
 rs28913916
@@ -307,8 +308,6 @@ rs190914158
 rs201108880
 rs201582342
 
-plink --bfile all14 --extract alcohol_snps.txt --make-bed --out acohol_snps
-plink2 --bfile alcohol_snps --freq --out alcohol_snps
 
 
 More data to use for PCA:
