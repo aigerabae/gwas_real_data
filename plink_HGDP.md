@@ -237,6 +237,7 @@ cp ../../p3/ethnicities6.txt ./metadata_kaz.txt
 cp ../../p3/*merged6* ./
 
 e) Changing build from 37 to 38 and merging datasets and their metadata:
+```bash
 comm -12 <(awk '{print $2}' merged6.bim | sort) <(awk '{print $2}' all4.bim | sort) > common_snps.txt
 cat merged6.bim | awk '{print $2"\t" $1}' > dictionary_chr
 cat merged6.bim | cut -f 2,4 > dictionary_pos
@@ -247,6 +248,7 @@ plink --bfile all7 --exclude all8-merge.missnp --make-bed --out all8
 plink --bfile merged6 --exclude all8-merge.missnp --make-bed --out merged7
 plink --bfile merged7 --bmerge all8 --make-bed --out all9
 cat metadata.txt metadata_kaz.txt > ethnic1.txt
+```
 
 f) QC:
 ```bash
