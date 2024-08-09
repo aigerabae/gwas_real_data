@@ -289,6 +289,28 @@ chmod +x plot_fst_heatmap.py
 ```
 
 Find ALDH2 gene in kazakh and other populations and see whether we absorb alcohol better or rose than other central asians or europeans
+SNPs:
+
+Alcohol-related SNPs
+nano alcohol_snps.txt
+rs2018417
+rs28626993
+rs28913916
+rs28914782
+rs41275697
+rs41275699
+rs113075608
+rs13306164
+rs141556759
+rs150631941
+rs190914158
+rs201108880
+rs201582342
+
+plink --bfile all14 --extract alcohol_snps.txt --make-bed --out acohol_snps
+plink2 --bfile alcohol_snps --freq --out alcohol_snps
+
+
 More data to use for PCA:
 
 Simons: can be accessed at https://www.simonsfoundation.org/simons-genome-diversity-project/ via cancer genomics cloud seven bridges metadata can be accessed at https://www.nature.com/articles/nature18964#Sec10 Supplementary Table 1
