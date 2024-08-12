@@ -296,6 +296,17 @@ cat ethnic4.txt | awk '{print $2"\t" $1}'  > ethnic5.ind
 perl AncestryPainter.pl -i ethnic5.ind -q ./all14.8.Q -t Kazakh -o Kazakh -l nolines -f png
 perl AncestryPainter.pl -i ethnic5.ind -q all14.8.Q -f png
 
+Ancient genomes:
+Changing phenotype to 1 to allow convertf (didn't test yet)
+plink --bfile all14 --pheno dataset.fam --make-pheno 1 '*' --make-bed --out all15
+
+Ancient genoems available at 
+https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/FFIDCW
+https://reich.hms.harvard.edu/allen-ancient-dna-resource-aadr-downloadable-genotypes-present-day-and-ancient-dna-data
+
+Tutorial:
+https://indoaryan.com/qpadm-tutorial/
+
 i) Fst
 ```bash
 cat ethnic2.txt | awk '{print $1 "\t" $1 "\t" $2}' > ethnic3.txt
