@@ -319,9 +319,17 @@ rs201582342
 
 More data to use for PCA:
 
+**Raw files:**
 Simons: can be accessed at https://www.simonsfoundation.org/simons-genome-diversity-project/ via cancer genomics cloud seven bridges metadata can be accessed at https://www.nature.com/articles/nature18964#Sec10 Supplementary Table 1
 
 1000 genomes can be accessed at https://www.internationalgenome.org/data-portal/population
+
+**Geno data:**
+10000 ancient and present genomes for qpAdm: https://reich.hms.harvard.edu/allen-ancient-dna-resource-aadr-downloadable-genotypes-present-day-and-ancient-dna-data
+
+**PLINK data**
+HGDP + 1000 genomes in plink: https://gnomad.broadinstitute.org/downloads#v3-hgdp-1kg - has also data for HapMap
+Simons in plink: https://reichdata.hms.harvard.edu/pub/datasets/sgdp/ - but it only has 1-3 people for each population
 
 
 Getting alzheimer rsID:
