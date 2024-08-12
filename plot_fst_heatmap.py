@@ -54,8 +54,8 @@ def main(file_path):
     ax.set_xticklabels(sorted_idx, fontsize=4, rotation=90)
     ax.set_yticklabels(sorted_idx, fontsize=4, rotation=0)
 
-    # Save the plot to a file
-    plt.savefig('fst_heatmap_sorted.png')
+    # Save the plot to a file with high resolution
+    plt.savefig('fst_heatmap_sorted.png', dpi=300, bbox_inches='tight', pad_inches=0.1)
     plt.show()
 
 if __name__ == "__main__":
