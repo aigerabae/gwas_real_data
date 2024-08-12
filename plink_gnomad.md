@@ -1,21 +1,18 @@
+1) remove families and get them into separate metadata file
+cat hgdp_tgp.fam | cut -f 1,2 > metadata.txt
+plink --bfile hgdp_tgp --recode --out gnomad1
+plink2 --vcf gnomad1 --double-id --make-bed --out gnomad2
 
-1) QC of HGDP data
+
+3) QC of HGDP data
 ```bash
 plink --bfile hgdp_tgp --geno 0.02 --make-bed --out gnomad1
 plink --bfile gnomad1 --mind 0.02 --make-bed --out gnomad2
 plink --bfile gnomad2 --maf 0.001 --make-bed --out gnomad3
-plink --bfile gnomad3 --genome --min 0.2 --out pihat_min0.2
-plink --bfile gnomad3 --missing --out missing_report
-awk '$10 > 0.2 {print $1, $2, $3, $4}' pihat_min0.2.genome > related_pairs.txt
-```
+plink --bfile gnomad3 --snps-only 'just-acgt' --make-bed --out gnomad4
+```  
 
-```bash
-plink --bfile HGDP6 --remove to_remove.txt --make-bed --out HGDP7
-plink --bfile HGDP7 --snps-only 'just-acgt' --make-bed --out HGDP8
-```
-
-4) PCA
-
+2) PCA
 Only keeping selected ethicities
 ```bash
 cut -f 1,5 metadata.txt > ethnicities1.txt
