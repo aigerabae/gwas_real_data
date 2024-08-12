@@ -1,7 +1,13 @@
+Data accessed at https://gnomad.broadinstitute.org/downloads#v4-core-dataset
+with 
+gsutil cp gs://gcp-public-data--gnomad/release/3.1/secondary_analyses/hgdp_1kg_v2/f2_fst/hgdp_tgp.bim ./
+gsutil cp gs://gcp-public-data--gnomad/release/3.1/secondary_analyses/hgdp_1kg_v2/f2_fst/hgdp_tgp.bed ./
+gsutil cp gs://gcp-public-data--gnomad/release/3.1/secondary_analyses/hgdp_1kg_v2/f2_fst/hgdp_tgp.fam ./
+
 1) remove families and get them into separate metadata file
 cat hgdp_tgp.fam | cut -f 1,2 > metadata.txt
-plink --bfile hgdp_tgp --recode --out gnomad1
-plink2 --vcf gnomad1 --double-id --make-bed --out gnomad2
+plink --bfile hgdp_tgp --recode vcf --out gnomad1
+plink2 --vcf gnomad1.vcf --const-fid 0 --make-bed --out gnomad2
 
 
 3) QC of HGDP data
@@ -264,3 +270,10 @@ plink --bfile kaz12 --extract rsID_study --make-bed --out AD_study
 plink2 --bfile AD_table --freq --out AD_table
 plink2 --bfile AD_study --freq --out AD_study
 ```
+
+Visualizing with AncestryPainter 
+ln -s ~/tools/AncestryPainter_v5/AncestryPainter.pl ./
+awk '{print $1}' all14.fam | grep -Fwf - ethnic2.txt > ethnic4.txt
+cat ethnic4.txt | awk '{print $2"\t" $1}'  > ethnic5.ind
+perl AncestryPainter.pl -i ethnic5.ind -q ./all14.8.Q -t Kazakh -o Kazakh -l nolines -f png
+perl AncestryPainter.pl -i ethnic5.ind -q all14.8.Q -f png
