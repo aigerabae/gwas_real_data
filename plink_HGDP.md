@@ -289,6 +289,13 @@ python safe_plot_admixture.py all14.11.Q ethnic2.txt
 python safe_plot_admixture.py all14.12.Q ethnic2.txt
 ```
 
+Visualizing with AncestryPainter 
+ln -s ~/tools/AncestryPainter_v5/AncestryPainter.pl ./
+awk '{print $1}' all14.fam | grep -Fwf - ethnic2.txt > ethnic4.txt
+cat ethnic4.txt | awk '{print $2"\t" $1}'  > ethnic5.ind
+perl AncestryPainter.pl -i ethnic5.ind -q ./all14.8.Q -t Kazakh -o Kazakh -l nolines -f png
+perl AncestryPainter.pl -i ethnic5.ind -q all14.8.Q -f png
+
 i) Fst
 ```bash
 cat ethnic2.txt | awk '{print $1 "\t" $1 "\t" $2}' > ethnic3.txt
