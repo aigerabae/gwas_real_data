@@ -290,6 +290,7 @@ python safe_plot_admixture.py all14.12.Q ethnic2.txt
 ```
 
 ADMIXTURE with 5/8 populations:
+```bash
 cat ethnic2.txt | grep -e "Kazakh" -e "Russian" -e "Bedouin" -e "Sindhi" -e "Japanese" -e "French" | awk '{print $1"\t" $1}' > extract_5.txt
 cat ethnic2.txt | grep -e "Kazakh" -e "Russian" -e "Bedouin" -e "Sindhi" -e "Japanese" -e "French" | awk '{print $1"\t" $2"\t" $3}' > ethnic_5.txt
 plink --bfile all14 --keep extract_5.txt --make-bed --out all15_5
@@ -320,12 +321,15 @@ perl AncestryPainter.pl -i ethnic8_5.ind -q ./all15_8.5.Q -t Kazakh -o Kazakh -l
 awk '{print $1}' all15_8.fam | grep -Fwf - ethnic_8.txt > ethnic4_8.txt
 cat ethnic4_8.txt | awk '{print $2"\t" $1}'  > ethnic8_5.ind
 perl AncestryPainter.pl -i ethnic8_5.ind -q ./all15_8.8.Q -t Kazakh -o Kazakh -l nolines -f png
+```
 
-Visualizing with AncestryPainter 
+Visualizing with AncestryPainter
+```bash
 ln -s ~/tools/AncestryPainter_v5/AncestryPainter.pl ./
 awk '{print $1}' all14.fam | grep -Fwf - ethnic2.txt > ethnic4.txt
 cat ethnic4.txt | awk '{print $2"\t" $1}'  > ethnic5.ind
 perl AncestryPainter.pl -i ethnic5.ind -q ./all14.8.Q -t Kazakh -o Kazakh -f png
+```
 
 **Ancient genomes:**
 Changing phenotype to 1 to allow convertf (didn't test yet)
