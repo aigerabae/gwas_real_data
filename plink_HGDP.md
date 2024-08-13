@@ -289,14 +289,45 @@ python safe_plot_admixture.py all14.11.Q ethnic2.txt
 python safe_plot_admixture.py all14.12.Q ethnic2.txt
 ```
 
+ADMIXTURE with 5/8 populations:
+cat ethnic2.txt | grep -e "Kazakh" -e "Russian" -e "Bedouin" -e "Sindhi" -e "Japanese" -e "French" | awk '{print $1"\t" $1}' > extract_5.txt
+cat ethnic2.txt | grep -e "Kazakh" -e "Russian" -e "Bedouin" -e "Sindhi" -e "Japanese" -e "French" | awk '{print $1"\t" $2"\t" $3}' > ethnic_5.txt
+plink --bfile all14 --keep extract_5.txt --make-bed --out all15_5
+for K in 5 8; do admixture --cv all15_5.bed -j8 $K | tee log${K}.out; done
+
+cat ethnic2.txt | grep -e "Kazakh" -e "Russian" -e "Bedouin" -e "Sindhi" -e "Japanese" -e "French" -e "Mongolian" -e "Tajik" -e "Turks" | awk '{print $1"\t" $1}' > extract_8.txt
+cat ethnic2.txt | grep -e "Kazakh" -e "Russian" -e "Bedouin" -e "Sindhi" -e "Japanese" -e "French" -e "Mongolian" -e "Tajik" -e "Turks" | awk '{print $1"\t" $2"\t" $3}' > ethnic_8.txt
+plink --bfile all14 --keep extract_8.txt --make-bed --out all15_8
+for K in 5 8; do admixture --cv all15_8.bed -j8 $K | tee log${K}.out; done
+
+python safe_plot_admixture.py all15_5.5.Q ethnic_5.txt
+python safe_plot_admixture.py all15_5.8.Q ethnic_5.txt
+python safe_plot_admixture.py all15_8.5.Q ethnic_8.txt
+python safe_plot_admixture.py all15_8.8.Q ethnic_8.txt
+
+awk '{print $1}' all15_5.fam | grep -Fwf - ethnic_5.txt > ethnic4_5.txt
+cat ethnic4_5.txt | awk '{print $2"\t" $1}'  > ethnic5_5.ind
+perl AncestryPainter.pl -i ethnic5_5.ind -q ./all15_5.5.Q -t Kazakh -o Kazakh -l nolines -f png
+
+awk '{print $1}' all15_5.fam | grep -Fwf - ethnic_5.txt > ethnic4_5.txt
+cat ethnic4_5.txt | awk '{print $2"\t" $1}'  > ethnic5_5.ind
+perl AncestryPainter.pl -i ethnic5_5.ind -q ./all15_5.8.Q -t Kazakh -o Kazakh -l nolines -f png
+
+awk '{print $1}' all15_8.fam | grep -Fwf - ethnic_8.txt > ethnic4_8.txt
+cat ethnic4_8.txt | awk '{print $2"\t" $1}'  > ethnic8_5.ind
+perl AncestryPainter.pl -i ethnic8_5.ind -q ./all15_8.5.Q -t Kazakh -o Kazakh -l nolines -f png
+
+awk '{print $1}' all15_8.fam | grep -Fwf - ethnic_8.txt > ethnic4_8.txt
+cat ethnic4_8.txt | awk '{print $2"\t" $1}'  > ethnic8_5.ind
+perl AncestryPainter.pl -i ethnic8_5.ind -q ./all15_8.8.Q -t Kazakh -o Kazakh -l nolines -f png
+
 Visualizing with AncestryPainter 
 ln -s ~/tools/AncestryPainter_v5/AncestryPainter.pl ./
 awk '{print $1}' all14.fam | grep -Fwf - ethnic2.txt > ethnic4.txt
 cat ethnic4.txt | awk '{print $2"\t" $1}'  > ethnic5.ind
-perl AncestryPainter.pl -i ethnic5.ind -q ./all14.8.Q -t Kazakh -o Kazakh -l nolines -f png
-perl AncestryPainter.pl -i ethnic5.ind -q all14.8.Q -f png
+perl AncestryPainter.pl -i ethnic5.ind -q ./all14.8.Q -t Kazakh -o Kazakh -f png
 
-Ancient genomes:
+**Ancient genomes:**
 Changing phenotype to 1 to allow convertf (didn't test yet)
 plink --bfile all14 --pheno dataset.fam --make-pheno 1 '*' --make-bed --out all15
 
@@ -343,7 +374,9 @@ Simons: can be accessed at https://www.simonsfoundation.org/simons-genome-divers
 1000 genomes can be accessed at https://www.internationalgenome.org/data-portal/population
 
 **Geno data:**
-10000 ancient and present genomes for qpAdm: https://reich.hms.harvard.edu/allen-ancient-dna-resource-aadr-downloadable-genotypes-present-day-and-ancient-dna-data
+10000 ancient and present genomes for qpAdm: 
+https://reich.hms.harvard.edu/allen-ancient-dna-resource-aadr-downloadable-genotypes-present-day-and-ancient-dna-data
+Also at: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/FFIDCW
 
 **PLINK data**
 HGDP + 1000 genomes in plink: https://gnomad.broadinstitute.org/downloads#v3-hgdp-1kg - has also data for HapMap
