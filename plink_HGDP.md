@@ -301,26 +301,25 @@ cat ethnic2.txt | grep -e "Kazakh" -e "Russian" -e "Bedouin" -e "Sindhi" -e "Jap
 plink --bfile all14 --keep extract_8.txt --make-bed --out all15_8
 for K in 5 8; do admixture --cv all15_8.bed -j8 $K | tee log${K}.out; done
 
-python safe_plot_admixture.py all15_5.5.Q ethnic_5.txt
-python safe_plot_admixture.py all15_5.8.Q ethnic_5.txt
-python safe_plot_admixture.py all15_8.5.Q ethnic_8.txt
-python safe_plot_admixture.py all15_8.8.Q ethnic_8.txt
-
 awk '{print $1}' all15_5.fam | grep -Fwf - ethnic_5.txt > ethnic4_5.txt
 cat ethnic4_5.txt | awk '{print $2"\t" $1}'  > ethnic5_5.ind
 perl AncestryPainter.pl -i ethnic5_5.ind -q ./all15_5.5.Q -t Kazakh -o Kazakh -l nolines -f png
+python safe_plot_admixture.py all15_5.5.Q ethnic_5.txt
 
 awk '{print $1}' all15_5.fam | grep -Fwf - ethnic_5.txt > ethnic4_5.txt
 cat ethnic4_5.txt | awk '{print $2"\t" $1}'  > ethnic5_5.ind
 perl AncestryPainter.pl -i ethnic5_5.ind -q ./all15_5.8.Q -t Kazakh -o Kazakh -l nolines -f png
+python safe_plot_admixture.py all15_5.8.Q ethnic_5.txt
 
 awk '{print $1}' all15_8.fam | grep -Fwf - ethnic_8.txt > ethnic4_8.txt
 cat ethnic4_8.txt | awk '{print $2"\t" $1}'  > ethnic8_5.ind
 perl AncestryPainter.pl -i ethnic8_5.ind -q ./all15_8.5.Q -t Kazakh -o Kazakh -l nolines -f png
+python safe_plot_admixture.py all15_8.5.Q ethnic_8.txt
 
 awk '{print $1}' all15_8.fam | grep -Fwf - ethnic_8.txt > ethnic4_8.txt
 cat ethnic4_8.txt | awk '{print $2"\t" $1}'  > ethnic8_5.ind
 perl AncestryPainter.pl -i ethnic8_5.ind -q ./all15_8.8.Q -t Kazakh -o Kazakh -l nolines -f png
+python safe_plot_admixture.py all15_8.8.Q ethnic_8.txt
 ```
 
 Visualizing with AncestryPainter
