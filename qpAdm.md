@@ -58,7 +58,7 @@ scale: NO
 ```
 
 ```bash
-nano lista.txt
+nano ./bin/fstat_23andme/lista.txt
 ```
 ```bash
 Sohi
