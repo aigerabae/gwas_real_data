@@ -94,12 +94,34 @@ cut -f 1,5 metadata.txt > ethnicities1.txt
 awk 'NR==FNR {ids[$1]; next} $1 in ids {print $1"\t" $2}' HGDP8.fam ethnicities.txt > ethnicities2.txt
 cat ethnicities2.txt <(awk '{print $1 "\tKazakh"}' kaz12_autosomal.fam) > ethnicities3.txt
 cat ethnicities3.txt | grep -e "Kazakh" -e "Uygur" -e "Hazara" -e "Russian" -e "French" -e "Basque" -e "Bergamo" -e "Pathan" -e "Sindhi" -e "Kalash" -e "Adygei" -e "Bedouin" -e "Mozabite" -e "Japanese" -e "Northern" -e "Mongolian" -e "Yakut" -e "Han" | awk '{print $1"\t" $2}' > ethnicities4.txt
+cat ethnicities4.txt | awk '{print $1"\t" $1}' > selected_ethnicities.txt
 plink --bfile HGDP8 --keep selected_ethnicities.txt --biallelic-only strict --make-bed --out HGDP9
+```
+
+ADMIXTURE without kazakhs: still looks weird
+```bash
+cp ../hgdp/ethnicities3.txt ./
+cat ethnicities3.txt | grep -e "Uygur" -e "Hazara" -e "Russian" -e "French" -e "Basque" -e "Bergamo" -e "Pathan" -e "Sindhi" -e "Kalash" -e "Adygei" -e "Bedouin" -e "Mozabite" -e "Japanese" -e "Northern" -e "Mongolian" -e "Yakut" -e "Han" -e "Yoruba" -e "Biaka" -e "Bantu" | awk '{print $1"\t" $2"\t" $2}' > ethnicities3_HGDP_only.txt
+cat ethnicities3_HGDP_only.txt | awk '{print $1"\t" $1}' > selected_ethnicities_african_no_kazakh.txt
+plink --bfile HGDP8 --keep selected_ethnicities_african_no_kazakh.txt --biallelic-only strict --make-bed --out HGDP8_african
+plink --bfile HGDP8_african --indep-pairwise 1000 150 0.4 --out pruned_data
+plink --bfile HGDP8_african --extract pruned_data.prune.in --make-bed --out HGDP8_pruned
+
+admixture --cv HGDP8_pruned.bed -j8 8
+python safe_plot_admixture.py HGDP8_pruned.8.Q ethnicities3_HGDP_only.txt
+admixture --cv HGDP8_pruned.bed -j8 3
+python safe_plot_admixture.py HGDP8_pruned.3.Q ethnicities3_HGDP_only.txt
+python average_plot_admixture.py HGDP8_pruned.3.Q ethnicities3_HGDP_only.txt
+
+cat ethnicities3_HGDP_only.txt | awk '{print $2"\t" $1}' > ethnicities3_HGDP.ind
+perl AncestryPainter.pl -i ethnicities3_HGDP.ind -q ./all14.8.Q -f png
+
+plink2 --bfile HGDP8_pruned --pca 10 --out all_pca
+python plot_eigenvec.py all_pca.eigenvec ethnicities3_HGDP_only.txt
 ```
 
 Merging kazakh and HGDP data (first - deal with multiallelic variants) and doing PCA;
 ```bash
-
 plink --bfile kaz12_autosomal --bmerge HGDP9.bed HGDP9.bim HGDP9.fam --make-bed --out merged1
 plink --bfile HGDP9 --exclude merged_dataset-merge.missnp --biallelic-only strict --make-bed --out HGDP10
 plink --bfile kaz12_autosomal --exclude merged_dataset-merge.missnp --biallelic-only strict --make-bed --out kaz13_autosomal
