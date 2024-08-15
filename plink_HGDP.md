@@ -312,8 +312,16 @@ python safe_plot_admixture.py all14.10.Q ethnic4.txt
 python safe_plot_admixture.py all14.11.Q ethnic4.txt
 python safe_plot_admixture.py all14.12.Q ethnic4.txt
 
-python average_plot_admixture.py all14.5.Q ethnic4.txt
+python average_plot_admixture.py all14.8.Q ethnic4.txt
+```
 
+Merging together all siberians
+```bash
+sed -e 's/keto/Siberia/gI' -e 's/altai/Siberia/gI' -e 's/nganassan/Siberia/gI' -e 's/Dolgan/Siberia/gI' -e 's/buriat/Siberia/gI' -e 's/chukchi/Siberia/gI' -e 's/koryak/Siberia/gI' -e 's/kryashen/Siberia/gI' -e 's/kumyks/Siberia/gI' -e 's/nivh/Siberia/gI' -e 's/tuva/Siberia/gI' -e 's/Keto/Siberia/gI' -e 's/komi/Siberia/gI' -e 's/even/Siberia/gI' -e 's/nenets/Siberia/gI' -e 's/Hakas/Siberia/gI'  ethnic4.txt > ethnic4_siberia_merged_together.txt
+
+sed -e 's/Abhkasians/caucasus/gI' -e 's/Adygei/caucasus/gI' -e 's/North_Ossetians/caucasus/gI' -e 's/Lezgins/caucasus/gI' -e 's/Chuvash/caucasus/gI' -e 's/Chechens/caucasus/gI' -e 's/Balkars/caucasus/gI' -e 's/Adygei/caucasus/gI' -e 's/kabardin/caucasus/gI' -e 's/mongol/Mongolian/gI'  ethnic4_siberia_merged_together.txt > ethnic4_siberia_caucasus_merged_together.txt
+
+python average_plot_admixture.py all14.5.Q ethnic4_siberia_caucasus_merged_together.txt
 ```
 
 ADMIXTURE with 5/8 populations:
