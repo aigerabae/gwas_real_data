@@ -301,14 +301,19 @@ plink --bfile all13 --extract pruned_data.prune.in --make-bed --out all14
 for K in 13 14 15; do admixture --cv all14.bed -j8 $K | tee log${K}.out; done
 for K in 2 3 4; do admixture --cv all14.bed -j8 $K | tee log${K}.out; done
 
-python safe_plot_admixture.py all14.5.Q ethnic2.txt
-python safe_plot_admixture.py all14.6.Q ethnic2.txt
-python safe_plot_admixture.py all14.7.Q ethnic2.txt
-python safe_plot_admixture.py all14.8.Q ethnic2.txt
-python safe_plot_admixture.py all14.9.Q ethnic2.txt
-python safe_plot_admixture.py all14.10.Q ethnic2.txt
-python safe_plot_admixture.py all14.11.Q ethnic2.txt
-python safe_plot_admixture.py all14.12.Q ethnic2.txt
+awk '{print $1}' all14.fam | grep -Fwf - ethnic2.txt > ethnic4.txt
+
+python safe_plot_admixture.py all14.5.Q ethnic4.txt
+python safe_plot_admixture.py all14.6.Q ethnic4.txt
+python safe_plot_admixture.py all14.7.Q ethnic4.txt
+python safe_plot_admixture.py all14.8.Q ethnic4.txt
+python safe_plot_admixture.py all14.9.Q ethnic4.txt
+python safe_plot_admixture.py all14.10.Q ethnic4.txt
+python safe_plot_admixture.py all14.11.Q ethnic4.txt
+python safe_plot_admixture.py all14.12.Q ethnic4.txt
+
+python average_plot_admixture.py all14.5.Q ethnic4.txt
+
 ```
 
 ADMIXTURE with 5/8 populations:
