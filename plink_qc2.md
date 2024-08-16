@@ -249,6 +249,4 @@ mv kaz_a5_224.vcf ./autosomal_224_ext_for_annovar.vcf
 Remove outliers from annotated version as well:
 ```bash
 awk '{for (i=1; i<=NF; i++) if (i!=282 && i!=304) printf "%s%s", $i, (i<NF?OFS:ORS)}' autosomal_ext_for_annovar.FINAL.annovar.hg38_multianno.header.txt > annovared_kaz12_autosomal_224.txt
-awk 'NR==FNR {cols[$1]=$236 OFS $237; next} {for (i=1; i<=NF; i++) if (i!=345 && i!=346) printf "%s%s", $i, (i<NF?OFS:ORS); if (FNR in cols) printf "%s%s", cols[FNR], ORS}' autosomal_224_ext_for_annovar.vcf annovared_kaz12_autosomal_224.txt > autosomal_224_ext_for_annovar_final.vcf
-rm annovared_kaz12_autosomal_224.txt
 ```
