@@ -138,6 +138,11 @@ cat outliers_kazakh.txt outliers_HGDP.txt > outliers.txt
 plink --bfile merged5 --remove outliers.txt --make-bed --out merged6
 ```
 
+Remove outliers from annotated version as well:
+awk '{for (i=1; i<=NF; i++) if (i!=282 && i!=304) printf "%s%s", $i, (i<NF?OFS:ORS)}' autosomal_ext_for_annovar.FINAL.annovar.hg38_multianno.header.txt > annovared_kaz12_autosomal_224.txt
+
+And from kaz12:
+
 5) Downloading turkic,siberian,caucasus,jewish (has uzbek) data from Estonian Biocentre:
 ```bash
 wget https://evolbio.ut.ee/turkic/turkic.fam
@@ -274,21 +279,21 @@ for K in 5 8; do admixture --cv all15_8.bed -j8 $K | tee log${K}.out; done
 
 awk '{print $1}' all15_5.fam | grep -Fwf - ethnic_5.txt > ethnic4_5.txt
 cat ethnic4_5.txt | awk '{print $2"\t" $1}'  > ethnic5_5.ind
-perl AncestryPainter.pl -i ethnic5_5.ind -q ./all15_5.5.Q -t Kazakh -o Kazakh -l nolines -f png
+perl AncestryPainter.pl -i ethnic5_5.ind -q ./all15_5.5.Q -t Kazakh -o Kazakh -f png
 python safe_plot_admixture.py all15_5.5.Q ethnic_5.txt
 
 awk '{print $1}' all15_5.fam | grep -Fwf - ethnic_5.txt > ethnic4_5.txt
 cat ethnic4_5.txt | awk '{print $2"\t" $1}'  > ethnic5_5.ind
-perl AncestryPainter.pl -i ethnic5_5.ind -q ./all15_5.8.Q -t Kazakh -o Kazakh -l nolines -f png
+perl AncestryPainter.pl -i ethnic5_5.ind -q ./all15_5.8.Q -t Kazakh -o Kazakh -f png
 python safe_plot_admixture.py all15_5.8.Q ethnic_5.txt
 
 awk '{print $1}' all15_8.fam | grep -Fwf - ethnic_8.txt > ethnic4_8.txt
 cat ethnic4_8.txt | awk '{print $2"\t" $1}'  > ethnic8_5.ind
-perl AncestryPainter.pl -i ethnic8_5.ind -q ./all15_8.5.Q -t Kazakh -o Kazakh -l nolines -f png
+perl AncestryPainter.pl -i ethnic8_5.ind -q ./all15_8.5.Q -t Kazakh -o Kazakh_8_5  -f png
 python safe_plot_admixture.py all15_8.5.Q ethnic_8.txt
 
 awk '{print $1}' all15_8.fam | grep -Fwf - ethnic_8.txt > ethnic4_8.txt
 cat ethnic4_8.txt | awk '{print $2"\t" $1}'  > ethnic8_5.ind
-perl AncestryPainter.pl -i ethnic8_5.ind -q ./all15_8.8.Q -t Kazakh -o Kazakh -l nolines -f png
+perl AncestryPainter.pl -i ethnic8_5.ind -q ./all15_8.8.Q -t Kazakh -o Kazakh_8_8  -f png
 python safe_plot_admixture.py all15_8.8.Q ethnic_8.txt
 ```
