@@ -138,11 +138,6 @@ cat outliers_kazakh.txt outliers_HGDP.txt > outliers.txt
 plink --bfile merged5 --remove outliers.txt --make-bed --out merged6
 ```
 
-Remove outliers from annotated version as well:
-awk '{for (i=1; i<=NF; i++) if (i!=282 && i!=304) printf "%s%s", $i, (i<NF?OFS:ORS)}' autosomal_ext_for_annovar.FINAL.annovar.hg38_multianno.header.txt > annovared_kaz12_autosomal_224.txt
-
-And from kaz12:
-
 5) Downloading turkic,siberian,caucasus,jewish (has uzbek) data from Estonian Biocentre:
 ```bash
 wget https://evolbio.ut.ee/turkic/turkic.fam
