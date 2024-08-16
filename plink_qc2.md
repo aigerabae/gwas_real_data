@@ -238,8 +238,9 @@ plink --bfile kaz12_224_mitoch --recode vcf --out kaz12_224_mitoch
 plink --bfile kaz12_224_y_chr --recode vcf --out kaz12_224_y_chr
 ```
 
-Making extended vcf using 224 samples:
+Making extended vcf _with MAFs and count of alleles) using 224 samples:
 ```bash
+plink2 --bfile kaz12_224_autosomal  --freq --out maf_kaz12_224_autosomal
 bcftools view -h kaz12_224_autosomal.vcf > kaz_a1_224.vcf
 bcftools view -H kaz12_224_autosomal.vcf > kaz_a2_224.vcf
 cat maf_kaz12_224_autosomal.afreq | tail -n +2 | cut -f 6,7 > added_info_224.txt
