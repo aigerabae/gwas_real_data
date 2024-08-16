@@ -212,6 +212,7 @@ cat maf_kaz12_autosomal.afreq | head -n 1 | cut -f 6,7 > added_header.txt
 (cat kaz_a1.vcf | sed '$d'; paste <(tail -n 1 kaz_a1.vcf) added_header.txt) > kaz_a4.vcf
 paste kaz_a2.vcf added_info.txt > kaz_a3.vcf
 cat kaz_a4.vcf kaz_a3.vcf > kaz_a5.vcf
+mv kaz_a5.vcf ./autosomal_ext_for_annovar.vcf
 ```
 
 12) Remove outliers that show on PCA:
@@ -246,4 +247,5 @@ cat maf_kaz12_224_autosomal.afreq | head -n 1 | cut -f 6,7 > added_header_224.tx
 (cat kaz_a1_224.vcf | sed '$d'; paste <(tail -n 1 kaz_a1.vcf) added_header_224.txt) > kaz_a4_224.vcf
 paste kaz_a2_224.vcf added_info_224.txt > kaz_a3_224.vcf
 cat kaz_a4_224.vcf kaz_a3_224.vcf > kaz_a5_224.vcf
+mv kaz_a5_224.vcf ./autosomal_224_ext_for_annovar.vcf
 ```
