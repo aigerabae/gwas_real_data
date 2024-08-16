@@ -228,13 +228,17 @@ awk '{for (i=1; i<=NF; i++) if (i!=282 && i!=304) printf "%s%s", $i, (i<NF?OFS:O
 ```
 
 And from kaz12:
+```bash
 plink --bfile kaz12_autosomal --remove outliers_kazakh.txt --make-bed --out kaz12_224_autosomal
 plink --bfile kaz12_mitoch --remove outliers_kazakh.txt --make-bed --out kaz12_224_mitoch
 plink --bfile kaz12_y_chr --remove outliers_kazakh.txt --make-bed --out kaz12_224_y_chr
 plink --bfile kaz12_224_autosomal --recode vcf --out kaz12_224_autosomal
 plink --bfile kaz12_224_mitoch --recode vcf --out kaz12_224_mitoch
 plink --bfile kaz12_224_y_chr --recode vcf --out kaz12_224_y_chr
+```
 
+Making extended vcf using 224 samples:
+```bash
 bcftools view -h kaz12_224_autosomal.vcf > kaz_a1_224.vcf
 bcftools view -H kaz12_224_autosomal.vcf > kaz_a2_224.vcf
 cat maf_kaz12_224_autosomal.afreq | tail -n +2 | cut -f 6,7 > added_info_224.txt
@@ -242,3 +246,4 @@ cat maf_kaz12_224_autosomal.afreq | head -n 1 | cut -f 6,7 > added_header_224.tx
 (cat kaz_a1_224.vcf | sed '$d'; paste <(tail -n 1 kaz_a1.vcf) added_header_224.txt) > kaz_a4_224.vcf
 paste kaz_a2_224.vcf added_info_224.txt > kaz_a3_224.vcf
 cat kaz_a4_224.vcf kaz_a3_224.vcf > kaz_a5_224.vcf
+```
