@@ -223,12 +223,8 @@ nano outliers_kazakh.txt
 1210510 1210510
 1302810  1302810
 ```
-Remove outliers from annotated version as well:
-```bash
-awk '{for (i=1; i<=NF; i++) if (i!=282 && i!=304) printf "%s%s", $i, (i<NF?OFS:ORS)}' autosomal_ext_for_annovar.FINAL.annovar.hg38_multianno.header.txt > annovared_kaz12_autosomal_224.txt
-```
 
-And from kaz12:
+Rempoving these outliers from kaz12:
 ```bash
 plink --bfile kaz12_autosomal --remove outliers_kazakh.txt --make-bed --out kaz12_224_autosomal
 plink --bfile kaz12_mitoch --remove outliers_kazakh.txt --make-bed --out kaz12_224_mitoch
@@ -249,4 +245,10 @@ cat maf_kaz12_224_autosomal.afreq | head -n 1 | cut -f 6,7 > added_header_224.tx
 paste kaz_a2_224.vcf added_info_224.txt > kaz_a3_224.vcf
 cat kaz_a4_224.vcf kaz_a3_224.vcf > kaz_a5_224.vcf
 mv kaz_a5_224.vcf ./autosomal_224_ext_for_annovar.vcf
+```
+Remove outliers from annotated version as well:
+```bash
+awk '{for (i=1; i<=NF; i++) if (i!=282 && i!=304) printf "%s%s", $i, (i<NF?OFS:ORS)}' autosomal_ext_for_annovar.FINAL.annovar.hg38_multianno.header.txt > annovared_kaz12_autosomal_224.txt
+awk 'NR==FNR {cols[$1]=$236 OFS $237; next} {for (i=1; i<=NF; i++) if (i!=345 && i!=346) printf "%s%s", $i, (i<NF?OFS:ORS); if (FNR in cols) printf "%s%s", cols[FNR], ORS}' autosomal_224_ext_for_annovar.vcf annovared_kaz12_autosomal_224.txt > autosomal_224_ext_for_annovar_final.vcf
+rm annovared_kaz12_autosomal_224.txt
 ```
