@@ -39,10 +39,12 @@ What columns do I need to save?
 
 1) transpose
 Remove header and select certain columns; Split,transpose (fastest way - with csvtk!),put back together:
+```bash
 cat ah.txt | tail -n +6 | cut -f 2-805,807,808,809,836 > ah1.tsv
 split -l 50000 -d ah1.tsv ah2_chunks
 seq -w 00 15 | parallel -j 8 'csvtk -t transpose ah2_chunks{} > ah3_chunks{}'
 paste ah3_chunks00 ah3_chunks01 ah3_chunks02 ah3_chunks03 ah3_chunks04 ah3_chunks05 ah3_chunks06 ah3_chunks07 ah3_chunks08 ah3_chunks09 ah3_chunks10 ah3_chunks11 ah3_chunks12 ah3_chunks13 ah3_chunks14 ah3_chunks15 > ah4.tsv
+```
 
 Result: 
 rows 1 to 804 - patients
