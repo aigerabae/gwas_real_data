@@ -53,8 +53,13 @@ rows 1 to 804 - patients
 807 - end
 808 - rsID
 
+cat ah4.tsv | tail -n 4 > ah5_1.map
+cat ah4.tsv | tail -n 1 > ah5_1.ped
+cat ah4.tsv | wc -l
+cat ah4.tsv | head -n 804 > ah5_2.ped
+cat ah5_1.ped ah5_2.ped > ah5_3.ped
+
 Map file:
 805,808,0s,806,807(?)
-
 Ped file:
 0s, 1(?), 0s, 0s, sex, phenotype, 2-804
