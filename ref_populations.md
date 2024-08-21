@@ -101,7 +101,7 @@ First - deal with multiallelic variants
 ```bash
 plink --bfile kaz12_autosomal --bmerge HGDP9.bed HGDP9.bim HGDP9.fam --make-bed --out merged1
 plink --bfile HGDP9 --exclude merged1-merge.missnp --biallelic-only strict --make-bed --out HGDP10
-plink --bfile kaz12_autosomal --exclude merged_dataset-merge.missnp --biallelic-only strict --make-bed --out kaz13_autosomal
+plink --bfile kaz12_autosomal --exclude merged1-merge.missnp --biallelic-only strict --make-bed --out kaz13_autosomal
 plink --bfile kaz13_autosomal --bmerge HGDP10.bed HGDP10.bim HGDP10.fam --make-bed --out merged2
 plink --bfile merged2 --geno 0.02 --make-bed --out merged3
 plink --bfile merged3 --mind 0.02 --make-bed --out merged4
