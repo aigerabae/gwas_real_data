@@ -32,35 +32,29 @@ df = pd.DataFrame(data)
 # Add a new column for marker size
 df['marker_size'] = np.where(df['ethnicity'] == 'Kazakh', 14, 6)  # 14 for 'Kazakh', 6 for others
 
-# Determine unique areas and create dynamic mappings
+# Determine unique regions and ethnicities
 unique_regions = df['region'].unique()
 unique_ethnicities = df['ethnicity'].unique()
 
-# Define a set of shape symbols (more than enough to cover various regions)
-shape_symbols = ['circle', 'square', 'triangle-up', 'triangle-down', 'square-open', 'diamond',
-                 'cross', 'x', 'star', 'hexagram', 'triangle-left', 'triangle-right', 
-                 'pentagon', 'hourglass', 'bowtie', 'circle-open']
+# Define a set of shape symbols (ensure enough for various regions)
+shape_symbols = ['circle', 'square', 'triangle-up', 'triangle-down', 'diamond', 'cross', 
+                 'x', 'star', 'hexagram', 'triangle-left', 'triangle-right', 'pentagon', 
+                 'hourglass', 'bowtie', 'circle-open']
+
+# Map regions to shape symbols
+shape_map = dict(zip(unique_regions, shape_symbols[:len(unique_regions)]))
 
 # Use color palette to assign colors dynamically
 color_palette = px.colors.qualitative.Plotly
-
-# Create mappings for regions to shapes and ethnicities to colors
-shape_map = dict(zip(unique_regions, shape_symbols[:len(unique_regions)]))
 color_map = dict(zip(unique_ethnicities, color_palette[:len(unique_ethnicities)]))
 
-# Create interactive scatter plot with dynamic marker size
+# Create interactive scatter plot with dynamic marker size, shape, and color
 fig = px.scatter(df, x='PC1', y='PC2', color='ethnicity', symbol='region', 
                  hover_data={'sample_id': True, 'ethnicity': True},
                  size='marker_size',  # Use the marker_size column to adjust sizes
-                 size_max=14)  # Maximum size for Kazakh
-
-# Update marker shapes and colors based on dynamic mapping
-for region, shape in shape_map.items():
-    fig.update_traces(marker=dict(symbol=shape), selector=dict(mode='markers+text', legendgroup=region))
-    
-for ethnicity in unique_ethnicities:
-    color = color_map.get(ethnicity)
-    fig.update_traces(marker=dict(color=color), selector=dict(name=ethnicity))
+                 size_max=14,  # Maximum size for Kazakh
+                 symbol_map=shape_map,  # Map regions to shapes
+                 color_discrete_map=color_map)  # Map ethnicities to colors
 
 # Update layout for larger font sizes and remove the grid
 fig.update_layout(
@@ -72,8 +66,8 @@ fig.update_layout(
     yaxis_title_font_size=20,
     legend_title_font_size=18,
     font=dict(size=16),
-    xaxis=dict(showgrid=False, zeroline=False),  # Reverse x-axis
-    yaxis=dict(showgrid=False, zeroline=False),  # Reverse y-axis
+    xaxis=dict(showgrid=False, zeroline=False),
+    yaxis=dict(showgrid=False, zeroline=False),
     plot_bgcolor='rgba(0,0,0,0)'  # Make background transparent
 )
 
