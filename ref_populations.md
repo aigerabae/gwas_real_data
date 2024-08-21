@@ -178,6 +178,9 @@ cat merged6.bim | cut -f 2,4 > dictionary_pos
 plink --bfile all4 --extract common_snps.txt --make-bed --out all5
 plink2 --bfile all5 --update-chr dictionary_chr --update-map dictionary_pos --sort-vars --make-pgen --out all6
 plink2 --pfile all6 --make-bed --out all7
+plink --bfile merged6 --bmerge all7 --make-bed --out all8
+# this line above is for making a missnp file
+
 plink --bfile all7 --exclude all8-merge.missnp --make-bed --out all8
 plink --bfile merged6 --exclude all8-merge.missnp --make-bed --out merged7
 ```
@@ -214,7 +217,6 @@ python plot_eigenvec.py all_pca.eigenvec ethnic2.txt
 ```bash
 cat ethnic2.txt | awk '{print $1 "\t" $1 "\t" $2}' > ethnic2_fst.txt
 plink2 --bfile all13 --fst CATPHENO --within ethnic2_fst.txt --double-id --out fst_output
-chmod +x plot_fst_heatmap.py
 ./plot_fst_heatmap.py fst_output.fst.summary
 ```
 
@@ -234,7 +236,9 @@ awk '{print $1}' all14.fam | grep -Fwf - ethnic2.txt > ethnic3.txt
 
 ADMIXTURE
 ```bash
-for K in 3 5 8 12; do admixture --cv all14.bed -j8 $K | tee log${K}.out; done
+for K in 8; do admixture --cv all14.bed -j8 $K | tee log${K}.out; done
+for K in 10; do admixture --cv all14.bed -j8 $K | tee log${K}.out; done
+for K in 3 5 15; do admixture --cv all14.bed -j8 $K | tee log${K}.out; done
 ```
 
 Plotting:
