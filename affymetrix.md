@@ -1,3 +1,5 @@
+Work I do on Affymetrix data; unrelated to GWAS 300 Kazakh analysis
+
 headers description = rows 1-5 
 column names = row 6
 
