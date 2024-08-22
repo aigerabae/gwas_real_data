@@ -35,7 +35,15 @@ cat rows_with_mafs.tsv | cut -f 11 | grep -w "exonic" | wc -l
 cat rows_with_mafs.tsv | cut -f 16 | grep -w "exonic" | wc -l
 ```
 
-table with rsID, kazakh MAFs and all other MAFs:
+table with rsID, ref/alt from databases, ref/alt from kazakh, kazakh MAFs and all other MAFs:
 ```bash
-cat rows_with_mafs.tsv | awk '{print $117,$348,$22, $23, $24, $25, $26, $57, $58, $59, $60, $61, $62, $63, $64, $65, $66, $67, $68, $69, $70, $71, $72, $73, $74, $75, $76, $77, $78, $79, $80, $81, $82, $83, $84, $85, $86, $87, $88, $89, $90, $91, $92, $93, $94, $95, $96, $97, $98, $99, $100, $101}'  > mafs_only.tsv
+awk 'NR==1 {print "ref_others alt_others ref_kazakh alt_kazakh", $117, $348, $22, $23, $24, $25, $26, $57, $58, $59, $60, $61, $62, $63, $64, $65, $66, $67, $68, $69, $70, $71, $72, $73, $74, $75, $76, $77, $78, $79, $80, $81, $82, $83, $84, $85, $86, $87, $88, $89, $90, $91, $92, $93, $94, $95, $96, $97, $98, $99, $100, $101}' rows_with_mafs.tsv > mafs_only.tsv
+awk 'NR>1 {print $4, $5, $118, $119, $117, $348, $22, $23, $24, $25, $26, $57, $58, $59, $60, $61, $62, $63, $64, $65, $66, $67, $68, $69, $70, $71, $72, $73, $74, $75, $76, $77, $78, $79, $80, $81, $82, $83, $84, $85, $86, $87, $88, $89, $90, $91, $92, $93, $94, $95, $96, $97, $98, $99, $100, $101}' rows_with_mafs.tsv >> mafs_only.tsv
+sed -i '' 's/ /\t/g' mafs_only.tsv
+```
+
+Find if ref/alt are the same in Kazakh and ref populations:
+```bash
+awk 'NR==1 {header=$0; print header > "mafs_mtch_ref_alt.tsv"; next} $1 == $3 && $2 == $4 {print >> "mafs_mtch_ref_alt.tsv"}' mafs_only.tsv
+awk 'NR > 1 && ($1 != $3 || $2 != $4)' mafs_only.tsv > mafs_nomtch_ref_alt.tsv
 ```
