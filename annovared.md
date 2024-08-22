@@ -26,4 +26,14 @@ Print rows with non-missing MAFs:
 awk -F'\t' '{for(i=57;i<=101;i++) if($i != ".") {print $0; next}; for(i=22;i<=26;i++) if($i != ".") {print $0; next}}' final_annovared_extended.tsv > rows_with_mafs.tsv
 ```
 
-how many of these rows with MAFs are exonic:
+how many of these rows with MAFs are exonic: ~ about 1600
+```bash
+cat rows_with_mafs.tsv | cut -f 6 | grep -w "exonic" | wc -l
+cat rows_with_mafs.tsv | cut -f 11 | grep -w "exonic" | wc -l
+cat rows_with_mafs.tsv | cut -f 16 | grep -w "exonic" | wc -l
+```
+
+table with rsID, kazakh MAFs and all other MAFs:
+```bash
+cat rows_with_mafs.tsv | awk '{printf "%s ", $117; for(i=22;i<=26;i++) printf "%s ", $i; for(i=57;i<=101;i++) printf "%s ", $i; print ""}' > mafs_only.tsv
+```
