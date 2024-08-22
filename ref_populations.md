@@ -258,16 +258,16 @@ Regular plot:
 python safe_plot_admixture.py all14.8.Q ethnic3.txt
 ```
 
-Round plot with kazakhs in the middle:
+Round plot with kazakhs in the middle: (ind file has 2 columns)
 ```bash
 ln -s ~/tools/AncestryPainter_v5/AncestryPainter.pl ./
-cat ethnic3.txt | awk '{print $2"\t" $1}'  > ethnic3.ind
+cat ethnic3.txt | awk '{print $2"\t" $1}'  > ethnic3.ind 
 perl AncestryPainter.pl -i ethnic3.ind -q ./all14.8.Q -t Kazakh -o Kazakh -f png
 ```
 
 Making a table with average percentages for each population:
 ```bash
-python create_admixtures_table.py all14.8.Q ethnic3.txt 
+python create_admixtures_table.py all14.8.Q ethnic3.ind
 ```
 
 ADMIXTURE with 5/8 populations:
