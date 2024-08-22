@@ -3,6 +3,8 @@ This script described work I did on annovar file from Aset:
 Adding extended (KAZ_MAF + allele count):
 ```bash
 cat autosomal_ext_for_annovar.FINAL.annovar.hg38_multianno.header.txt | cut -f 347,348 > for_extended_vcf.tsv
+sed -i '' 's/ALT_FREQS/kaz_alt_frq/g' for_extended_vcf.tsv
+sed -i '' 's/OBS_CT/kaz_allele_count/g' for_extended_vcf.tsv
 paste kaz_gwas_for_annovar_224.FINAL.annovar.hg38_multianno.header.txt for_extended_vcf.tsv > final_annovared_extended.tsv
 ```
 
@@ -35,5 +37,5 @@ cat rows_with_mafs.tsv | cut -f 16 | grep -w "exonic" | wc -l
 
 table with rsID, kazakh MAFs and all other MAFs:
 ```bash
-cat rows_with_mafs.tsv | awk '{printf "%s ", $117; for(i=22;i<=26;i++) printf "%s ", $i; for(i=57;i<=101;i++) printf "%s ", $i; print ""}' > mafs_only.tsv
+cat rows_with_mafs.tsv | awk '{print $117,$348,$22, $23, $24, $25, $26, $57, $58, $59, $60, $61, $62, $63, $64, $65, $66, $67, $68, $69, $70, $71, $72, $73, $74, $75, $76, $77, $78, $79, $80, $81, $82, $83, $84, $85, $86, $87, $88, $89, $90, $91, $92, $93, $94, $95, $96, $97, $98, $99, $100, $101}'  > mafs_only.tsv
 ```
