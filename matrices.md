@@ -1,3 +1,5 @@
+This script contains work I did to process matrices for GEO database to remove unnecwsary samples (300->224)
+
 Filtering matrices
 columns_to_remove.tsv has column numbers that I want to remove
 
