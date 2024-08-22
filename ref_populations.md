@@ -1,4 +1,5 @@
 HGDP: accessed at https://www.hagsc.org/hgdp/files.html 
+
 Metadata: accessed at https://www.internationalgenome.org/data-portal/data-collection/hgdp 
 
 1) HGDP text file 36.1 build -> plink binary file with 38 build
