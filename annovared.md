@@ -52,8 +52,7 @@ awk 'NR>1 {print $4, $5, $118, $119, $117, $348, $22, $23, $24, $25, $26, $57, $
 sed -i '' 's/ /\t/g' mafs_only.tsv
 ```
 
-Find if ref/alt are the same in Kazakh and ref populations:
+Find if ref/alt are the same in Kazakh and ref populations: no, they are all the same!
 ```bash
-awk 'NR==1 {header=$0; print header > "mafs_mtch_ref_alt.tsv"; next} $1 == $3 && $2 == $4 {print >> "mafs_mtch_ref_alt.tsv"}' mafs_only.tsv
-awk 'NR > 1 && ($1 != $3 || $2 != $4)' mafs_only.tsv > mafs_nomtch_ref_alt.tsv
+awk '$1 != $3 || $2 != $4' mafs_only.tsv
 ```
