@@ -1,3 +1,6 @@
+# This Python script generates average percentages for each ethncity for each k. 
+# Input: admixture Q file + ethnicities file with sampels in column 1 and ethnciities in column 2
+
 import numpy as np
 import pandas as pd
 import sys
