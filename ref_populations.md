@@ -223,10 +223,14 @@ plink2 --bfile all13 --fst CATPHENO --within ethnic2_fst.txt --double-id --out f
 ```
 
 13) IBD for kazakhs with all populations
+```bash
 plink --bfile all14 --genome --out ibd_all
+```
 
 14) ROH
+```bash
 plink --bfile kaz12_autosomal --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
+```
 
 15) ADMIXTURE 
 Pruning data and adjusting metadata:
