@@ -167,13 +167,20 @@ awk '$2 !~ /^rs/ {print}' kaz10.bim | sort -k2,2
 ```
 Nope! all clean
 
-let's remove any duplicates and return it in plink1.9 version
+8) Remove outliers that show on PCA and remove any duplicates and return it in plink1.9 version
+```bash
+nano outliers_kazakh.txt
+```
+```bash
+1210510 1210510
+1302810  1302810
+```
 ```bash
 plink2 --bfile kaz10 --rm-dup exclude-all --make-bed --out kaz11
-plink --bfile kaz11 --make-bed --out kaz12
+plink --bfile kaz11 --remove outliers_kazakh.txt  --make-bed --out kaz12
 ```
 
-8) let's remove all non-autosomal regions
+9) let's remove all non-autosomal regions
 ```bash
 awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' kaz12.bim > snp_1_22.txt
 plink --bfile kaz12 --extract snp_1_22.txt --make-bed --out kaz12_autosomal
@@ -187,15 +194,17 @@ awk '{ if ($1 == 24) print $2 }' kaz12.bim > snp_y.txt
 plink --bfile kaz12 --extract snp_y.txt --make-bed --out kaz12_y_chr
 ```
 
-9) create table of MAFs
+10) create table of MAFs
 ```bash
 plink2 --bfile kaz12  --freq --out maf_kaz12
 plink2 --bfile kaz12_autosomal  --freq --out maf_kaz12_autosomal
 plink2 --bfile kaz12_mitoch  --freq --out maf_kaz12_mitoch
 plink2 --bfile kaz12_y_chr --freq --out maf_kaz12_y_chr
+sed -i '' 's/ALT_FREQS/kaz_alt_frq/g' maf_kaz12.afreq  maf_kaz12_autosomal.afreq maf_kaz12_mitoch.afreq maf_kaz12_y_chr.afreq
+sed -i '' 's/OBS_CT/kaz_allele_count/g' maf_kaz12.afreq  maf_kaz12_autosomal.afreq maf_kaz12_mitoch.afreq maf_kaz12_y_chr.afreq
 ```
 
-10) plink binary to vcf
+11) plink binary to vcf
  ```bash
 plink --bfile kaz12_autosomal --recode vcf --out kaz12_autosomal
 plink --bfile kaz12_mitoch --recode vcf --out kaz12_mitoch
@@ -203,7 +212,7 @@ plink --bfile kaz12_y_chr --recode vcf --out kaz12_y_chr
 plink --bfile kaz12 --recode vcf --out kaz12_all
 ```
 
-11) adding additional info to vcf file (MAF and allele count)
+12) adding additional info to vcf file (MAF and allele count)
 ```bash
 bcftools view -h kaz12_autosomal.vcf > kaz_a1.vcf
 bcftools view -H kaz12_autosomal.vcf > kaz_a2.vcf
@@ -213,40 +222,4 @@ cat maf_kaz12_autosomal.afreq | head -n 1 | cut -f 6,7 > added_header.txt
 paste kaz_a2.vcf added_info.txt > kaz_a3.vcf
 cat kaz_a4.vcf kaz_a3.vcf > kaz_a5.vcf
 mv kaz_a5.vcf ./autosomal_ext_for_annovar.vcf
-```
-
-12) Remove outliers that show on PCA:
-```bash
-nano outliers_kazakh.txt
-```
-```bash
-1210510 1210510
-1302810  1302810
-```
-
-Rempoving these outliers from kaz12:
-```bash
-plink --bfile kaz12_autosomal --remove outliers_kazakh.txt --make-bed --out kaz12_224_autosomal
-plink --bfile kaz12_mitoch --remove outliers_kazakh.txt --make-bed --out kaz12_224_mitoch
-plink --bfile kaz12_y_chr --remove outliers_kazakh.txt --make-bed --out kaz12_224_y_chr
-plink --bfile kaz12_224_autosomal --recode vcf --out kaz12_224_autosomal
-plink --bfile kaz12_224_mitoch --recode vcf --out kaz12_224_mitoch
-plink --bfile kaz12_224_y_chr --recode vcf --out kaz12_224_y_chr
-```
-
-Making extended vcf _with MAFs and count of alleles) using 224 samples:
-```bash
-plink2 --bfile kaz12_224_autosomal  --freq --out maf_kaz12_224_autosomal
-bcftools view -h kaz12_224_autosomal.vcf > kaz_a1_224.vcf
-bcftools view -H kaz12_224_autosomal.vcf > kaz_a2_224.vcf
-cat maf_kaz12_224_autosomal.afreq | tail -n +2 | cut -f 6,7 > added_info_224.txt
-cat maf_kaz12_224_autosomal.afreq | head -n 1 | cut -f 6,7 > added_header_224.txt
-(cat kaz_a1_224.vcf | sed '$d'; paste <(tail -n 1 kaz_a1.vcf) added_header_224.txt) > kaz_a4_224.vcf
-paste kaz_a2_224.vcf added_info_224.txt > kaz_a3_224.vcf
-cat kaz_a4_224.vcf kaz_a3_224.vcf > kaz_a5_224.vcf
-mv kaz_a5_224.vcf ./autosomal_224_ext_for_annovar.vcf
-```
-Remove outliers from annotated version as well:
-```bash
-awk '{for (i=1; i<=NF; i++) if (i!=282 && i!=304) printf "%s%s", $i, (i<NF?OFS:ORS)}' autosomal_ext_for_annovar.FINAL.annovar.hg38_multianno.header.txt > annovared_kaz12_autosomal_224.txt
 ```
