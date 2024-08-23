@@ -56,3 +56,8 @@ Find if ref/alt are the same in Kazakh and ref populations: no, they are all the
 ```bash
 awk '$1 != $3 || $2 != $4' mafs_only.tsv
 ```
+
+Gene list for GO: (KnownGene)
+awk '$13 !~ /dist/ && $13 != "." {print $13}' final_annovared_extended.tsv > genelist_knowngene.txt
+awk '$19 !~ /dist/ && $19 != "." {print $19}' final_annovared_extended.tsv > genelist_ensemble.txt
+awk '$7 !~ /dist/ && $7 != "." {print $7}' final_annovared_extended.tsv > genelist_reqseq.txt
