@@ -267,7 +267,8 @@ perl AncestryPainter.pl -i ethnic3.ind -q ./all14.8.Q -t Kazakh -o Kazakh -f png
 
 Making a table with average percentages for each population:
 ```bash
-python create_admixtures_table.py all14.8.Q ethnic3.ind
+cat ethnic3.txt | awk '{print $1"\t"$2}' > ethnic3_table.txt
+python create_admixtures_table.py all14.8.Q ethnic3_table.txt
 ```
 
 ADMIXTURE with 5/8 populations:
