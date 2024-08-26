@@ -39,21 +39,28 @@ table with rsID, ref/alt from databases, ref/alt from kazakh, kazakh MAFs and al
 cut -f 4,5,118,119,117,348,22-26,57-101 rows_with_mafs.tsv > mafs_only.tsv
 ```
 
-In Excel I manually moved the last 4 columns to be the first 4 columns.
-
 Then I made sure that ref/alt are the same in Kazakh and ref populations:
 ```bash
 awk '$2 != $5 || $3 != $6' mafs_only.tsv
 ```
 
-Gene list for GO: (KnownGene)
+In Excel I manually moved the last 4 columns of mafs_only.tsv to be the first 4 columns.
+
+Gene list for GO: (KnownGene) - not needed yet
+```bash
 awk '$13 !~ /dist/ && $13 != "." {print $13}' final_annovared_extended.tsv > genelist_knowngene.txt
 awk '$19 !~ /dist/ && $19 != "." {print $19}' final_annovared_extended.tsv > genelist_ensemble.txt
 awk '$7 !~ /dist/ && $7 != "." {print $7}' final_annovared_extended.tsv > genelist_reqseq.txt
+```
 
 Fold change:
+```bash
 awk 'NR==1 {print $0, "Kazakh_MAF", "European_MAF", "EastAsian_MAF", "SouthAsian_MAF", "African_MAF", "MiddleEast_MAF"} 
 NR>1 {getline file < "mafs_only.tsv"; split(file,maf,"\t"); print $0, maf[4], maf[54], maf[51], maf[56], maf[47], maf[53]}' fold_change_table.tsv > fold_change_with_mafs.tsv
+```
 
+Saved refrence mafs separately
+```bash
 cut -f 1,4,54,51,56,47,53 mafs_only.tsv > mafs_gnomad.tsv
 sed -i '' -e 's/gnomad41_genome_AF_afr/afr_maf/g' -e 's/gnomad41_genome_AF_eas/east_asian_maf/g' -e 's/gnomad41_genome_AF_mid/mid_east_maf/g' -e 's/gnomad41_genome_AF_nfe/euro_maf/g' -e 's/gnomad41_genome_AF_sas/south_asia_maf/g'  mafs_gnomad.tsv
+```
