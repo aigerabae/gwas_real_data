@@ -50,3 +50,10 @@ Gene list for GO: (KnownGene)
 awk '$13 !~ /dist/ && $13 != "." {print $13}' final_annovared_extended.tsv > genelist_knowngene.txt
 awk '$19 !~ /dist/ && $19 != "." {print $19}' final_annovared_extended.tsv > genelist_ensemble.txt
 awk '$7 !~ /dist/ && $7 != "." {print $7}' final_annovared_extended.tsv > genelist_reqseq.txt
+
+Fold change:
+awk 'NR==1 {print $0, "Kazakh_MAF", "European_MAF", "EastAsian_MAF", "SouthAsian_MAF", "African_MAF", "MiddleEast_MAF"} 
+NR>1 {getline file < "mafs_only.tsv"; split(file,maf,"\t"); print $0, maf[4], maf[54], maf[51], maf[56], maf[47], maf[53]}' fold_change_table.tsv > fold_change_with_mafs.tsv
+
+cut -f 1,4,54,51,56,47,53 mafs_only.tsv > mafs_gnomad.tsv
+sed -i '' -e 's/gnomad41_genome_AF_afr/afr_maf/g' -e 's/gnomad41_genome_AF_eas/east_asian_maf/g' -e 's/gnomad41_genome_AF_mid/mid_east_maf/g' -e 's/gnomad41_genome_AF_nfe/euro_maf/g' -e 's/gnomad41_genome_AF_sas/south_asia_maf/g'  mafs_gnomad.tsv
