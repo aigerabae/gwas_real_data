@@ -22,45 +22,89 @@ cat final_annovared_extended.tsv | cut -f 14 | sort | uniq -c
 cat final_annovared_extended.tsv | cut -f 19 | sort | uniq -c
 ```
 
-Print rows with non-missing MAFs:
+Print rows with non-missing MAFs: 
 ```bash
-awk -F'\t' '{for(i=57;i<=101;i++) if($i != ".") {print $0; next}; for(i=22;i<=26;i++) if($i != ".") {print $0; next}}' final_annovared_extended.tsv > rows_with_mafs.tsv
+awk -F'\t' '{if($303 != "." && $307 != "." && $306 != "." && $27 != ".") print $0}' final_annovared_extended.tsv > rows_with_mafs.tsv
 ```
 
-how many of these rows with MAFs are exonic: ~ about 1600
+how many of these rows with MAFs are exonic: ~ about 14000/22000
 ```bash
 cat rows_with_mafs.tsv | cut -f 6 | grep -w "exonic" | wc -l
 cat rows_with_mafs.tsv | cut -f 11 | grep -w "exonic" | wc -l
 cat rows_with_mafs.tsv | cut -f 16 | grep -w "exonic" | wc -l
 ```
 
-table with rsID, ref/alt from databases, ref/alt from kazakh, kazakh MAFs and all other MAFs:
+table with rsID, ref/alt from databases, ref/alt from kazakh, kazakh MAFs and other population MAFs:
 ```bash
-cut -f 4,5,118,119,117,348,22-26,57-101 rows_with_mafs.tsv > mafs_only.tsv
+cut -f 456,4,5,457,458,687,303,307,306,27 rows_with_mafs.tsv | awk -F'\t' '{print $7, $1, $2, $8, $9, $10, $6, $5, $3, $4}' OFS='\t' > mafs_only.tsv
+sed -i '' -e 's/kaz_alt_frq/Kazakh_MAF/g' -e 's/AF_nfe/European_MAF/g' -e 's/AF_eas/EastAsian_MAF/g' -e 's/SAS.sites.2015_08/SouthAsian_MAF/g' -e 's/AF_afr/African_MAF/g' mafs_only.tsv
 ```
 
 Then I made sure that ref/alt are the same in Kazakh and ref populations:
 ```bash
-awk '$2 != $5 || $3 != $6' mafs_only.tsv
-```
-
-In Excel I manually moved the last 4 columns of mafs_only.tsv to be the first 4 columns.
-
-Gene list for GO: (KnownGene) - not needed yet
-```bash
-awk '$13 !~ /dist/ && $13 != "." {print $13}' final_annovared_extended.tsv > genelist_knowngene.txt
-awk '$19 !~ /dist/ && $19 != "." {print $19}' final_annovared_extended.tsv > genelist_ensemble.txt
-awk '$7 !~ /dist/ && $7 != "." {print $7}' final_annovared_extended.tsv > genelist_reqseq.txt
+awk '$2 != $4 || $3 != $5' mafs_only.tsv
 ```
 
 Fold change:
-```bash
-awk 'NR==1 {print $0, "Kazakh_MAF", "European_MAF", "EastAsian_MAF", "SouthAsian_MAF", "African_MAF", "MiddleEast_MAF"} 
-NR>1 {getline file < "mafs_only.tsv"; split(file,maf,"\t"); print $0, maf[4], maf[54], maf[51], maf[56], maf[47], maf[53]}' fold_change_table.tsv > fold_change_with_mafs.tsv
+```python
+#!/usr/bin/env python3
+
+import csv
+
+# Input and output file names
+input_file = "mafs_only.tsv"
+output_file = "fold_change.tsv"
+
+# Function to calculate fold change or handle the 0/NA cases
+def calculate_fold_change(kazakh_maf, referent_maf):
+    # Check for "NA" values (represented as ".")
+    if kazakh_maf == "NA" or referent_maf == "NA":
+        return "NA"
+    kazakh_maf = float(kazakh_maf)
+    referent_maf = float(referent_maf)
+
+    # Handle the 0 cases or calculate the fold change
+    if kazakh_maf == 0 and referent_maf == 0:
+        return "kz=db=0"
+    elif kazakh_maf == 0:
+        return "kz=0"
+    elif referent_maf == 0:
+        return "DB=0"
+    else:
+        return kazakh_maf / referent_maf if kazakh_maf > referent_maf else -(referent_maf / kazakh_maf)
+
+# Open the input file and process it
+with open(input_file, 'r') as infile, open(output_file, 'w', newline='') as outfile:
+    reader = csv.reader(infile, delimiter='\t')
+    writer = csv.writer(outfile, delimiter='\t')
+    
+    # Write the header row
+    header = next(reader)
+    writer.writerow(["ID", "FoldChange_Europeans", "FoldChange_EastAsians", "FoldChange_SouthAsians", "FoldChange_Africans"])
+    
+    # Process each row
+    for row in reader:
+        snp = row[0]
+        kazakh_maf = row[5] if row[5] != "." else "NA"  # Kazakh MAF from column 6
+        european_maf = row[6] if row[6] != "." else "NA"  # European MAF from column 7
+        east_asian_maf = row[7] if row[7] != "." else "NA"  # East Asian MAF from column 8
+        south_asian_maf = row[8] if row[8] != "." else "NA"  # South Asian MAF from column 9
+        african_maf = row[9] if row[9] != "." else "NA"  # African MAF from column 10
+
+        # Calculate fold changes
+        fold_change_europeans = calculate_fold_change(kazakh_maf, european_maf)
+        fold_change_east_asians = calculate_fold_change(kazakh_maf, east_asian_maf)
+        fold_change_south_asians = calculate_fold_change(kazakh_maf, south_asian_maf)
+        fold_change_africans = calculate_fold_change(kazakh_maf, african_maf)
+
+        # Write the result for this SNP
+        writer.writerow([snp, fold_change_europeans, fold_change_east_asians, fold_change_south_asians, fold_change_africans])
+
+print(f"Fold change table saved to {output_file}")
 ```
 
-Saved refrence mafs separately
 ```bash
-cut -f 1,4,54,51,56,47,53 mafs_only.tsv > mafs_gnomad.tsv
-sed -i '' -e 's/gnomad41_genome_AF_afr/afr_maf/g' -e 's/gnomad41_genome_AF_eas/east_asian_maf/g' -e 's/gnomad41_genome_AF_mid/mid_east_maf/g' -e 's/gnomad41_genome_AF_nfe/euro_maf/g' -e 's/gnomad41_genome_AF_sas/south_asia_maf/g'  mafs_gnomad.tsv
+chmod +x calculate_fold_change.py 
+./calculate_fold_change.py
+paste fold_change.tsv <(cut -f 6,7,8,9,10 mafs_only.tsv) | awk -F'\t' '{print $1, $6, $2, $7, $3, $8, $4, $9, $5, $10}' OFS='\t' > fold_change_with_mafs.tsv
 ```
