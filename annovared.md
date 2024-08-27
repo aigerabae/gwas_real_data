@@ -3,13 +3,13 @@ This script described work I did on annovar file from Aset:
 Adding extended (KAZ_MAF + allele count) + changing ref/alt to kaz_ref/alt and DB (database) ref/alt:
 ```bash
 cat autosomal_ext_for_annovar.vcf | tail -n +31 | cut -f 234,235 > for_extended_vcf.tsv
-paste kaz_gwas_for_annovar_224.FINAL.annovar.hg38_multianno.header.txt for_extended_vcf.tsv > final_annovared_extended.tsv
+paste kaz_gwas_for_annovar_224.LATEST.annovar.hg19_multianno.header.txt for_extended_vcf.tsv > final_annovared_extended.tsv
 sed -i '' -e 's/REF/kaz_ref/g' -e 's/ALT/kaz_alt/g' -e 's/Ref/DB_ref/g' -e 's/Alt/DB_alt/g' final_annovared_extended.tsv
 ```
 
-Print how many missing values are in columns 60 to 111:
+Print how many missing values are in columns 1 to 452:
 ```bash
-awk -F"\t" '{for(i=6;i<=111;i++) if($i == ".") count[i]++} END{for(i=6;i<=111;i++) print "Column " i ": " count[i]}' final_annovared_extended.tsv 
+awk -F"\t" '{for(i=1;i<=452;i++) if($i == ".") count[i]++} END{for(i=1;i<=452;i++) print "Column " i ": " count[i]}' final_annovared_extended.tsv 
 ```
 
 Print mutation type and exonic function (3 databases):
