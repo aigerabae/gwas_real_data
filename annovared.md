@@ -103,8 +103,18 @@ with open(input_file, 'r') as infile, open(output_file, 'w', newline='') as outf
 print(f"Fold change table saved to {output_file}")
 ```
 
+Executing the code:
 ```bash
 chmod +x calculate_fold_change.py 
 ./calculate_fold_change.py
+```
+
+Modifying the fold change file to include the MAFs and making separate files for SNPs different with different populations:
+```bash
 paste fold_change.tsv <(cut -f 6,7,8,9,10 mafs_only.tsv) | awk -F'\t' '{print $1, $6, $2, $7, $3, $8, $4, $9, $5, $10}' OFS='\t' > fold_change_with_mafs.tsv
+awk -F'\t' '{if (($3 > 5 || $3 < -5) && ($5 > 5 || $5 < -5) && ($7 > 5 || $7 < -5) && ($9 > 5 || $9 < -5)) print $0}' fold_change_with_mafs.tsv > mafs_unique.tsv
+awk -F'\t' '{if ($3 > 5 || $3 < -5) print $0}' fold_change_with_mafs.tsv > mafs_change_euro.tsv
+awk -F'\t' '{if ($5 > 5 || $5 < -5) print $0}' fold_change_with_mafs.tsv > mafs_change_eastAsia.tsv
+awk -F'\t' '{if ($7 > 5 || $7 < -5) print $0}' fold_change_with_mafs.tsv > mafs_change_southAsia.tsv
+awk -F'\t' '{if ($9 > 5 || $9 < -5) print $0}' fold_change_with_mafs.tsv > mafs_change_afro.tsv
 ```
