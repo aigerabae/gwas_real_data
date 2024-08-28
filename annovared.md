@@ -117,7 +117,7 @@ removing all lines where there is 0 value:
 paste fold_change.tsv <(cut -f 6,7,8,9,10 mafs_only.tsv) | awk -F'\t' '{print $1, $6, $2, $7, $3, $8, $4, $9, $5, $10}' OFS='\t' > fold_change1.tsv
 sed -i '' 's/\r//' fold_change1.tsv
 grep -v '=' fold_change1.tsv > fold_change2.tsv
-awk -F'\t' '$2 >= 0.02232143 && $4 >=  0.01 && $6 >=  0.01 && $8 >=  0.01 && $10 >=  0.01' fold_change2.tsv > fold_change3.tsv
+awk -F'\t' '$2 >= 0.02232143 && $4 >=  0.001 && $6 >=  0.001 && $8 >=  0.01 && $10 >=  0.001' fold_change2.tsv > fold_change3.tsv
 ```
 
 checking how many exonic MAFs are left:
