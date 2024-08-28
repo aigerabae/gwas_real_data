@@ -34,7 +34,7 @@ cat rows_with_mafs.tsv | cut -f 11 | grep -w "exonic" | wc -l
 cat rows_with_mafs.tsv | cut -f 16 | grep -w "exonic" | wc -l
 ```
 
-table with rsID, ref/alt from databases, ref/alt from kazakh, kazakh MAFs and other population MAFs:
+Making a table with rsID, ref/alt from databases, ref/alt from kazakh, kazakh MAFs and other population MAFs; then renaming the MAFs:
 ```bash
 cut -f 456,4,5,457,458,687,303,307,306,27 rows_with_mafs.tsv | awk -F'\t' '{print $7, $1, $2, $8, $9, $10, $6, $5, $3, $4}' OFS='\t' > mafs_only.tsv
 sed -i '' -e 's/kaz_alt_frq/Kazakh_MAF/g' -e 's/AF_nfe/European_MAF/g' -e 's/AF_eas/EastAsian_MAF/g' -e 's/SAS.sites.2015_08/SouthAsian_MAF/g' -e 's/AF_afr/African_MAF/g' mafs_only.tsv
@@ -109,12 +109,39 @@ chmod +x calculate_fold_change.py
 ./calculate_fold_change.py
 ```
 
-Modifying the fold change file to include the MAFs and making separate files for SNPs different with different populations:
+Modifying the fold change file to include the MAFs and making separate files for SNPs different with different populations; 
+removing extra return characters
+removing all lines where there is 0 value:
+
 ```bash
-paste fold_change.tsv <(cut -f 6,7,8,9,10 mafs_only.tsv) | awk -F'\t' '{print $1, $6, $2, $7, $3, $8, $4, $9, $5, $10}' OFS='\t' > fold_change_with_mafs.tsv
-awk -F'\t' '{if (($3 > 5 || $3 < -5) && ($5 > 5 || $5 < -5) && ($7 > 5 || $7 < -5) && ($9 > 5 || $9 < -5)) print $0}' fold_change_with_mafs.tsv > mafs_unique.tsv
-awk -F'\t' '{if ($3 > 5 || $3 < -5) print $0}' fold_change_with_mafs.tsv > mafs_change_euro.tsv
-awk -F'\t' '{if ($5 > 5 || $5 < -5) print $0}' fold_change_with_mafs.tsv > mafs_change_eastAsia.tsv
-awk -F'\t' '{if ($7 > 5 || $7 < -5) print $0}' fold_change_with_mafs.tsv > mafs_change_southAsia.tsv
-awk -F'\t' '{if ($9 > 5 || $9 < -5) print $0}' fold_change_with_mafs.tsv > mafs_change_afro.tsv
+paste fold_change.tsv <(cut -f 6,7,8,9,10 mafs_only.tsv) | awk -F'\t' '{print $1, $6, $2, $7, $3, $8, $4, $9, $5, $10}' OFS='\t' > fold_change1.tsv
+sed -i '' 's/\r//' fold_change1.tsv
+grep -v '=' fold_change1.tsv > fold_change2.tsv
+awk -F'\t' '$2 >= 0.02232143 && $4 >=  0.01 && $6 >=  0.01 && $8 >=  0.01 && $10 >=  0.01' fold_change2.tsv > fold_change3.tsv
+```
+
+checking how many exonic MAFs are left:
+```bash
+awk -F'\t' '$6 == "exonic" {print $456}' rows_with_mafs.tsv > exonic_rsIDs.tsv
+awk -F'\t' 'NR==FNR {a[$1]; next} $1 in a' exonic_rsIDs.tsv fold_change1.tsv | wc -l
+awk -F'\t' 'NR==FNR {a[$1]; next} $1 in a' exonic_rsIDs.tsv fold_change2.tsv | wc -l
+awk -F'\t' 'NR==FNR {a[$1]; next} $1 in a' exonic_rsIDs.tsv fold_change3.tsv | wc -l
+```
+
+Getting specific values different from each of these populations:
+```bash
+awk -F'\t' '{if (($3 > 5 || $3 < -5) && ($5 > 5 || $5 < -5) && ($7 > 5 || $7 < -5) && ($9 > 5 || $9 < -5)) print $0}' fold_change3.tsv > mafs_unique.tsv
+awk -F'\t' '{if ($3 > 5 || $3 < -5) print $0}' fold_change3.tsv > mafs_change_euro.tsv
+awk -F'\t' '{if ($5 > 5 || $5 < -5) print $0}' fold_change3.tsv > mafs_change_eastAsia.tsv
+awk -F'\t' '{if ($7 > 5 || $7 < -5) print $0}' fold_change3.tsv > mafs_change_southAsia.tsv
+awk -F'\t' '{if ($9 > 5 || $9 < -5) print $0}' fold_change3.tsv > mafs_change_afro.tsv
+```
+
+Checking how many exonic SNPs are left in each file: 4 246 148 99 374
+```bash
+awk -F'\t' 'NR==FNR {a[$1]; next} $1 in a' exonic_rsIDs.tsv mafs_unique.tsv | wc -l
+awk -F'\t' 'NR==FNR {a[$1]; next} $1 in a' exonic_rsIDs.tsv mafs_change_euro.tsv | wc -l
+awk -F'\t' 'NR==FNR {a[$1]; next} $1 in a' exonic_rsIDs.tsv mafs_change_eastAsia.tsv | wc -l
+awk -F'\t' 'NR==FNR {a[$1]; next} $1 in a' exonic_rsIDs.tsv mafs_change_southAsia.tsv | wc -l
+awk -F'\t' 'NR==FNR {a[$1]; next} $1 in a' exonic_rsIDs.tsv mafs_change_afro.tsv | wc -l
 ```
