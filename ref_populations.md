@@ -303,3 +303,14 @@ cat ethnic4_8.txt | awk '{print $2"\t" $1}'  > ethnic8_5.ind
 perl AncestryPainter.pl -i ethnic8_5.ind -q ./all15_8.8.Q -t Kazakh -o Kazakh_8_8  -f png
 python safe_plot_admixture.py all15_8.8.Q ethnic_8.txt
 ```
+
+
+gnomad data:
+Getting rsIDs:
+plink --bfile hgdp_tgp --keep <(echo -e "Surui HGDP00843") --recode vcf --out small
+cp ~/tools/annovar/convert2annovar.pl ./
+cp ~/tools/annovar/annotate_variation.pl ./
+perl convert2annovar.pl -format vcf4 small.vcf > input.avinput
+perl annotate_variation.pl --downdb avsnp151 -buildver hg38 -webfrom annovar humandb/
+
+wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/HGSVC2/release/v1.0/integrated_callset/freeze3.snv.alt.vcf.gz	
