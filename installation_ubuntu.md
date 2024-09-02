@@ -19,6 +19,6 @@ curl http://data.biostarhandbook.com/install/conda.txt | xargs conda install -y
 
 efetch -db nuccore -id 2 -format gb
 mkdir -p ~/bin
-curl http://data.biostarhandbook.com/install/doctor.py > ~/bin/doctor.py chmod +x ~/bin/doctor.py
+curl http://data.biostarhandbook.com/install/doctor.py > ~/bin/doctor.py
 ~/bin/doctor.py
 ```
