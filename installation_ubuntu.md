@@ -2,6 +2,7 @@
 ```bash
 curl http://data.biostarhandbook.com/install/bash_profile.txt >> ~/.bash_profile
 curl http://data.biostarhandbook.com/install/bashrc.txt >> ~/.bashrc
+source ~/.bash_profile
 
 URL=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 curl $URL > miniconda-installer.sh
