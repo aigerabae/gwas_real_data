@@ -30,3 +30,7 @@ sudo dpkg -i rstudio-2024.04.2-764-amd64.deb
 root /usr/lib/rstudio/chrome-sandbox
 sudo chmod 4755 /usr/lib/rstudio/chrome-sandbox
 ```
+
+sudo apt-get update
+sudo apt-get install -y liblzma-dev libcurl4-openssl-dev libssl-dev libxml2-dev build-essential
+sudo apt-get install libbz2-dev
