@@ -23,3 +23,10 @@ curl http://data.biostarhandbook.com/install/doctor.py > ~/bin/doctor.py
 chmod +x ~/bin/doctor.py
 ~/bin/doctor.py
 ```
+
+I downloaded ubuntu version of rstudio and then ran
+```bash
+sudo dpkg -i rstudio-2024.04.2-764-amd64.deb 
+root /usr/lib/rstudio/chrome-sandbox
+sudo chmod 4755 /usr/lib/rstudio/chrome-sandbox
+```
