@@ -34,3 +34,7 @@ sudo chmod 4755 /usr/lib/rstudio/chrome-sandbox
 sudo apt-get update
 sudo apt-get install -y liblzma-dev libcurl4-openssl-dev libssl-dev libxml2-dev build-essential
 sudo apt-get install libbz2-dev
+
+$ sudo cp plink2 /usr/local/bin/
+$ sudo cp plink /usr/local/bin/
+
