@@ -46,3 +46,10 @@ sudo cp -r /home/user/biostar/gwas/alzheimer/manifest/ /mnt/windows/biostar/alzh
 
 sudo mkdir -p /mnt/windows/biostar/tools/genome_studio/
 sudo cp -r /home/user/tools/genome_studio/ /mnt/windows/biostar/tools/genome_studio/ 
+
+sudo mkdir -p /mnt/windows/biostar/alzheimer/idats_clean/
+sudo find /mnt/windows/biostar/alzheimer/idats/ -type f -name "*.idat" -exec cp {} /mnt/windows/biostar/alzheimer/idats_clean/ \;
+
+Checking how many unique samples i have:
+ls /mnt/windows/biostar/alzheimer/idats_clean/*_*.idat | sed 's/_Red.idat//;s/_Grn.idat//' | sort | uniq | wc -l
+Answer = 288
