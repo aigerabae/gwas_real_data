@@ -38,3 +38,11 @@ sudo apt-get install libbz2-dev
 $ sudo cp plink2 /usr/local/bin/
 $ sudo cp plink /usr/local/bin/
 
+sudo mkdir -p /mnt/windows/biostar/alzheimer/idats/
+sudo cp -r /home/user/biostar/gwas/alzheimer/idats/ /mnt/windows/biostar/alzheimer/idats/
+
+sudo mkdir -p /mnt/windows/biostar/alzheimer/manifest/
+sudo cp -r /home/user/biostar/gwas/alzheimer/manifest/ /mnt/windows/biostar/alzheimer/manifest/
+
+sudo mkdir -p /mnt/windows/biostar/tools/genome_studio/
+sudo cp -r /home/user/tools/genome_studio/ /mnt/windows/biostar/tools/genome_studio/ 
