@@ -53,3 +53,6 @@ sudo find /mnt/windows/biostar/alzheimer/idats/ -type f -name "*.idat" -exec cp 
 Checking how many unique samples i have:
 ls /mnt/windows/biostar/alzheimer/idats_clean/*_*.idat | sed 's/_Red.idat//;s/_Grn.idat//' | sort | uniq | wc -l
 Answer = 288
+
+
+turns out the files need to be in sepatate folders corresponding to different arrays! clean folder is not necesary 
