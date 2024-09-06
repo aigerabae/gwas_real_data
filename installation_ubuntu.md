@@ -30,14 +30,18 @@ sudo dpkg -i rstudio-2024.04.2-764-amd64.deb
 root /usr/lib/rstudio/chrome-sandbox
 sudo chmod 4755 /usr/lib/rstudio/chrome-sandbox
 ```
-
+```bash
 sudo apt-get update
 sudo apt-get install -y liblzma-dev libcurl4-openssl-dev libssl-dev libxml2-dev build-essential
 sudo apt-get install libbz2-dev
 
-$ sudo cp plink2 /usr/local/bin/
-$ sudo cp plink /usr/local/bin/
+sudo cp plink2 /usr/local/bin/
+sudo cp plink /usr/local/bin/
+```
 
+```bash
+conda activate bioinfo
+sudo mount /dev/sda3 /mnt/windows
 sudo mkdir -p /mnt/windows/biostar/alzheimer/idats/
 sudo cp -r /home/user/biostar/gwas/alzheimer/idats/ /mnt/windows/biostar/alzheimer/idats/
 
@@ -49,9 +53,11 @@ sudo cp -r /home/user/tools/genome_studio/ /mnt/windows/biostar/tools/genome_stu
 
 sudo mkdir -p /mnt/windows/biostar/alzheimer/idats_clean/
 sudo find /mnt/windows/biostar/alzheimer/idats/ -type f -name "*.idat" -exec cp {} /mnt/windows/biostar/alzheimer/idats_clean/ \;
-
+```
 Checking how many unique samples i have:
+```bash
 ls /mnt/windows/biostar/alzheimer/idats_clean/*_*.idat | sed 's/_Red.idat//;s/_Grn.idat//' | sort | uniq | wc -l
+```
 Answer = 288
 
 
