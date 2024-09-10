@@ -83,3 +83,11 @@ awk '{
   if (NR > 1) print "0", $1, "0", "0", $2, $3, $0;
 }' genotypes2.txt > ah1.ped
 ```
+
+FinalReport to plink::
+in ad.txt remove the first 10 rows and save as ad1.txt
+In ad1.txt merge columns 3 and 4, so that their merged content is column 3 and save as ad2.txt
+in ad2.txt use pivot_table to turn long data to wide with index=column 2, columns = column 1, values = column 3; save as pivoted.txt
+save ad.ped with 0s in columns 1,3,4,5,6; for column 2 use column 1 from pivoted.txt; for columns 2 to end use columns 7 to end of pivoted.txt
+
+save the first 253702 rows of ad1.txt
