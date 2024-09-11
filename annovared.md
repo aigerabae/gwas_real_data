@@ -22,6 +22,11 @@ cat final_annovared_extended.tsv | cut -f 14 | sort | uniq -c
 cat final_annovared_extended.tsv | cut -f 19 | sort | uniq -c
 ```
 
+checking if ref/alt are the same: - yes!
+```bash
+awk -F'\t' '$4 != $457 || $5 != $458' final_annovared_extended.tsv | cut -f 4,5,457,458 | head 
+```
+
 Print rows with non-missing MAFs: 
 ```bash
 awk -F'\t' '{if($303 != "." && $307 != "." && $306 != "." && $27 != ".") print $0}' final_annovared_extended.tsv > rows_with_mafs.tsv
