@@ -154,3 +154,8 @@ awk -F'\t' 'NR==FNR {a[$1]; next} $1 in a' exonic_rsIDs.tsv mafs_change_eastAsia
 awk -F'\t' 'NR==FNR {a[$1]; next} $1 in a' exonic_rsIDs.tsv mafs_change_southAsia.tsv | wc -l
 awk -F'\t' 'NR==FNR {a[$1]; next} $1 in a' exonic_rsIDs.tsv mafs_change_afro.tsv | wc -l
 ```
+
+Finding genes for lactase:
+cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | grep -e "LCT" -e "ExonicFunc.knownGene" | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > lactose.tsv
+cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | grep -e "ALDH2" -e "ADH" -e "ExonicFunc.knownGene" | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > alcohol.tsv
+
