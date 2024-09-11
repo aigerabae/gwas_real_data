@@ -37,7 +37,11 @@ cat rows_with_mafs.tsv | cut -f 16 | grep -w "exonic" | wc -l
 Making a table with rsID, ref/alt from databases, ref/alt from kazakh, kazakh MAFs and other population MAFs; then renaming the MAFs:
 ```bash
 cut -f 456,4,5,457,458,687,303,307,306,27 rows_with_mafs.tsv | awk -F'\t' '{print $7, $1, $2, $8, $9, $10, $6, $5, $3, $4}' OFS='\t' > mafs_only.tsv
-sed -i '' -e 's/kaz_alt_frq/Kazakh_MAF/g' -e 's/AF_nfe/European_MAF/g' -e 's/AF_eas/EastAsian_MAF/g' -e 's/SAS.sites.2015_08/SouthAsian_MAF/g' -e 's/AF_afr/African_MAF/g' mafs_only.tsv
+sed -i -e 's/kaz_alt_frq/Kazakh_MAF/g' \
+       -e 's/AF_nfe/European_MAF/g' \
+       -e 's/AF_eas/EastAsian_MAF/g' \
+       -e 's/SAS.sites.2015_08/SouthAsian_MAF/g' \
+       -e 's/AF_afr/African_MAF/g' mafs_only.tsv
 ```
 
 Then I made sure that ref/alt are the same in Kazakh and ref populations:
