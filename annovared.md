@@ -159,3 +159,53 @@ Finding genes for lactase:
 cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | grep -e "LCT" -e "ExonicFunc.knownGene" | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > lactose.tsv
 cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | grep -e "ALDH2" -e "ADH" -e "ExonicFunc.knownGene" | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > alcohol.tsv
 
+Calculating Fst as a measure of differential MAF:
+
+
+```bash
+nano calculate_fst.py
+```
+
+```python
+#!/usr/bin/env python3
+import pandas as pd
+import sys
+
+# Check if the correct number of arguments is passed
+if len(sys.argv) != 3:
+    print("Usage: calculate_fst.py <input_file> <output_file>")
+    sys.exit(1)
+
+input_file = sys.argv[1]
+output_file = sys.argv[2]
+
+# Load the MAF table
+maf_df = pd.read_csv(input_file, sep='\t')
+
+# Define a function to calculate Fst between two populations based on their MAFs
+def calculate_fst(maf1, maf2):
+    p_avg = (maf1 + maf2) / 2  # Average allele frequency between populations
+    H_T = 2 * p_avg * (1 - p_avg)  # Total heterozygosity
+    H_S1 = 2 * maf1 * (1 - maf1)  # Subpopulation heterozygosity for population 1
+    H_S2 = 2 * maf2 * (1 - maf2)  # Subpopulation heterozygosity for population 2
+    H_S = (H_S1 + H_S2) / 2  # Average subpopulation heterozygosity
+    if H_T == 0:  # To avoid division by zero
+        return 0
+    else:
+        Fst = (H_T - H_S) / H_T  # Fst formula
+        return Fst
+
+# Calculate Fst for each SNP between Kazakhs and the other populations
+fst_columns = ['Fst_European', 'Fst_EastAsian', 'Fst_SouthAsian', 'Fst_African']
+for pop in fst_columns:
+    population_maf = pop.split('_')[1] + '_MAF'
+    maf_df[pop] = maf_df.apply(lambda row: calculate_fst(row['Kazakh_MAF'], row[population_maf]), axis=1)
+
+# Save the results to a new file
+maf_df.to_csv(output_file, sep='\t', index=False)
+
+print(f"Fst calculations completed. Results saved to {output_file}")
+```
+
+chmod +x calculate_fst.py 
+./calculate_fst.py mafs_only.tsv mafs_fst.tsv
