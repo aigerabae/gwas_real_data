@@ -1,34 +1,35 @@
 Downloading gnomad data (HGDP + 1000 Genomes):
 
+```bash
 gsutil cp gs://gcp-public-data--gnomad/release/3.1/secondary_analyses/hgdp_1kg_v2/f2_fst/hgdp_tgp.bim ./
 gsutil cp gs://gcp-public-data--gnomad/release/3.1/secondary_analyses/hgdp_1kg_v2/f2_fst/hgdp_tgp.bed ./
 gsutil cp gs://gcp-public-data--gnomad/release/3.1/secondary_analyses/hgdp_1kg_v2/f2_fst/hgdp_tgp.fam ./
+wget https://storage.googleapis.com/gcp-public-data--gnomad/release/3.1/secondary_analyses/hgdp_1kg_v2/metadata_and_qc/gnomad_meta_updated.tsv
+wget https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/README_populations.md
+```
 
-gnomad data:
-Getting rsIDs:
-awk 'NR>1 { print $1, $2, $4 }' ucsc_hg38 | sed 's/chr//g' > update_positions.txt
-plink --bfile hgdp_tgp --update-name update_positions.txt 1 2 --make-bed --out gnomad1
+getting metadata:
+cat gnomad_meta_updated.tsv | cut -f 1,176 > pops.tsv
+sed -i 's/[[:space:]]*$//' eurasian_to_keep.tsv
+sed -i 's/[[:space:]]*$//' pops.tsv
+grep -Ff eurasian_to_keep.tsv pops.tsv > samples_to_keep.tsv
 
-awk 'FNR==NR {a[$1 FS $4]; next} (($1 FS $2) in a)' hgdp_tgp.bim all_snps_151_common | wc -l
-awk 'FNR==NR {a[$1 FS $4]; next} (($1 FS $2) in a)' hgdp_tgp.bim ucsc_hg38 | wc -l
+Merging with kazakh data:
+awk '!seen[$1,$4]++' kaz3.bim > kaz4.bim
+awk '!seen[$1,$4]++' gnomad.bim > gnomad1.bim
 
+comm -12 <(awk '{print $1, $4}' kaz3.bim | sort) <(awk '{print $1, $4}' gnomad.bim | sort) | awk 'NR==FNR{pos[$1 FS $2]; next} ($1 FS $4) in pos {print $2}' - kaz4.bim > common_rsIDs.txt
+comm -12 <(awk '{print $1, $4}' kaz3.bim | sort) <(awk '{print $1, $4}' gnomad.bim | sort) | awk 'NR==FNR{pos[$1 FS $2]; next} ($1 FS $4) in pos {print $2}' - gnomad1.bim > common_gnomad_names.txt
+paste common_gnomad_names.txt common_rsIDs.txt > dict_names.txt
 
-cut -f1,4 hgdp_tgp.bim > positions.txt
-awk '{print $1 "\t" $2 "\t" $2+1}' positions.txt > positions.bed
-bedToBigBed positions.bed chrom.sizes positions.bb
+plink --bfile gnomad --extract common_gnomad_names.txt --make-bed --out gnomad1
+plink2 --bfile gnomad1 --update-name dict_names.txt 2 1 --make-bed --out gnomad2
 
-chr1	796577	796578	rs535581815
-chr1	187225205	187225206	rs79657852
-chr2	19787364	19787365	rs79657840
+cat samples_to_keep_metadata.tsv | cut -f 1 > samples_to_keep.tsv
+awk 'NR==FNR {fam[$2] = $1; next} {if ($1 in fam) print fam[$1], $1}' gnomad2.fam samples_to_keep.tsv > samples_to_keep2.tsv
+plink --bfile gnomad2 --keep samples_to_keep2.tsv --make-bed --out gnomad3
 
-chr1	chr1:796338:T:C	0.0	796338	C	T
-chr1	chr1:796578:C:T	0.0	796578	T	C
-chr1	chr1:800302:G:C	0.0	800302	C	G
-chr1	chr1:841166:A:G	0.0	841166	G	A
-chr1	chr1:858952:G:A	0.0	858952	A	G
-chr1	chr1:874496:A:G	0.0	874496	G	A
-chr1	chr1:892786:A:G	0.0	892786	G	A
-chr1	chr1:901516:T:C	0.0	901516	C	T
-chr1	chr1:908025:A:G	0.0	908025	G	A
-chr1	chr1:911220:CT:C	0.0	911220	C	CT
-
+for K in 8; do admixture --cv gnomad3.bed -j8 $K | tee log${K}.out; done
+ln -s ~/tools/AncestryPainter_v5/AncestryPainter.pl ./
+cat samples_to_keep_metadata.tsv | awk '{print $3"\t" $1}'  > samples.ind 
+perl AncestryPainter.pl -i samples.ind -q ./gnomad3.8.Q -f png
