@@ -42,10 +42,11 @@ awk 'NR==FNR {fam[$2] = $1; next} {if ($1 in fam) print fam[$1], $1}' gnomad2.fa
 plink --bfile gnomad2 --keep samples_to_keep2.tsv --make-bed --out gnomad3
 ```
 
-Running admixture on gnomad data without kazakhs:
+Running admixture on gnomad data without kazakhs: ~ still not very nice; even worse than just estonian + hgdp
 ```bash
 for K in 8; do admixture --cv gnomad3.bed -j8 $K | tee log${K}.out; done
 ln -s ~/tools/AncestryPainter_v5/AncestryPainter.pl ./
-cat samples_to_keep_metadata.tsv | awk '{print $3"\t" $1}'  > samples.ind 
-perl AncestryPainter.pl -i samples.ind -q ./gnomad3.8.Q -f png
+cat samples_to_keep_metadata.tsv | awk '{print $3"\t" $1}'  > samples.ind
+grep -Ff <(cut -d " " -f2 samples_to_keep2.tsv) samples.ind > samples1.ind
+perl AncestryPainter.pl -i samples1.ind -q ./gnomad3.8.Q -t Uygur -o Uygur_adm  -f png
 ```
