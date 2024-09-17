@@ -14,8 +14,6 @@ use join to get a table with samples.tsv joined by columns 2 and 3 from id_sex_p
 save ah1.ped with column 1 = all 0s; column 2 = column 1 of genotypes2.txt; column 3 all 0s; column 4 = all 0s; column 5 = column 2 of id_sex_pheno2.tsv; column 6 = column 3 of id_sex_pheno2.tsv; columsn 7 to end = columns 2 to end of genotypes2.txt
 
 ```bash
-#!/bin/bash
-
 # Step 1: Remove the first 5 rows from ah.txt and save as ah1.txt
 tail -n +6 ah.txt > ah1.txt
 
@@ -60,22 +58,7 @@ cut -f 2-805 ah6.txt > genotypes.txt
 sed -i 's/ //g' genotypes.txt 
 
 # Step 8: Transpose genotypes.txt and save as genotypes2.txt
-awk '
-{
-  for (i=1; i<=NF; i++)  {
-    a[NR,i] = $i
-  }
-}
-NF>p { p = NF }
-END {
-  for(j=1; j<=p; j++) {
-    str=a[1,j]
-    for(i=2; i<=NR; i++) {
-      str=str" "a[i,j];
-    }
-    print str
-  }
-}' genotypes.txt > genotypes2.txt
+datamash transpose <genotypes.txt > genotypes2.txt
 
 # Step 9: In id_sex_pheno.tsv, remove rows where columns 2 and 3 are empty and save as id_sex_pheno1.tsv
 awk '$2 != "" && $3 != ""' id_sex_pheno.tsv > id_sex_pheno1.tsv
@@ -84,13 +67,22 @@ awk '$2 != "" && $3 != ""' id_sex_pheno.tsv > id_sex_pheno1.tsv
 awk '{ print $1 }' genotypes2.txt > samples.tsv
 
 # Step 11: Use join to get a table with samples.tsv joined by columns 2 and 3 from id_sex_pheno1.tsv and save as id_sex_pheno2.tsv
-join -1 1 -2 1 samples.tsv <(awk '{print $1, $2, $3}' id_sex_pheno1.tsv) > id_sex_pheno2.tsv
+sort -k1,1 samples.tsv > samples1.tsv
+sort -k1,1 id_sex_pheno1.tsv > id_sex_pheno2.tsv
+join -1 1 -2 1 samples1.tsv <(awk '{print $1, $2, $3}' id_sex_pheno2.tsv) > id_sex_pheno3.tsv
+sed -i 's/ \+/\t/g' id_sex_pheno3.tsv
 
 # Step 12: Save ah1.ped
-awk '{
-  if (NR > 1) print "0", $1, "0", "0", $2, $3, $0;
-}' genotypes2.txt > ah1.ped
-```
+paste <(awk '{print "0"}' genotypes2.txt) <(cut -f 1 genotypes2.txt) <(awk '{print "0"}' genotypes2.txt) <(awk '{print "0"}' genotypes2.txt) <(cut -f 2 id_sex_pheno3.tsv) <(cut -f 3 id_sex_pheno2.tsv) > temp_first_6_columns.txt
+cut -f 2- genotypes2.txt > temp_genotypes_columns.txt
+paste temp_first_6_columns.txt temp_genotypes_columns.txt > ah1.ped
+
+
+
+
+
+
+
 
 FinalReport to plink::
 in ad.txt remove the first 10 rows and save as ad1.txt
