@@ -51,7 +51,7 @@ awk -F'\t' -v OFS='\t' 'NR == 1 {for(i=2; i<=805; i++) {sub(/_\(.*$/, "", $i); s
 cat ah1_header.txt ah5.txt > ah6.txt
 
 # Step 6: Save columns 807, 836, 0s, 808 in that order to ah.map
-awk -F'\t' -v OFS='\t'  '{ print $807, $836, "0", $808 }' ah6.txt > ah.map
+awk -F'\t' -v OFS='\t' 'NR > 1 { print $807, $836, "0", $808 }' ah6.txt > ah.map
 
 # Step 7: Save columns 2-805 to genotypes.txt
 cut -f 2-805 ah6.txt > genotypes.txt
@@ -74,8 +74,10 @@ sed -i 's/ \+/\t/g' id_sex_pheno3.tsv
 
 # Step 12: Save ah1.ped
 paste <(awk '{print "0"}' genotypes2.txt) <(cut -f 1 genotypes2.txt) <(awk '{print "0"}' genotypes2.txt) <(awk '{print "0"}' genotypes2.txt) <(cut -f 2 id_sex_pheno3.tsv) <(cut -f 3 id_sex_pheno2.tsv) > temp_first_6_columns.txt
-cut -f 2- genotypes2.txt > temp_genotypes_columns.txt
-paste temp_first_6_columns.txt temp_genotypes_columns.txt > ah.ped
+cut -f 2- genotypes2.txt > genotypes_no_header.txt
+sed -i 's/./&\t/g' genotypes_no_header.txt
+sed -i 's/\t\+/\t/g' genotypes_no_header.txt
+paste temp_first_6_columns.txt genotypes_no_header.txt > ah.ped
 
 
 
