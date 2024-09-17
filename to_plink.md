@@ -20,33 +20,40 @@ save ah1.ped with column 1 = all 0s; column 2 = column 1 of genotypes2.txt; colu
 tail -n +6 ah.txt > ah1.txt
 
 # Step 2: Remove rows where column 836 is empty from ah1.txt and save as ah2.txt
-awk '$836 != ""' ah1.txt > ah2.txt
+awk -F'\t' '$836 != ""' ah1.txt > ah2.txt
 
 # Step 3: Remove rows where column 835 doesn't equal 2 from ah2.txt and save as ah3.txt
-awk '$835 == 2' ah2.txt > ah3.txt
+awk -F'\t' '$835 == 2' ah2.txt > ah3.txt
 
-# Step 4: For columns 2-805, replace "A" with col 819, "B" with col 820, and "NoCall" with "0", save as ah4.txt
-awk '{
-  for(i=2; i<=805; i++) {
-    if($i == "A") $i = $819;
-    else if($i == "B") $i = $820;
-    else if($i == "NoCall") $i = "0";
-  }
-  print
-}' ah3.txt > ah4.txt
+Checking what we have in cells for genotypes:
+awk -F'\t' '{for(i=2; i<=805; i++) print $i}' ah3.txt | sort | uniq -c
+
+# Step 4: For columns 2-805, replace AA with column 819 twice merged; AB with columns 819 and 820 merged; BB with column 820 twice merged; A with column 819 merged with 0; B with column 820 merged with 0 and "NoCall", NoCall_1" and "ZeroCN" with "0", save as ah4.txt
+awk -F'\t' -v OFS='\t' '{for(i=2; i<=805; i++) {
+    if($i == "AA") $i = $819 $819;
+    else if($i == "AB") $i = $819 $820;
+    else if($i == "BB") $i = $820 $820;
+    else if($i == "A") $i = $819 "0";
+    else if($i == "B") $i = $820 "0";
+    else if($i == "NoCall" || $i == "NoCall_1" || $i == "ZeroCN") $i = "0";
+} print}' ah3.txt > ah4.txt
+
+Checking what we have in cells for genotypes:
+awk -F'\t' '{for(i=2; i<=805; i++) print $i}' ah4.txt | sort | uniq -c
+
+Removing all non binary genotypes (long stretches of nucleotides identified earelier)
+awk -F'\t' -v OFS='\t' '{keep = 1; for(i=2; i<=805; i++) {if(length($i) > 2) {keep = 0; break;}} if(keep) print}' ah4.txt > ah5.txt
+sed -i 's/-/0/g' ah5.txt
+
+Checking what we have in cells for genotypes:
+awk -F'\t' '{for(i=2; i<=805; i++) print $i}' ah5.txt | sort | uniq -c
 
 # Step 5: Modify the header row in ah4.txt, saving the result as ah5.txt
-awk 'NR == 1 {
-  for(i=2; i<=805; i++) {
-    sub(/_\(.*$/, "", $i);
-    sub(/AH/, "", $i);
-  }
-}
-{ print }
-' ah4.txt > ah5.txt
+awk 'NR == 1 {  for(i=2; i<=805; i++) {    sub(/_\(.*$/, "", $i);    sub(/AH/, "", $i);  }}{ print }' ah5.txt > ah6.txt
+
 
 # Step 6: Save columns 807, 836, 0s, 808 in that order to ah.map
-awk '{ print $807, $836, "0s", $808 }' ah5.txt > ah.map
+awk '{ print $807, $836, "0", $808 }' ah6.txt > ah.map
 
 # Step 7: Save columns 2-805 to genotypes.txt
 awk '{ for(i=2; i<=805; i++) printf "%s ", $i; print "" }' ah5.txt > genotypes.txt
