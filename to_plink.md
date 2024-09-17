@@ -22,7 +22,7 @@ tail -n +6 ah.txt > ah1.txt
 # Step 2: Remove rows where column 836 is empty from ah1.txt and save as ah2.txt
 awk -F'\t' '$836 != ""' ah1.txt > ah2.txt
 
-# Step 3: Remove rows where column 835 doesn't equal 2 from ah2.txt and save as ah3.txt
+# Step 3: Remove rows where column 835 doesn't equal 2 from ah2.txt and save as ah3.txt (except row 1)
 awk -F'\t' '$835 == 2' ah2.txt > ah3.txt
 
 Checking what we have in cells for genotypes:
@@ -33,9 +33,9 @@ awk -F'\t' -v OFS='\t' '{for(i=2; i<=805; i++) {
     if($i == "AA") $i = $819 $819;
     else if($i == "AB") $i = $819 $820;
     else if($i == "BB") $i = $820 $820;
-    else if($i == "A") $i = $819 "0";
-    else if($i == "B") $i = $820 "0";
-    else if($i == "NoCall" || $i == "NoCall_1" || $i == "ZeroCN") $i = "0";
+    else if($i == "A") $i = $819 "00";
+    else if($i == "B") $i = $820 "00";
+    else if($i == "NoCall" || $i == "NoCall_1" || $i == "ZeroCN") $i = "00";
 } print}' ah3.txt > ah4.txt
 
 Checking what we have in cells for genotypes:
@@ -48,15 +48,16 @@ sed -i 's/-/0/g' ah5.txt
 Checking what we have in cells for genotypes:
 awk -F'\t' '{for(i=2; i<=805; i++) print $i}' ah5.txt | sort | uniq -c
 
-# Step 5: Modify the header row in ah4.txt, saving the result as ah5.txt
-awk 'NR == 1 {  for(i=2; i<=805; i++) {    sub(/_\(.*$/, "", $i);    sub(/AH/, "", $i);  }}{ print }' ah5.txt > ah6.txt
-
+# Step 5: Modify the header row in ah1.txt and concatenate with processed data without header
+awk -F'\t' -v OFS='\t' 'NR == 1 {for(i=2; i<=805; i++) {sub(/_\(.*$/, "", $i); sub(/AH/, "", $i);} print}' ah1.txt > ah1_header.txt
+cat ah1_header.txt ah5.txt > ah6.txt
 
 # Step 6: Save columns 807, 836, 0s, 808 in that order to ah.map
-awk '{ print $807, $836, "0", $808 }' ah6.txt > ah.map
+awk -F'\t' -v OFS='\t'  '{ print $807, $836, "0", $808 }' ah6.txt > ah.map
 
 # Step 7: Save columns 2-805 to genotypes.txt
-awk '{ for(i=2; i<=805; i++) printf "%s ", $i; print "" }' ah5.txt > genotypes.txt
+cut -f 2-805 ah6.txt > genotypes.txt
+sed -i 's/ //g' genotypes.txt 
 
 # Step 8: Transpose genotypes.txt and save as genotypes2.txt
 awk '
