@@ -75,7 +75,7 @@ sed -i 's/ \+/\t/g' id_sex_pheno3.tsv
 # Step 12: Save ah1.ped
 paste <(awk '{print "0"}' genotypes2.txt) <(cut -f 1 genotypes2.txt) <(awk '{print "0"}' genotypes2.txt) <(awk '{print "0"}' genotypes2.txt) <(cut -f 2 id_sex_pheno3.tsv) <(cut -f 3 id_sex_pheno2.tsv) > temp_first_6_columns.txt
 cut -f 2- genotypes2.txt > temp_genotypes_columns.txt
-paste temp_first_6_columns.txt temp_genotypes_columns.txt > ah1.ped
+paste temp_first_6_columns.txt temp_genotypes_columns.txt > ah.ped
 
 
 
