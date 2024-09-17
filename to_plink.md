@@ -78,7 +78,7 @@ cut -f 2- genotypes2.txt > genotypes_no_header.txt
 sed -i 's/./&\t/g' genotypes_no_header.txt
 sed -i 's/\t\+/\t/g' genotypes_no_header.txt
 paste temp_first_6_columns.txt genotypes_no_header.txt > ah.ped
-
+```
 
 
 
