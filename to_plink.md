@@ -50,8 +50,16 @@ join -1 1 -2 1 id_sex_pheno2.tsv genotypes3.txt | awk '{printf "0\t%s\t0\t0\t", 
 sed -i 's/\r//g' combined1.txt
 cat combined1.txt | cut -f 7- > genotypes4.txt
 sed 's/./&\t/g' genotypes4.txt > genotypes5.txt
-sed 's/\t\+/\t/g' genotypes5.tsv > genotypes6.txt
+sed 's/\t\+/\t/g' genotypes5.txt > genotypes6.txt
+cut -f1-6 combined1.txt | paste - genotypes6.txt > ah.ped
 
+plink --file ah --missing-code -9,0,NA,na --make-bed --out ah
+
+It! doesn't! Work!3
+Possibly irregular .ped line.  Restarting scan, assuming multichar alleles.
+Rescanning .ped file... 0%
+Error: Half-missing call in .ped file at variant 5119, line 1.
+(base) 
 ```
 
 
