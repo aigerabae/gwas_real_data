@@ -1,18 +1,4 @@
-Affyemtrix data:
-Remove the first 5 rows of ah.txt and save as ah1.txt
-remove rows where column 836 is empty in ah1.txt and save as ah2.txt
-remove rows where column 835 doesn't equal 2 and save as ah3.txt
-for every row in columns 2-805 inclusive: replace "A" with content of coplumn 819 from that same row; replace "B" with content of coplumn 820 from that same row; replace "NoCall" with "0" and save as ah4.txt
-in row 1 of ah4.txt columns 2 to 805 inclusive remove in each cell everything after "_(" (inclusive); also remove "AH" from cells; save as ah5.txt
-save in ah5.txt columns 807, 836, 0s, 808 (use awk in that exact order) as ah.map
-save columns 2 to 805 inclusive as genotypes.txt
-transpose genotypes.txt and save as genotypes2.txt
-save head_ah.tsv second sheet (id_sex_pheno) from personal google sheets account
-in id_sex_pheno.tsv remove rows where columns 2 and 3 have empty values and save that as id_sex_pheno1.tsv
-save column 1 of genotypes2.txt as samples.tsv
-use join to get a table with samples.tsv joined by columns 2 and 3 from id_sex_pheno1.tsv; save as id_sex_pheno2.tsv
-save ah1.ped with column 1 = all 0s; column 2 = column 1 of genotypes2.txt; column 3 all 0s; column 4 = all 0s; column 5 = column 2 of id_sex_pheno2.tsv; column 6 = column 3 of id_sex_pheno2.tsv; columsn 7 to end = columns 2 to end of genotypes2.txt
-
+Affymetrix data:
 ```bash
 # Step 1: Remove the first 5 rows from ah.txt and save as ah1.txt
 tail -n +6 ah.txt > ah1.txt
@@ -85,21 +71,22 @@ in ad2.txt use pivot_table to turn long data to wide with index=column 2, column
 save ad.ped with 0s in columns 1,3,4,5,6; for column 2 use column 1 from pivoted.txt; for columns 2 to end use columns 7 to end of pivoted.txt
 
 gwas:
+```bash
 cat gwas300_FinalReport.txt | cut -f 1,2,3,4 > gwas300.txt
 awk 'NR > 1 { print $3, $2, 0, $4 }' SNP_Map.txt > kaz.map
-dont forget to remove snps with 0 as chromosome!
+# dont forget to remove snps with 0 as chromosome!
 
-in gwas300.txt remove the first 10 rows and save as kaz1.txt
+# in gwas300.txt remove the first 10 rows and save as kaz1.txt
 tail -n +11 "gwas300.txt" > kaz1.txt
 
-In kaz1.txt merge columns 3 and 4, so that their merged content is column 3 and save as kaz2.txt
+# In kaz1.txt merge columns 3 and 4, so that their merged content is column 3 and save as kaz2.txt
 awk 'BEGIN {OFS="\t"} {$3=$3""$4; $4=""; print}' kaz1.txt > kaz2.txt
 
-pivoting
+# pivoting
 awk '{printf "%s%s", $3, (NR%665608 ? OFS : ORS)}' kaz2.txt > pivoted1.txt
 cat kaz2.txt | cut -f 2 | uniq > pivoted_header.txt
 
-save ad.ped with 0 in columns 1,3,4,5,6; for column 2 use pivoted_header.txt; for columns 2 to end use all columns from pivoted1.txt
+# save ad.ped with 0 in columns 1,3,4,5,6; for column 2 use pivoted_header.txt; for columns 2 to end use all columns from pivoted1.txt
 awk 'BEGIN { OFS="\t" } { print 0, $0, 0, 0, 0, 0 }' pivoted_header.txt > temp_columns.txt
 paste temp_columns.txt pivoted1.txt > kaz.ped
 
@@ -111,16 +98,19 @@ plink --bfile kaz1 --exclude non_rs_SNP.txt --make-bed --out kaz2
 awk '$1 == 0 {print $2}' kaz2.bim > exclude_snps.txt
 plink --bfile kaz2 --exclude exclude_snps.txt --make-bed --out kaz3
 
-merge kaz3 and gnomad binary data using positions on chromosomes; use names from kaz3; save merged dataset as merged binary dataset
-... Unsuccessful. Only 20000 common SNPs...
+# merge kaz3 and gnomad binary data using positions on chromosomes; use names from kaz3; save merged dataset as merged binary dataset (script available in gnomad.md)
+# ... Unsuccessful. Only 20000 common SNPs... admixture still looks bad
+```
 
 Alzheimer idats to plink
+```bash
 awk 'NR > 1 { print $3, $2, 0, $4 }' SNP_Map.txt > alz.map
 tail -n +11 "alz_FinalReport_2.txt" > alz1.txt
 awk 'BEGIN {OFS="\t"} {$3=$3""$4; $4=""; print}' alz1.txt > alz2.txt
 awk '{printf "%s%s", $3, (NR%253702 ? OFS : ORS)}' alz2.txt > pivoted_alz.txt
+```
 
-For some reason it doesn't pivot it properly... it generates or at least displays only
+For some reason it doesn't pivot it properly... it generates or at least displays only... need to make a short test file head and cut first 50 columns and view in google sheets
 
 cat kaz2.txt | cut -f 2 | uniq > pivoted_header.txt
 awk 'BEGIN { OFS="\t" } { print 0, $0, 0, 0, 0, 0 }' pivoted_header.txt > temp_columns.txt
