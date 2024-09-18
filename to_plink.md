@@ -34,28 +34,24 @@ awk -F'\t' -v OFS='\t' 'NR > 1 { print $807, $836, "0", $808 }' ah6.txt > ah.map
 cut -f 2-805 ah6.txt > genotypes.txt
 sed -i 's/ //g' genotypes.txt 
 
-# Step 8: Transpose genotypes.txt and save as genotypes2.txt
+# Step 8: Transpose genotypes.txt and save as genotypes2.txt; sort genotypes2.txt
 datamash transpose <genotypes.txt > genotypes2.txt
+sort -k1,1 genotypes2.txt > genotypes3.txt
 
-# Step 9: In id_sex_pheno.tsv, remove rows where columns 2 and 3 are empty and save as id_sex_pheno1.tsv
+# Step 9: In id_sex_pheno.tsv, remove rows where column 2 and 3 are empty and save as id_sex_pheno1.tsv
 awk '$2 != "" && $3 != ""' id_sex_pheno.tsv > id_sex_pheno1.tsv
 
-# Step 10: Save column 1 of genotypes2.txt as samples.tsv
-awk '{ print $1 }' genotypes2.txt > samples.tsv
-
-# Step 11: Use join to get a table with samples.tsv joined by columns 2 and 3 from id_sex_pheno1.tsv and save as id_sex_pheno2.tsv
-sort -k1,1 samples.tsv > samples1.tsv
+# Step 11: sort id_sex_pheno1.tsv and fix formatting
 sort -k1,1 id_sex_pheno1.tsv > id_sex_pheno2.tsv
-join -1 1 -2 1 samples1.tsv <(awk '{print $1, $2, $3}' id_sex_pheno2.tsv) > id_sex_pheno3.tsv
-sed -i 's/ \+/\t/g' id_sex_pheno3.tsv
+sed -i 's/ \+/\t/g' id_sex_pheno2.tsv
 
 # Step 12: Save ah1.ped
-paste <(awk '{print "0"}' genotypes2.txt) <(cut -f 1 genotypes2.txt) <(awk '{print "0"}' genotypes2.txt) <(awk '{print "0"}' genotypes2.txt) <(cut -f 2 id_sex_pheno3.tsv) <(cut -f 3 id_sex_pheno2.tsv) > temp_first_6_columns.txt
-cut -f 2- genotypes2.txt > genotypes_no_header.txt
-sed -i 's/./&\t/g' genotypes_no_header.txt
-sed -i 's/\t\+/\t/g' genotypes_no_header.txt
-paste temp_first_6_columns.txt genotypes_no_header.txt > ah.ped
-sed -i 's/\r//g' ah.ped
+join -1 1 -2 1 id_sex_pheno2.tsv genotypes3.txt | awk '{printf "0\t%s\t0\t0\t", $1; for (i=2; i<=NF; i++) printf "%s\t", $i; printf "\n"}' > combined1.txt
+sed -i 's/\r//g' combined1.txt
+cat combined1.txt | cut -f 7- > genotypes4.txt
+sed 's/./&\t/g' genotypes4.txt > genotypes5.txt
+sed 's/\t\+/\t/g' genotypes5.tsv > genotypes6.txt
+
 ```
 
 
