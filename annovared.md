@@ -155,12 +155,12 @@ awk -F'\t' 'NR==FNR {a[$1]; next} $1 in a' exonic_rsIDs.tsv mafs_change_southAsi
 awk -F'\t' 'NR==FNR {a[$1]; next} $1 in a' exonic_rsIDs.tsv mafs_change_afro.tsv | wc -l
 ```
 
-Finding genes for lactase:
+Finding genes for lactase, alcohol, and pharmacogenes:
 cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | grep -e "LCT" -e "ExonicFunc.knownGene" | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > lactose.tsv
 cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | grep -e "ALDH2" -e "ADH" -e "ExonicFunc.knownGene" | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > alcohol.tsv
+cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | grep -w -e "IFNL3" -e "NUDT15" -e "SLCO1B1" -e "TPMT" -e "UGT1A1" -e "CFTR" -e "CYP2B6" -e "CYP2C19" -e "CYP2C9" -e "CYP2D6" -e "CYP3A5" -e "CYP4F2" -e "DPYD" -e "VKORC1" -e "ExonicFunc.knownGene" | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > pharm_idda.tsv
 
 Calculating Fst as a measure of differential MAF:
-
 
 ```bash
 nano calculate_fst.py
@@ -209,3 +209,5 @@ print(f"Fst calculations completed. Results saved to {output_file}")
 
 chmod +x calculate_fst.py 
 ./calculate_fst.py mafs_only.tsv mafs_fst.tsv
+
+cat mafs_fst.tsv | grep -f idda_pharm_rsIDs.txt  > idda_pharm_fsts.txt
