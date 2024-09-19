@@ -160,6 +160,25 @@ cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | 
 cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | grep -e "ALDH2" -e "ADH" -e "ExonicFunc.knownGene" | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > alcohol.tsv
 cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | grep -w -e "IFNL3" -e "NUDT15" -e "SLCO1B1" -e "TPMT" -e "UGT1A1" -e "CFTR" -e "CYP2B6" -e "CYP2C19" -e "CYP2C9" -e "CYP2D6" -e "CYP3A5" -e "CYP4F2" -e "DPYD" -e "VKORC1" -e "ExonicFunc.knownGene" | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > pharm_idda.tsv
 
+awk -F'\t' '$14 == "ExonicFunc.knownGene" || $70 == "D" && $76 == "D"' final_annovared_extended.tsv | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > deleterious.tsv
+
+cat deleterious.tsv | cut -f 12 | awk 'NR > 1 {sum += $1 * 224} END {print sum / 224}' 
+# There was an average of 81.2555 likely deleterious nonsynonymous single nucleotide variants (SNVs) (those which are classified as deleterious by both SIFT and PolyPhen databases) per individual
+
+awk -F'\t' '$70 == "D" && $76 == "D" {for (i=463; i<=686; i++) if ($i == "1/1") count[i]++} END {for (i=463; i<=686; i++) print "Individual " i-462 ": " count[i]}' final_annovared_extended.tsv 
+
+awk -F'\t' '$70 == "D" && $76 == "D" {for (i=463; i<=686; i++) if ($i == "1/1") count[i]++} END {sum=0; for (i=463; i<=686; i++) sum+=count[i]; print "Average: ", sum/(686-463+1)}' final_annovared_extended.tsv
+# An average of 19 variants per individual were homozygotes, therefore representing the presence of a considerable amount of potentially deleterious variation in the Kazakh population. 
+
+awk -F'\t' '$14 == "ExonicFunc.knownGene" || $333 == "drug_response"' final_annovared_extended.tsv | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > clinvar_drug_response.tsv
+awk -F'\t' '$14 == "ExonicFunc.knownGene" || $333 == "pathogenic"|| $333 == "risk_factor"' final_annovared_extended.tsv | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > clinvar_pathogenic_riskfactor.tsv
+
+# Protein domains:
+cat final_annovared_extended.tsv | cut -f 169 | sort | uniq -c
+
+
+
+
 Calculating Fst as a measure of differential MAF:
 
 ```bash
