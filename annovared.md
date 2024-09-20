@@ -160,6 +160,10 @@ cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | 
 cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | grep -e "ALDH2" -e "ADH" -e "ExonicFunc.knownGene" | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > alcohol.tsv
 cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | grep -w -e "IFNL3" -e "NUDT15" -e "SLCO1B1" -e "TPMT" -e "UGT1A1" -e "CFTR" -e "CYP2B6" -e "CYP2C19" -e "CYP2C9" -e "CYP2D6" -e "CYP3A5" -e "CYP4F2" -e "DPYD" -e "VKORC1" -e "ExonicFunc.knownGene" | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > pharm_idda.tsv
 
+cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | grep -w -f druggable_genome.tsv  | awk '$14 == "ExonicFunc.knownGene" || $70 == "D" && $76 == "D"' | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > druggable_mafs.tsv
+```
+
+```bash
 awk -F'\t' '$14 == "ExonicFunc.knownGene" || $70 == "D" && $76 == "D"' final_annovared_extended.tsv | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > deleterious.tsv
 
 cat deleterious.tsv | cut -f 12 | awk 'NR > 1 {sum += $1 * 224} END {print sum / 224}' 
@@ -173,8 +177,6 @@ awk -F'\t' '$70 == "D" && $76 == "D" {for (i=463; i<=686; i++) if ($i == "1/1") 
 awk -F'\t' '$14 == "ExonicFunc.knownGene" || $333 == "drug_response"' final_annovared_extended.tsv | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > clinvar_drug_response.tsv
 awk -F'\t' '$14 == "ExonicFunc.knownGene" || $333 == "pathogenic"|| $333 == "risk_factor"' final_annovared_extended.tsv | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > clinvar_pathogenic_riskfactor.tsv
 
-# Protein domains:
-cat final_annovared_extended.tsv | cut -f 169 | sort | uniq -c
 
 
 
