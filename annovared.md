@@ -156,6 +156,7 @@ awk -F'\t' 'NR==FNR {a[$1]; next} $1 in a' exonic_rsIDs.tsv mafs_change_afro.tsv
 ```
 
 Finding genes for lactase, alcohol, and pharmacogenes:
+```bash
 cat final_annovared_extended.tsv | grep -e "LCT" -e "ExonicFunc.knownGene" -e "rs4988235" | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > lactose.tsv
 
 
@@ -166,6 +167,9 @@ cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | 
 
 cat final_annovared_extended.tsv | grep -e "exonic" -e "ExonicFunc.knownGene" | $70 == "D" && $76 == "D"' | grep -w -e "thyroid" -e "ExonicFunc.knownGene" | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > thyroid.tsv
 awk -F'\t' '$14 == "ExonicFunc.knownGene" || $70 == "D" || $76 == "D"' final_annovared_extended.tsv | grep "thyroid" | cut -f 7,9,12,14,17,19,27,303,306,307,456,687 > thyroid.tsv
+
+awk -F"\t" '($687 > 0.4 || $687 < 0.1) &&  ($70 == "D" && $76 == "D")' final_annovared_extended.tsv |  cut -f 7,9,12,14,17,19,27,303,306,307,456,687  > large_and_small_mafs.tsv
+
 ```
 
 ```bash
