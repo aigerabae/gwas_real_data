@@ -88,12 +88,13 @@ awk 'BEGIN {OFS="\t"} {$3=$3""$4; $4=""; print}' kaz1.txt > kaz2.txt
 
 # pivoting
 awk '{printf "%s%s", $3, (NR%665608 ? OFS : ORS)}' kaz2.txt > pivoted1.txt
-cat kaz2.txt | cut -f 2 | uniq > pivoted_header.txt
 
 # save ad.ped with 0 in columns 1,3,4,5,6; for column 2 use pivoted_header.txt; for columns 2 to end use all columns from pivoted1.txt
+cat kaz2.txt | cut -f 2 | uniq > pivoted_header.txt
 awk 'BEGIN { OFS="\t" } { print 0, $0, 0, 0, 0, 0 }' pivoted_header.txt > temp_columns.txt
 paste temp_columns.txt pivoted1.txt > kaz.ped
 
+# Merging
 plink --file kaz --make-bed --out kaz
 awk -F'\t' '!seen[$1]++' GSA-24v2-0_A1_b150_rsids.txt | awk -F'\t' '!seen[$2]++' | awk -F'\t' '$2 !~ /,/' > GSA-dictionary.txt
 plink --bfile kaz --update-name GSA-dictionary.txt --make-bed --out kaz1
@@ -111,18 +112,14 @@ Alzheimer idats to plink
 awk 'NR > 1 { print $3, $2, 0, $4 }' SNP_Map.txt > alz.map
 tail -n +11 "alz_FinalReport_2.txt" > alz1.txt
 awk 'BEGIN {OFS="\t"} {$3=$3""$4; $4=""; print}' alz1.txt > alz2.txt
-awk '{printf "%s%s", $3, (NR%253702 ? OFS : ORS)}' alz2.txt > pivoted_alz.txt
-```
-
-For some reason it doesn't pivot it properly... it generates or at least displays only... need to make a short test file head and cut first 50 columns and view in google sheets
-
-cat kaz2.txt | cut -f 2 | uniq > pivoted_header.txt
+sed $'s/\r/\t/g' alz2.txt > alz3.txt
+awk '{printf "%s%s", $3, (NR%253702 ? OFS : ORS)}' alz3.txt > pivoted_alz.txt
+cat alz3.txt | cut -f 2 | uniq > pivoted_header.txt
 awk 'BEGIN { OFS="\t" } { print 0, $0, 0, 0, 0, 0 }' pivoted_header.txt > temp_columns.txt
 paste temp_columns.txt pivoted_alz.txt > alz.ped
+```
 
-
-
-
+Changing snp names to standard rsID names, excluding SNPs on 0 chromosome, adding sex and phenotypes:
 plink --file alz --make-bed --out alz
 awk -F'\t' '!seen[$1]++' InfiniumImmunoArray-24v2-0_A_b138_rsids.txt | awk -F'\t' '!seen[$2]++' | awk -F'\t' '$2 !~ /,/' > IA-dictionary.txt
 plink --bfile alz --update-name IA-dictionary.txt --make-bed --out alz1
@@ -130,3 +127,9 @@ awk '$2 !~ /^rs/' alz1.bim | sort -k2,2 > non_rs_SNP.txt
 plink --bfile alz1 --exclude non_rs_SNP.txt --make-bed --out alz2
 awk '$1 == 0 {print $2}' alz2.bim > exclude_snps.txt
 plink --bfile alz2 --exclude exclude_snps.txt --make-bed --out alz3
+
+
+I used metadata (from different zapusks) to identify samples IDs and their matching SEntrix_ID positions; i mnually replaced 207851060016 with 207859430016 since they were the only samples that faild to replace names and they had an identical numebr of samples so i figured it was a misspelling
+
+plink --bfile alz3 --update-ids alzheimer_metadata_selected_dictionary.tsv --make-bed --out alz4
+now need to add sex and phenotypes
