@@ -129,7 +129,9 @@ awk '$1 == 0 {print $2}' alz2.bim > exclude_snps.txt
 plink --bfile alz2 --exclude exclude_snps.txt --make-bed --out alz3
 
 
-I used metadata (from different zapusks) to identify samples IDs and their matching SEntrix_ID positions; i mnually replaced 207851060016 with 207859430016 since they were the only samples that faild to replace names and they had an identical numebr of samples so i figured it was a misspelling
+I used metadata (from different zapusks) to identify samples IDs and their matching Sentrix_ID positions; i manually replaced 207851060016 with 207859430016 since they were the only samples that faild to replace names and they had an identical numebr of samples so i figured it was a misspelling
 
-plink --bfile alz3 --update-ids alzheimer_metadata_selected_dictionary.tsv --make-bed --out alz4
+plink --bfile alz3 --update-ids 'alzheimer_metadata_selected - true_dict.tsv' --make-bed --out alz4
+plink --bfile alz4 --update-sex 'alzheimer_metadata_selected - sex.tsv' --make-bed --out alz5
+
 now need to add sex and phenotypes
