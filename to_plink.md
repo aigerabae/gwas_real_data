@@ -10,18 +10,15 @@ awk -F'\t' '$836 != ""' ah1.txt > ah2.txt
 awk -F'\t' '$835 == 2' ah2.txt > ah3.txt
 
 # Step 4: For columns 2-805, replace AA with column 819 twice merged; AB with columns 819 and 820 merged; BB with column 820 twice merged; A with column 819 merged with 0; B with column 820 merged with 0 and "NoCall", NoCall_1" and "ZeroCN" with "0", save as ah4.txt
-awk -F'\t' -v OFS='\t' '{for(i=2; i<=805; i++) {
-    if($i == "AA") $i = $819 $819;
-    else if($i == "AB") $i = $819 $820;
-    else if($i == "BB") $i = $820 $820;
-    else if($i == "A") $i = "00";
-    else if($i == "B") $i = "00";
-    else if($i == "NoCall" || $i == "NoCall_1" || $i == "ZeroCN") $i = "00";
-} print}' ah3.txt > ah4.txt
 
-# Step 5: Removing all non binary genotypes (long stretches of nucleotides identified earelier)
-awk -F'\t' -v OFS='\t' '{keep = 1; for(i=2; i<=805; i++) {if(length($i) > 2) {keep = 0; break;}} if(keep) print}' ah4.txt > ah5.txt
-sed -i 's/-/0/g' ah5.txt
+awk -F'\t' -v OFS='\t' '{for(i=2; i<=805; i++) {
+    if($i == "AA") $i = $819 "\t" $819;
+    else if($i == "AB") $i = $819 "\t" $820;
+    else if($i == "BB") $i = $820 "\t" $820;
+    else if($i == "A") $i = "0\t0";
+    else if($i == "B") $i = "0\t0";
+    else if($i == "NoCall" || $i == "NoCall_1" || $i == "ZeroCN") $i = "0\t0";
+} print}' ah3.txt > ah4.txt
 
 # Step 6: Modify the header row in ah1.txt and concatenate with processed data without header
 awk -F'\t' -v OFS='\t' 'NR == 1 {for(i=2; i<=805; i++) {sub(/_\(.*$/, "", $i); sub(/AH/, "", $i);} print}' ah1.txt > ah1_header.txt
