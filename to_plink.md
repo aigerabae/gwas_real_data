@@ -20,6 +20,8 @@ awk -F'\t' -v OFS='\t' '{for(i=2; i<=805; i++) {
     else if($i == "NoCall" || $i == "NoCall_1" || $i == "ZeroCN") $i = "0\t0";
 } print}' ah3.txt > ah4.txt
 
+# I changed this to make them tab separated immediately at this stage but nolw there is a different number of N in each row... need to fix that and also run the rest of the code with new ah4.txt
+
 # Step 6: Modify the header row in ah1.txt and concatenate with processed data without header
 awk -F'\t' -v OFS='\t' 'NR == 1 {for(i=2; i<=805; i++) {sub(/_\(.*$/, "", $i); sub(/AH/, "", $i);} print}' ah1.txt > ah1_header.txt
 cat ah1_header.txt ah5.txt > ah6.txt
