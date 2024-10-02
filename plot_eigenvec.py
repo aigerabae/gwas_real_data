@@ -32,6 +32,9 @@ df = pd.DataFrame(data)
 # Add a new column for marker size
 df['marker_size'] = np.where(df['ethnicity'] == 'Kazakh', 14, 6)  # 14 for 'Kazakh', 6 for others
 
+# Sort the dataframe by region and then by ethnicity
+df = df.sort_values(by=['region', 'ethnicity'], ascending=True)
+
 # Determine unique regions and ethnicities
 unique_regions = df['region'].unique()
 unique_ethnicities = df['ethnicity'].unique()
@@ -54,7 +57,8 @@ fig = px.scatter(df, x='PC1', y='PC2', color='ethnicity', symbol='region',
                  size='marker_size',  # Use the marker_size column to adjust sizes
                  size_max=14,  # Maximum size for Kazakh
                  symbol_map=shape_map,  # Map regions to shapes
-                 color_discrete_map=color_map)  # Map ethnicities to colors
+                 color_discrete_map=color_map,  # Map ethnicities to colors
+                 category_orders={'region': list(unique_regions), 'ethnicity': list(unique_ethnicities)})  # Ensure legend order
 
 # Update layout for larger font sizes and remove the grid
 fig.update_layout(
