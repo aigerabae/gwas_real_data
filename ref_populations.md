@@ -209,7 +209,7 @@ Updating metadata to have the same individuals as in fam file:
 awk '{print $1}' all13.fam | grep -Fwf - ethnic1.txt > ethnic2.txt
 ```
 
-I saved ethnic2 in google sheets as metadata_hgdp_estonian_kz_final and mnaully adjusted the labels so they are more reasonable; saved to hgdp_estonian folder as ethnic_final.stv
+I saved ethnic2 in google sheets as metadata_hgdp_estonian_kz_final and mnaully adjusted the labels so they are more reasonable; saved to hgdp_estonian folder as ethnic_final.tsv
 
 11) PCA:
 ```bash
@@ -217,12 +217,11 @@ plink2 --bfile all13 --pca 10 --out all_pca
 python plot_eigenvec.py all_pca.eigenvec ethnic_final.tsv
 ```
 
-12) Fst
+12) Fst - needs fst summary file and file with order of ethncitiies 
 ```bash
-cat ethnic2.txt | awk '{print $1 "\t" $1 "\t" $2}' > ethnic2_fst.txt
+cat ethnic_final.tsv | awk '{print $1 "\t" $1 "\t" $2 "\t" $3}' > ethnic2_fst.txt
 plink2 --bfile all13 --fst CATPHENO --within ethnic2_fst.txt --double-id --out fst_output
 ./plot_fst_heatmap.py fst_output.fst.summary
-```
 
 13) IBD for kazakhs with all populations
 ```bash
