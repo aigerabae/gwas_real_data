@@ -104,6 +104,13 @@ plink --bfile kaz2 --exclude exclude_snps.txt --make-bed --out kaz3
 
 # merge kaz3 and gnomad binary data using positions on chromosomes; use names from kaz3; save merged dataset as merged binary dataset (script available in gnomad.md)
 # ... Unsuccessful. Only 20000 common SNPs... admixture still looks bad
+
+# Figure out what to do with 8623 indels that you have in the hg38 dataset:
+cat kaz1.bim | awk '$5 == "I "|| $5 == "D" || $6 == "I" || $6 == "D"' | wc -l
+
+# Figure out where can you do quality control on a dataset with indels. also you might not be able to use the binary files, may have to go back to the ped map files.
+
+# also try running genome studio on  hg19 and see how many SNPs and indels you have and if they are the same or not
 ```
 
 Alzheimer idats to plink
