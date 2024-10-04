@@ -209,7 +209,7 @@ Updating metadata to have the same individuals as in fam file:
 awk '{print $1}' all13.fam | grep -Fwf - ethnic1.txt > ethnic2.txt
 ```
 
-I saved ethnic2 in google sheets as metadata_hgdp_estonian_kz_final and mnaully adjusted the labels so they are more reasonable; saved to hgdp_estonian folder as ethnic_final.tsv
+I saved ethnic2 in google sheets as metadata_hgdp_estonian_kz_final and mnaully adjusted the labels so they are more reasonable; saved to hgdp_estonian folder as ethnic_final.tsv (at work computer)
 
 11) PCA:
 ```bash
