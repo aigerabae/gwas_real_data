@@ -1,5 +1,6 @@
 reproducibility solving:
 
+```bash
 awk -F'\t' '!seen[$1]++' GSA-24v2-0_A1_b150_rsids.txt | awk -F'\t' '!seen[$2]++' | awk -F'\t' '$2 !~ /,/' > GSA-dictionary.txt
 
 plink --bfile kaz --update-name GSA-dictionary.txt --make-bed --out kaz1
@@ -12,7 +13,7 @@ plink --bfile custom_kaz1 --exclude custom_non_rs_SNP.txt --make-bed --out custo
 
 diff <(cut -f2  kaz2.bim | sort) <(cut -f2  custom_kaz2.bim | sort)
 echo "Exclusive to kaz2.bim: $(comm -23 <(cut -f2 kaz2.bim | sort) <(cut -f2 custom_kaz2.bim | sort) | wc -l), Exclusive to custom_kaz2.bim: $(comm -13 <(cut -f2 kaz2.bim | sort) <(cut -f2 custom_kaz2.bim | sort) | wc -l), Common: $(comm -12 <(cut -f2 kaz2.bim | sort) <(cut -f2 custom_kaz2.bim | sort) | wc -l)"
-Exclusive to kaz2.bim: 34161, Exclusive to custom_kaz2.bim: 17188, Common: 641539
+# Exclusive to kaz2.bim: 34161, Exclusive to custom_kaz2.bim: 17188, Common: 641539
 
 echo "Exclusive to kaz.bim: $(comm -23 <(cut -f2 kaz.bim | sort) <(cut -f2 custom_kaz.bim | sort) | wc -l), Exclusive to custom_kaz.bim: $(comm -13 <(cut -f2 kaz.bim | sort) <(cut -f2 custom_kaz.bim | sort) | wc -l), Common: $(comm -12 <(cut -f2 kaz.bim | sort) <(cut -f2 custom_kaz.bim | sort) | wc -l)"
 # Exclusive to kaz.bim: 117857, Exclusive to custom_kaz.bim: 17244, Common: 648364
@@ -135,3 +136,4 @@ grep maf_kaz12_autosomal.afreq -w -e rs2108622 -e rs3745274 -e rs3745274 -e rs41
 # same here - some had to be searched manually
 
 # Thank god... all but one SNP from ones I described are present in the re-done dataset with almost identical MAFs (I suppose the tiny difference in 1 of them comes from different calling algrithms but I'd say its negligible). The one that isn't present is for atopic dermatitis but I'm sure I can come up with something if I take a look at insertions and deletions instead. Yay! I have re-done PCA and FST (although now I have considerably less SNPs) but it still looks oretty much the same. Now I need to redo the figure with the mutations and potentially recalculate the numbers with different mutations ("average of 79 non-synymous mutations per person" or something alogn the lines). I have uploaded all work I did in that redo_october folder in Google DRive to continue on Monday on the workstation.
+```
