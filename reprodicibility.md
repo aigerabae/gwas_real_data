@@ -134,6 +134,7 @@ grep maf_custom_kaz10.afreq -w -e rs2108622 -e rs3745274 -e rs3745274 -e rs41483
 plink2 --bfile kaz12_autosomal  --freq --out maf_kaz12_autosomal
 grep maf_kaz12_autosomal.afreq -w -e rs2108622 -e rs3745274 -e rs3745274 -e rs4148323 -e rs2070959 -e rs4988235 -e rs1573496 -e rs671 -e rs4148323 -e rs2056900 -e rs2076740 -e rs189261858 -e rs12484684 
 # same here - some had to be searched manually
+```
 
 # Thank god... all but one SNP from ones I described are present in the re-done dataset with almost identical MAFs (I suppose the tiny difference in 1 of them comes from different calling algrithms but I'd say its negligible). The one that isn't present is for atopic dermatitis but I'm sure I can come up with something if I take a look at insertions and deletions instead. Yay! I have re-done PCA and FST (although now I have considerably less SNPs) but it still looks oretty much the same. Now I need to redo the figure with the mutations and potentially recalculate the numbers with different mutations ("average of 79 non-synymous mutations per person" or something alogn the lines). I have uploaded all work I did in that redo_october folder in Google DRive to continue on Monday on the workstation.
-```
+
