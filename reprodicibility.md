@@ -146,3 +146,17 @@ $ cat custom_kaz.bim | cut -f 5-6 | grep -e "I" -e "D" | wc -l
 # 8628 indels
 
 Let's save indels and CNVs in a different format using GenomeStudio
+
+Didn't work. Let's try going with IAAP-cli:
+sudo apt-get install icu-devtools
+sudo apt install dotnet-sdk-8.0
+dotnet --version
+export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+
+Added this to the end of EXPORT in bashrc"
+:/home/user/tools/iaap_cli_2_1/array-analysis-cli/:/home/user/tools/iaap_cli_1_1/iaap-cli/
+source ~/.bash_profile
+
+Tomorrow will work on making the command for it using this tutorial: https://support-docs.illumina.com/ARR/ArrayAnalysisCLI/Content/ARR/IMA/RunAnalysis_Local.htm
+
+make sue to figure our loci name to rsID name conversion and remove unnecesary samples as well (maybe use Sampleheet from GenomeStudio modified?)
