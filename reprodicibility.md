@@ -138,3 +138,11 @@ grep maf_kaz12_autosomal.afreq -w -e rs2108622 -e rs3745274 -e rs3745274 -e rs41
 
 # Thank god... all but one SNP from ones I described are present in the re-done dataset with almost identical MAFs (I suppose the tiny difference in 1 of them comes from different calling algrithms but I'd say its negligible). The one that isn't present is for atopic dermatitis but I'm sure I can come up with something if I take a look at insertions and deletions instead. Yay! I have re-done PCA and FST (although now I have considerably less SNPs) but it still looks oretty much the same. Now I need to redo the figure with the mutations and potentially recalculate the numbers with different mutations ("average of 79 non-synymous mutations per person" or something alogn the lines). I have uploaded all work I did in that redo_october folder in Google DRive to continue on Monday on the workstation.
 
+# Let's work with indels and CNVs:
+$ cat custom_kaz.bim | cut -f 2 | grep "CNV" | wc -l
+# 2288 CNVs
+
+$ cat custom_kaz.bim | cut -f 5-6 | grep -e "I" -e "D" | wc -l
+# 8628 indels
+
+Let's save indels and CNVs in a different format using GenomeStudio
