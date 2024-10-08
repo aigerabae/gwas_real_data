@@ -136,29 +136,29 @@ grep maf_kaz12_autosomal.afreq -w -e rs2108622 -e rs3745274 -e rs3745274 -e rs41
 # same here - some had to be searched manually
 ```
 
-# Thank god... all but one SNP from ones I described are present in the re-done dataset with almost identical MAFs (I suppose the tiny difference in 1 of them comes from different calling algrithms but I'd say its negligible). The one that isn't present is for atopic dermatitis but I'm sure I can come up with something if I take a look at insertions and deletions instead. Yay! I have re-done PCA and FST (although now I have considerably less SNPs) but it still looks oretty much the same. Now I need to redo the figure with the mutations and potentially recalculate the numbers with different mutations ("average of 79 non-synymous mutations per person" or something alogn the lines). I have uploaded all work I did in that redo_october folder in Google DRive to continue on Monday on the workstation.
+Thank god... all but one SNP from ones I described are present in the re-done dataset with almost identical MAFs (I suppose the tiny difference in 1 of them comes from different calling algrithms but I'd say its negligible). The one that isn't present is for atopic dermatitis but I'm sure I can come up with something if I take a look at insertions and deletions instead. Yay! I have re-done PCA and FST (although now I have considerably less SNPs) but it still looks oretty much the same. Now I need to redo the figure with the mutations and potentially recalculate the numbers with different mutations ("average of 79 non-synymous mutations per person" or something alogn the lines). I have uploaded all work I did in that redo_october folder in Google DRive to continue on Monday on the workstation.
 
+```bash
 # Let's work with indels and CNVs:
-$ cat custom_kaz.bim | cut -f 2 | grep "CNV" | wc -l
+cat custom_kaz.bim | cut -f 2 | grep "CNV" | wc -l
 # 2288 CNVs
 
-$ cat custom_kaz.bim | cut -f 5-6 | grep -e "I" -e "D" | wc -l
+cat custom_kaz.bim | cut -f 5-6 | grep -e "I" -e "D" | wc -l
 # 8628 indels
 
-Let's save indels and CNVs in a different format using GenomeStudio
+# Let's save indels and CNVs in a different format using GenomeStudio
 
-Didn't work. Let's try going with IAAP-cli:
+# Didn't work. Let's try going with IAAP-cli:
 sudo apt-get install icu-devtools
 sudo apt install dotnet-sdk-8.0
 dotnet --version
 export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
-Added this to the end of EXPORT in bashrc"
-:/home/user/tools/iaap_cli_2_1/array-analysis-cli/:/home/user/tools/iaap_cli_1_1/iaap-cli/
+# Added this to the end of EXPORT in bashrc: ":/home/user/tools/iaap_cli_2_1/array-analysis-cli/:/home/user/tools/iaap_cli_1_1/iaap-cli/"
 source ~/.bash_profile
 
-I removed 72 samples from my SampleSheet in google sheets to just have 224 filtered ones. I also changed path to idats be on the current disk
-Downloaded reference file for hg19 from https://support.illumina.com/downloads/genome-fasta-files.html
+# I removed 72 samples from my SampleSheet in google sheets to just have 224 filtered ones. I also changed path to idats be on the current disk
+# Downloaded reference file for hg19 from https://support.illumina.com/downloads/genome-fasta-files.html
 
 array-analysis-cli genotype call     --bpm-manifest /home/user/biostar/gwas/redo_october/making_vcf/hg19_manifest/GSA-24v2-0_A1_hg19.bpm     --cluster-file /home/user/biostar/gwas/redo_october/making_vcf/clustering_file/GSA-24v2-0_A1_ClusterFile.egt     --idat-sample-sheet /home/user/biostar/gwas/redo_october/making_vcf/sample_sheet/SampleSheet_224_aap_cli.csv     --output-folder /home/user/biostar/gwas/redo_october/making_vcf/gtc
 
@@ -173,4 +173,4 @@ for file in *.vcf; do
     bgzip "$file" && tabix -p vcf "${file}.gz"
 done
 bcftools merge ./*.vcf.gz -o merged_output.vcf
-
+```
