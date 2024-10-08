@@ -157,6 +157,20 @@ Added this to the end of EXPORT in bashrc"
 :/home/user/tools/iaap_cli_2_1/array-analysis-cli/:/home/user/tools/iaap_cli_1_1/iaap-cli/
 source ~/.bash_profile
 
-Tomorrow will work on making the command for it using this tutorial: https://support-docs.illumina.com/ARR/ArrayAnalysisCLI/Content/ARR/IMA/RunAnalysis_Local.htm
+I removed 72 samples from my SampleSheet in google sheets to just have 224 filtered ones. I also changed path to idats be on the current disk
+Downloaded reference file for hg19 from https://support.illumina.com/downloads/genome-fasta-files.html
 
-make sue to figure our loci name to rsID name conversion and remove unnecesary samples as well (maybe use Sampleheet from GenomeStudio modified?)
+array-analysis-cli genotype call     --bpm-manifest /home/user/biostar/gwas/redo_october/making_vcf/hg19_manifest/GSA-24v2-0_A1_hg19.bpm     --cluster-file /home/user/biostar/gwas/redo_october/making_vcf/clustering_file/GSA-24v2-0_A1_ClusterFile.egt     --idat-sample-sheet /home/user/biostar/gwas/redo_october/making_vcf/sample_sheet/SampleSheet_224_aap_cli.csv     --output-folder /home/user/biostar/gwas/redo_october/making_vcf/gtc
+
+array-analysis-cli genotype gtc-to-vcf \
+    --bpm-manifest /home/user/biostar/gwas/redo_october/making_vcf/hg19_manifest/GSA-24v2-0_A1_hg19.bpm \
+    --genome-fasta-file /home/user/biostar/gwas/redo_october/making_vcf/GRCh37_genome/GRCh37_genome.fa \
+    --gtc-sample-sheet /home/user/biostar/gwas/redo_october/making_vcf/sample_sheet/SampleSheet_224_aap_cli_with_gtc.csv \
+    --csv-manifest /home/user/biostar/gwas/redo_october/making_vcf/hg19_manifest/GSA-24v2-0_A1.csv \
+    --output-folder /home/user/biostar/gwas/redo_october/making_vcf/output_vcf
+
+for file in *.vcf; do
+    bgzip "$file" && tabix -p vcf "${file}.gz"
+done
+bcftools merge ./*.vcf.gz -o merged_output.vcf
+
