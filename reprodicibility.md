@@ -155,7 +155,7 @@ dotnet --version
 export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
 # Added this to the end of EXPORT in bashrc: ":/home/user/tools/iaap_cli_2_1/array-analysis-cli/:/home/user/tools/iaap_cli_1_1/iaap-cli/"
-source ~/.bash_profile
+source ~/.bashrc
 
 # I removed 72 samples from my SampleSheet in google sheets to just have 224 filtered ones. I also changed path to idats be on the current disk
 # Downloaded reference file for hg19 from https://support.illumina.com/downloads/genome-fasta-files.html
@@ -174,3 +174,21 @@ for file in *.vcf; do
 done
 bcftools merge ./*.vcf.gz -o merged_output.vcf
 ```
+
+perl convert2annovar.pl -format vcf4 merged_output.vcf -outfile input.avinput
+merged_output.vcf
+
+bcftools query -l merged_output.vcf > old_sample_names.txt
+bcftools reheader -s sentrix_to_sampleID.tsv -o renamed.vcf merged_output.vcf
+bgzip -k renamed.vcf
+tabix -p vcf renamed.vcf.gz
+
+# added this to PATH: ":/home/user/tools/dragen/dragena/"
+dragena genotype gtc-to-vcf \
+    --bpm-manifest /home/user/biostar/gwas/redo_october/making_vcf/hg19_manifest/GSA-24v2-0_A1_hg19.bpm \
+    --genome-fasta-file /home/user/biostar/gwas/redo_october/making_vcf/GRCh37_genome/GRCh37_genome.fa \
+    --gtc-sample-sheet /home/user/biostar/gwas/redo_october/making_vcf/sample_sheet/SampleSheet_224_aap_cli_with_gtc.csv \
+    --csv-manifest /home/user/biostar/gwas/redo_october/making_vcf/hg19_manifest/GSA-24v2-0_A1.csv \
+    --output-folder /home/user/biostar/gwas/redo_october/making_vcf/output_dragena_vcf
+
+Same result, no quality score in dragena but it creates indexed gz file so its a bit more cinvenient. Can't do CNV because don't have CN model. Might not really need it since in the ped/map file i got from genomestudio all CNV variants are labeled as 0 amount
