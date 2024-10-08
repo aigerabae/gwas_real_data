@@ -62,3 +62,6 @@ Answer = 288
 
 
 turns out the files need to be in sepatate folders corresponding to different arrays! clean folder is not necesary 
+
+wget http://www.openbioinformatics.org/annovar/download/0wgxR2rIVP/annovar.latest.tar.gz
+
