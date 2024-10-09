@@ -44,15 +44,5 @@ cat kaz1.bim | awk '$5 == "I "|| $5 == "D" || $6 == "I" || $6 == "D"' | wc -l
 # also try running genome studio on  hg19 and see how many SNPs and indels you have and if they are the same or not
 ```
 
-Alzheimer idats to plink
-```bash
-awk 'NR > 1 { print $3, $2, 0, $4 }' SNP_Map.txt > alz.map
-tail -n +11 "alz_FinalReport_2.txt" > alz1.txt
-awk 'BEGIN {OFS="\t"} {$3=$3""$4; $4=""; print}' alz1.txt > alz2.txt
-sed $'s/\r/\t/g' alz2.txt > alz3.txt
-awk '{printf "%s%s", $3, (NR%253702 ? OFS : ORS)}' alz3.txt > pivoted_alz.txt
-cat alz3.txt | cut -f 2 | uniq > pivoted_header.txt
-awk 'BEGIN { OFS="\t" } { print 0, $0, 0, 0, 0, 0 }' pivoted_header.txt > temp_columns.txt
-paste temp_columns.txt pivoted_alz.txt > alz.ped
-```
+
 
