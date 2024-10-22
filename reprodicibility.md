@@ -1,28 +1,36 @@
 reproducibility solving:
 
 ```bash
-awk -F'\t' '!seen[$1]++' GSA-24v2-0_A1_b150_rsids.txt | awk -F'\t' '!seen[$2]++' | awk -F'\t' '$2 !~ /,/' > GSA-dictionary.txt
+# I removed 72 samples from my SampleSheet in google sheets to just have 224 filtered ones. I also changed path to idats be on the current disk
+# Downloaded reference file for hg19 from https://support.illumina.com/downloads/genome-fasta-files.html
 
-plink --bfile kaz --update-name GSA-dictionary.txt --make-bed --out kaz1
-awk '$2 !~ /^rs/' kaz1.bim | sort -k2,2 > kaz_non_rs_SNP.txt
-plink --bfile kaz1 --exclude kaz_non_rs_SNP.txt --make-bed --out kaz2
+array-analysis-cli genotype call \
+    --bpm-manifest /home/user/biostar/gwas/redo_october/making_vcf/hg19_manifest/GSA-24v2-0_A1_hg19.bpm \
+    --cluster-file /home/user/biostar/gwas/redo_october/making_vcf/clustering_file/GSA-24v2-0_A1_ClusterFile.egt \
+    --idat-sample-sheet /home/user/biostar/gwas/redo_october/making_vcf/sample_sheet/SampleSheet_224_aap_cli.csv \
+    --output-folder /home/user/biostar/gwas/redo_october/making_vcf/gtc
+
+dragena genotype gtc-to-vcf \
+    --bpm-manifest /home/user/biostar/gwas/redo_october/making_vcf/hg19_manifest/GSA-24v2-0_A1_hg19.bpm \
+    --genome-fasta-file /home/user/biostar/gwas/redo_october/making_vcf/GRCh37_genome/GRCh37_genome.fa \
+    --gtc-sample-sheet /home/user/biostar/gwas/redo_october/making_vcf/sample_sheet/SampleSheet_224_aap_cli_with_gtc.csv \
+    --csv-manifest /home/user/biostar/gwas/redo_october/making_vcf/hg19_manifest/GSA-24v2-0_A1.csv \
+    --output-folder /home/user/biostar/gwas/redo_october/making_vcf/output_dragena_vcf
+
+bcftools merge ./*.vcf.gz -o merged_output.vcf
+# I renamed sentrix names to regular sample names
+```
+
+```bash
+plink --vcf merged_output.vcf --make-bed --out custom_kaz
+awk -F'\t' '!seen[$1]++' GSA-24v2-0_A1_b150_rsids.txt | awk -F'\t' '!seen[$2]++' | awk -F'\t' '$2 !~ /,/' > GSA-dictionary.txt
 
 plink --bfile custom_kaz --update-name GSA-dictionary.txt --make-bed --out custom_kaz1
 awk '$2 !~ /^rs/' custom_kaz1.bim | sort -k2,2 > custom_non_rs_SNP.txt
 plink --bfile custom_kaz1 --exclude custom_non_rs_SNP.txt --make-bed --out custom_kaz2
 
-diff <(cut -f2  kaz2.bim | sort) <(cut -f2  custom_kaz2.bim | sort)
-echo "Exclusive to kaz2.bim: $(comm -23 <(cut -f2 kaz2.bim | sort) <(cut -f2 custom_kaz2.bim | sort) | wc -l), Exclusive to custom_kaz2.bim: $(comm -13 <(cut -f2 kaz2.bim | sort) <(cut -f2 custom_kaz2.bim | sort) | wc -l), Common: $(comm -12 <(cut -f2 kaz2.bim | sort) <(cut -f2 custom_kaz2.bim | sort) | wc -l)"
-# Exclusive to kaz2.bim: 34161, Exclusive to custom_kaz2.bim: 17188, Common: 641539
-
-echo "Exclusive to kaz.bim: $(comm -23 <(cut -f2 kaz.bim | sort) <(cut -f2 custom_kaz.bim | sort) | wc -l), Exclusive to custom_kaz.bim: $(comm -13 <(cut -f2 kaz.bim | sort) <(cut -f2 custom_kaz.bim | sort) | wc -l), Common: $(comm -12 <(cut -f2 kaz.bim | sort) <(cut -f2 custom_kaz.bim | sort) | wc -l)"
-# Exclusive to kaz.bim: 117857, Exclusive to custom_kaz.bim: 17244, Common: 648364
-
-# I removed all old kaz files into separate folder and named it korean
-
 # Make FID same as IID
-$ cat custom_kaz2.fam | grep -wf list.txt | cut -d " " -f 1 
-
+cat custom_kaz2.fam | grep -wf list.txt | cut -d " " -f 1
 # I manually changed 1 of 122 and 1 of 123 into 122_1 and 123_1 because ther were 2 of each of them
 
 plink --bfile custom_kaz2 --remove "reproducibility - to_remove.tsv" --make-bed --out custom_kaz3
@@ -32,16 +40,47 @@ plink --bfile custom_kaz4 --impute-sex --make-bed --out custom_kaz5
 plink --bfile custom_kaz5 --geno 0.02 --make-bed --out custom_kaz6
 plink --bfile custom_kaz6 --mind 0.02 --make-bed --out custom_kaz7
 plink --bfile custom_kaz7 --maf 0.001 --make-bed --out custom_kaz8
-awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' custom_kaz8.bim > snp_1_22.txt
-plink --bfile custom_kaz8 --extract snp_1_22.txt --make-bed --out custom_kaz9
 
 # Attention! At this stage I removed all non-nucleotide SNPs (indels). But weirdly they are already not here. Probably got filteredt out at some point.
-plink --bfile custom_kaz9 --snps-only 'just-acgt' --make-bed --out custom_kaz10
+plink --bfile custom_kaz8 --snps-only 'just-acgt' --make-bed --out custom_kaz9
+
+# autosomal, mitochnodrial, y-chr
+awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' custom_kaz9.bim > snp_1_22.txt
+plink --bfile custom_kaz9 --extract snp_1_22.txt --make-bed --out custom_kaz9_autosomal
+
+awk '{ if ($1 == 26) print $2 }' custom_kaz9.bim > snp_mitoch.txt
+plink --bfile custom_kaz9 --extract snp_mitoch.txt --make-bed --out custom_kaz9_mitoch
+
+awk '{ if ($1 == 24) print $2 }' custom_kaz9.bim > snp_y.txt
+plink --bfile custom_kaz9 --extract snp_y.txt --make-bed --out custom_kaz9_y_chr
+
+# Getting the same stuff as originally:
+plink2 --bfile custom_kaz9  --freq --out maf_custom_kaz9
+plink2 --bfile custom_kaz9_autosomal  --freq --out maf_custom_kaz9_autosomal
+plink2 --bfile custom_kaz9_mitoch  --freq --out maf_custom_kaz9_mitoch
+plink2 --bfile custom_kaz9_y_chr --freq --out maf_custom_kaz9_y_chr
+sed -i 's/ALT_FREQS/kaz_alt_frq/g' maf_custom_kaz9_autosomal.afreq  maf_custom_kaz9_mitoch.afreq maf_custom_kaz9_y_chr.afreq maf_custom_kaz9.afreq
+sed -i 's/OBS_CT/kaz_allele_count/g' maf_custom_kaz9_autosomal.afreq  maf_custom_kaz9_mitoch.afreq maf_custom_kaz9_y_chr.afreq maf_custom_kaz9.afreq
+
+#making vcfs
+plink --bfile custom_kaz9_autosomal --recode vcf --out custom_kaz9_autosomal
+plink --bfile custom_kaz9_mitoch --recode vcf --out custom_kaz9_mitoch
+plink --bfile custom_kaz9_y_chr --recode vcf --out custom_kaz9_y_chr
+plink --bfile custom_kaz9 --recode vcf --out custom_kaz9_all
+
+# making extended vcfs
+bcftools view -h custom_kaz9_autosomal.vcf > kaz_a1.vcf && bcftools view -H custom_kaz9_autosomal.vcf > kaz_a2.vcf && tail -n +2 maf_custom_kaz9_autosomal.afreq | cut -f 6,7 > added_info.txt && head -n 1 maf_custom_kaz9_autosomal.afreq | cut -f 6,7 > added_header.txt && (sed '$d' kaz_a1.vcf; paste <(tail -n 1 kaz_a1.vcf) added_header.txt) > kaz_a4.vcf && paste kaz_a2.vcf added_info.txt > kaz_a3.vcf && cat kaz_a4.vcf kaz_a3.vcf > kaz_a5.vcf && mv kaz_a5.vcf ./autosomal_ext_for_annovar.vcf
+
+# ROH
+plink --bfile custom_kaz9_autosomal --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
+
+# IBD between kazakhs only
+plink --bfile custom_kaz9_autosomal --genome --out ibd_kaz
 
 # Merging with HGDP:
-$ cp ../redo_july/working_with_ref_data/hgdp_estonian/HGDP9.bed ./
-$ cp ../redo_july/working_with_ref_data/hgdp_estonian/HGDP9.bim ./
-$ cp ../redo_july/working_with_ref_data/hgdp_estonian/HGDP9.fam ./
+cp ../redo_july/working_with_ref_data/hgdp_estonian/HGDP9.bed ./
+cp ../redo_july/working_with_ref_data/hgdp_estonian/HGDP9.bim ./
+cp ../redo_july/working_with_ref_data/hgdp_estonian/HGDP9.fam ./
 
 plink --bfile custom_kaz10 --bmerge HGDP9.bed HGDP9.bim HGDP9.fam --make-bed --out merged1
 plink --bfile HGDP9 --exclude merged1-merge.missnp --biallelic-only strict --make-bed --out HGDP10
@@ -54,7 +93,6 @@ plink --bfile merged4 --exclude duplicates.txt --make-bed --out merged6
 # merged6 instead of merged5 because in the original code i removed some outliers which i did earlier
 
 # Strangely only 54000 SNPs remaining
-
 wget https://evolbio.ut.ee/turkic/turkic.fam
 wget https://evolbio.ut.ee/turkic/turkic.bim
 wget https://evolbio.ut.ee/turkic/turkic.bed
@@ -113,7 +151,20 @@ python plot_eigenvec.py all_pca.eigenvec ethnic_final.tsv
 cat ethnic_final.tsv | awk '{print $1 "\t" $1 "\t" $2 "\t" $3}' > ethnic2_fst.txt
 plink2 --bfile all13 --fst CATPHENO --within ethnic2_fst.txt --double-id --out fst_output
 ./plot_fst_heatmap.py fst_output.fst.summary sorting_order.tsv
+```
 
+# all but 1 mutation is present in the new dataset; the PCA and Fst graphs I updated; the claculations in the phram part kept intact due to no annotated vcf
+
+# IGNORE! 
+```bash
+# Let's work with indels and CNVs:
+cat custom_kaz.bim | cut -f 2 | grep "CNV" | wc -l
+# 2288 CNVs
+
+cat custom_kaz.bim | cut -f 5-6 | grep -e "I" -e "D" | wc -l
+# 8628 indels
+
+# Same result, no quality score in dragena but it creates indexed gz file so its a bit more cinvenient. Can't do CNV because don't have CN model. Might not really need it since in the ped/map file i got from genomestudio all CNV variants are labeled as 0 amount
 
 # Making a table of MAFs and checking manually if i have the pharmacogenes there in the same amounts:
 plink2 --bfile custom_kaz10  --freq --out maf_custom_kaz10
@@ -134,63 +185,13 @@ grep maf_custom_kaz10.afreq -w -e rs2108622 -e rs3745274 -e rs3745274 -e rs41483
 plink2 --bfile kaz12_autosomal  --freq --out maf_kaz12_autosomal
 grep maf_kaz12_autosomal.afreq -w -e rs2108622 -e rs3745274 -e rs3745274 -e rs4148323 -e rs2070959 -e rs4988235 -e rs1573496 -e rs671 -e rs4148323 -e rs2056900 -e rs2076740 -e rs189261858 -e rs12484684 
 # same here - some had to be searched manually
-```
 
-Thank god... all but one SNP from ones I described are present in the re-done dataset with almost identical MAFs (I suppose the tiny difference in 1 of them comes from different calling algrithms but I'd say its negligible). The one that isn't present is for atopic dermatitis but I'm sure I can come up with something if I take a look at insertions and deletions instead. Yay! I have re-done PCA and FST (although now I have considerably less SNPs) but it still looks oretty much the same. Now I need to redo the figure with the mutations and potentially recalculate the numbers with different mutations ("average of 79 non-synymous mutations per person" or something alogn the lines). I have uploaded all work I did in that redo_october folder in Google DRive to continue on Monday on the workstation.
+# comparing korean kaz and my custom kaz:
+diff <(cut -f2  kaz2.bim | sort) <(cut -f2  custom_kaz2.bim | sort)
+echo "Exclusive to kaz2.bim: $(comm -23 <(cut -f2 kaz2.bim | sort) <(cut -f2 custom_kaz2.bim | sort) | wc -l), Exclusive to custom_kaz2.bim: $(comm -13 <(cut -f2 kaz2.bim | sort) <(cut -f2 custom_kaz2.bim | sort) | wc -l), Common: $(comm -12 <(cut -f2 kaz2.bim | sort) <(cut -f2 custom_kaz2.bim | sort) | wc -l)"
+# Exclusive to kaz2.bim: 34161, Exclusive to custom_kaz2.bim: 17188, Common: 641539
 
-```bash
-# Let's work with indels and CNVs:
-cat custom_kaz.bim | cut -f 2 | grep "CNV" | wc -l
-# 2288 CNVs
+echo "Exclusive to kaz.bim: $(comm -23 <(cut -f2 kaz.bim | sort) <(cut -f2 custom_kaz.bim | sort) | wc -l), Exclusive to custom_kaz.bim: $(comm -13 <(cut -f2 kaz.bim | sort) <(cut -f2 custom_kaz.bim | sort) | wc -l), Common: $(comm -12 <(cut -f2 kaz.bim | sort) <(cut -f2 custom_kaz.bim | sort) | wc -l)"
+# Exclusive to kaz.bim: 117857, Exclusive to custom_kaz.bim: 17244, Common: 648364
 
-cat custom_kaz.bim | cut -f 5-6 | grep -e "I" -e "D" | wc -l
-# 8628 indels
-
-# Let's save indels and CNVs in a different format using GenomeStudio
-
-# Didn't work. Let's try going with IAAP-cli:
-sudo apt-get install icu-devtools
-sudo apt install dotnet-sdk-8.0
-dotnet --version
-export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
-
-# Added this to the end of EXPORT in bashrc: ":/home/user/tools/iaap_cli_2_1/array-analysis-cli/:/home/user/tools/iaap_cli_1_1/iaap-cli/"
-source ~/.bashrc
-
-# I removed 72 samples from my SampleSheet in google sheets to just have 224 filtered ones. I also changed path to idats be on the current disk
-# Downloaded reference file for hg19 from https://support.illumina.com/downloads/genome-fasta-files.html
-
-array-analysis-cli genotype call     --bpm-manifest /home/user/biostar/gwas/redo_october/making_vcf/hg19_manifest/GSA-24v2-0_A1_hg19.bpm     --cluster-file /home/user/biostar/gwas/redo_october/making_vcf/clustering_file/GSA-24v2-0_A1_ClusterFile.egt     --idat-sample-sheet /home/user/biostar/gwas/redo_october/making_vcf/sample_sheet/SampleSheet_224_aap_cli.csv     --output-folder /home/user/biostar/gwas/redo_october/making_vcf/gtc
-
-array-analysis-cli genotype gtc-to-vcf \
-    --bpm-manifest /home/user/biostar/gwas/redo_october/making_vcf/hg19_manifest/GSA-24v2-0_A1_hg19.bpm \
-    --genome-fasta-file /home/user/biostar/gwas/redo_october/making_vcf/GRCh37_genome/GRCh37_genome.fa \
-    --gtc-sample-sheet /home/user/biostar/gwas/redo_october/making_vcf/sample_sheet/SampleSheet_224_aap_cli_with_gtc.csv \
-    --csv-manifest /home/user/biostar/gwas/redo_october/making_vcf/hg19_manifest/GSA-24v2-0_A1.csv \
-    --output-folder /home/user/biostar/gwas/redo_october/making_vcf/output_vcf
-
-for file in *.vcf; do
-    bgzip "$file" && tabix -p vcf "${file}.gz"
-done
-bcftools merge ./*.vcf.gz -o merged_output.vcf
-```
-
-perl convert2annovar.pl -format vcf4 merged_output.vcf -outfile input.avinput
-merged_output.vcf
-
-bcftools query -l merged_output.vcf > old_sample_names.txt
-bcftools reheader -s sentrix_to_sampleID.tsv -o renamed.vcf merged_output.vcf
-bgzip -k renamed.vcf
-tabix -p vcf renamed.vcf.gz
-
-# added this to PATH: ":/home/user/tools/dragen/dragena/"
-dragena genotype gtc-to-vcf \
-    --bpm-manifest /home/user/biostar/gwas/redo_october/making_vcf/hg19_manifest/GSA-24v2-0_A1_hg19.bpm \
-    --genome-fasta-file /home/user/biostar/gwas/redo_october/making_vcf/GRCh37_genome/GRCh37_genome.fa \
-    --gtc-sample-sheet /home/user/biostar/gwas/redo_october/making_vcf/sample_sheet/SampleSheet_224_aap_cli_with_gtc.csv \
-    --csv-manifest /home/user/biostar/gwas/redo_october/making_vcf/hg19_manifest/GSA-24v2-0_A1.csv \
-    --output-folder /home/user/biostar/gwas/redo_october/making_vcf/output_dragena_vcf
-
-Same result, no quality score in dragena but it creates indexed gz file so its a bit more cinvenient. Can't do CNV because don't have CN model. Might not really need it since in the ped/map file i got from genomestudio all CNV variants are labeled as 0 amount
-
-
+# I removed all old kaz files into separate folder and named it korean
