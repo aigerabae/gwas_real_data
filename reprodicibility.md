@@ -1,5 +1,6 @@
 reproducibility solving:
 
+# RAW intensity fiels to VCF:
 ```bash
 # I removed 72 samples from my SampleSheet in google sheets to just have 224 filtered ones. I also changed path to idats be on the current disk
 # Downloaded reference file for hg19 from https://support.illumina.com/downloads/genome-fasta-files.html
@@ -76,7 +77,10 @@ plink --bfile custom_kaz9_autosomal --homozyg-density 60 --homozyg-gap 500 --hom
 
 # IBD between kazakhs only
 plink --bfile custom_kaz9_autosomal --genome --out ibd_kaz
+```
 
+# Working with reference data:
+```bash
 # Merging with HGDP:
 cp ../redo_july/working_with_ref_data/hgdp_estonian/HGDP9.bed ./
 cp ../redo_july/working_with_ref_data/hgdp_estonian/HGDP9.bim ./
