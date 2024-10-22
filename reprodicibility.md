@@ -22,6 +22,7 @@ bcftools merge ./*.vcf.gz -o merged_output.vcf
 # I renamed sentrix names to regular sample names
 ```
 
+# Quality control of kaz data:
 ```bash
 plink --vcf merged_output.vcf --make-bed --out custom_kaz
 awk -F'\t' '!seen[$1]++' GSA-24v2-0_A1_b150_rsids.txt | awk -F'\t' '!seen[$2]++' | awk -F'\t' '$2 !~ /,/' > GSA-dictionary.txt
