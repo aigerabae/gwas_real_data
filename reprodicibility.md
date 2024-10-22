@@ -44,39 +44,6 @@ plink --bfile custom_kaz7 --maf 0.001 --make-bed --out custom_kaz8
 
 # Attention! At this stage I removed all non-nucleotide SNPs (indels). But weirdly they are already not here. Probably got filteredt out at some point.
 plink --bfile custom_kaz8 --snps-only 'just-acgt' --make-bed --out custom_kaz9
-
-# autosomal, mitochnodrial, y-chr
-awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' custom_kaz9.bim > snp_1_22.txt
-plink --bfile custom_kaz9 --extract snp_1_22.txt --make-bed --out custom_kaz9_autosomal
-
-awk '{ if ($1 == 26) print $2 }' custom_kaz9.bim > snp_mitoch.txt
-plink --bfile custom_kaz9 --extract snp_mitoch.txt --make-bed --out custom_kaz9_mitoch
-
-awk '{ if ($1 == 24) print $2 }' custom_kaz9.bim > snp_y.txt
-plink --bfile custom_kaz9 --extract snp_y.txt --make-bed --out custom_kaz9_y_chr
-
-# Getting the same stuff as originally:
-plink2 --bfile custom_kaz9  --freq --out maf_custom_kaz9
-plink2 --bfile custom_kaz9_autosomal  --freq --out maf_custom_kaz9_autosomal
-plink2 --bfile custom_kaz9_mitoch  --freq --out maf_custom_kaz9_mitoch
-plink2 --bfile custom_kaz9_y_chr --freq --out maf_custom_kaz9_y_chr
-sed -i 's/ALT_FREQS/kaz_alt_frq/g' maf_custom_kaz9_autosomal.afreq  maf_custom_kaz9_mitoch.afreq maf_custom_kaz9_y_chr.afreq maf_custom_kaz9.afreq
-sed -i 's/OBS_CT/kaz_allele_count/g' maf_custom_kaz9_autosomal.afreq  maf_custom_kaz9_mitoch.afreq maf_custom_kaz9_y_chr.afreq maf_custom_kaz9.afreq
-
-#making vcfs
-plink --bfile custom_kaz9_autosomal --recode vcf --out custom_kaz9_autosomal
-plink --bfile custom_kaz9_mitoch --recode vcf --out custom_kaz9_mitoch
-plink --bfile custom_kaz9_y_chr --recode vcf --out custom_kaz9_y_chr
-plink --bfile custom_kaz9 --recode vcf --out custom_kaz9_all
-
-# making extended vcfs
-bcftools view -h custom_kaz9_autosomal.vcf > kaz_a1.vcf && bcftools view -H custom_kaz9_autosomal.vcf > kaz_a2.vcf && tail -n +2 maf_custom_kaz9_autosomal.afreq | cut -f 6,7 > added_info.txt && head -n 1 maf_custom_kaz9_autosomal.afreq | cut -f 6,7 > added_header.txt && (sed '$d' kaz_a1.vcf; paste <(tail -n 1 kaz_a1.vcf) added_header.txt) > kaz_a4.vcf && paste kaz_a2.vcf added_info.txt > kaz_a3.vcf && cat kaz_a4.vcf kaz_a3.vcf > kaz_a5.vcf && mv kaz_a5.vcf ./autosomal_ext_for_annovar.vcf
-
-# ROH
-plink --bfile custom_kaz9_autosomal --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
-
-# IBD between kazakhs only
-plink --bfile custom_kaz9_autosomal --genome --out ibd_kaz
 ```
 
 # Working with reference data:
@@ -156,11 +123,46 @@ cat ethnic_final.tsv | awk '{print $1 "\t" $1 "\t" $2 "\t" $3}' > ethnic2_fst.tx
 plink2 --bfile all13 --fst CATPHENO --within ethnic2_fst.txt --double-id --out fst_output
 ./plot_fst_heatmap.py fst_output.fst.summary sorting_order.tsv
 ```
+```bash
+# Getting docs and graphs for publication:
+# autosomal, mitochnodrial, y-chr
+awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' custom_kaz9.bim > snp_1_22.txt
+plink --bfile custom_kaz9 --extract snp_1_22.txt --make-bed --out custom_kaz9_autosomal
 
+awk '{ if ($1 == 26) print $2 }' custom_kaz9.bim > snp_mitoch.txt
+plink --bfile custom_kaz9 --extract snp_mitoch.txt --make-bed --out custom_kaz9_mitoch
+
+awk '{ if ($1 == 24) print $2 }' custom_kaz9.bim > snp_y.txt
+plink --bfile custom_kaz9 --extract snp_y.txt --make-bed --out custom_kaz9_y_chr
+
+#mafs
+plink2 --bfile custom_kaz9  --freq --out maf_custom_kaz9
+plink2 --bfile custom_kaz9_autosomal  --freq --out maf_custom_kaz9_autosomal
+plink2 --bfile custom_kaz9_mitoch  --freq --out maf_custom_kaz9_mitoch
+plink2 --bfile custom_kaz9_y_chr --freq --out maf_custom_kaz9_y_chr
+sed -i 's/ALT_FREQS/kaz_alt_frq/g' maf_custom_kaz9_autosomal.afreq  maf_custom_kaz9_mitoch.afreq maf_custom_kaz9_y_chr.afreq maf_custom_kaz9.afreq
+sed -i 's/OBS_CT/kaz_allele_count/g' maf_custom_kaz9_autosomal.afreq  maf_custom_kaz9_mitoch.afreq maf_custom_kaz9_y_chr.afreq maf_custom_kaz9.afreq
+
+#making vcfs
+plink --bfile custom_kaz9_autosomal --recode vcf --out custom_kaz9_autosomal
+plink --bfile custom_kaz9_mitoch --recode vcf --out custom_kaz9_mitoch
+plink --bfile custom_kaz9_y_chr --recode vcf --out custom_kaz9_y_chr
+plink --bfile custom_kaz9 --recode vcf --out custom_kaz9_all
+
+# making extended vcfs
+bcftools view -h custom_kaz9_autosomal.vcf > kaz_a1.vcf && bcftools view -H custom_kaz9_autosomal.vcf > kaz_a2.vcf && tail -n +2 maf_custom_kaz9_autosomal.afreq | cut -f 6,7 > added_info.txt && head -n 1 maf_custom_kaz9_autosomal.afreq | cut -f 6,7 > added_header.txt && (sed '$d' kaz_a1.vcf; paste <(tail -n 1 kaz_a1.vcf) added_header.txt) > kaz_a4.vcf && paste kaz_a2.vcf added_info.txt > kaz_a3.vcf && cat kaz_a4.vcf kaz_a3.vcf > kaz_a5.vcf && mv kaz_a5.vcf ./autosomal_ext_for_annovar.vcf
+
+# ROH
+plink --bfile custom_kaz9_autosomal --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
+
+# IBD between kazakhs only
+plink --bfile custom_kaz9_autosomal --genome --out ibd_kaz
+```
+
+# IGNORE! Work in progress notes 
+```bash
 # all but 1 mutation is present in the new dataset; the PCA and Fst graphs I updated; the claculations in the phram part kept intact due to no annotated vcf
 
-# IGNORE! 
-```bash
 # Let's work with indels and CNVs:
 cat custom_kaz.bim | cut -f 2 | grep "CNV" | wc -l
 # 2288 CNVs
