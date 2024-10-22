@@ -131,7 +131,7 @@ awk '{print $1}' all15.fam | grep -Fwf - ethnic2.txt > ethnic3.txt
 for K in 8; do admixture --cv all15.bed -j8 $K | tee log${K}.out; done
 ln -s ~/tools/AncestryPainter_v5/AncestryPainter.pl ./
 cat ethnic3.txt | awk '{print $2"\t" $1}'  > ethnic3.ind 
-perl AncestryPainter.pl -i ethnic3.ind -q ./all14.8.Q -t Kazakh -o Kazakh -f png
+perl AncestryPainter.pl -i ethnic3.ind -q ./all15.8.Q -t Kazakh -o Kazakh -f png
 ```
 
 # Getting docs and graphs for publication:
@@ -170,6 +170,7 @@ plink --bfile custom_kaz9_autosomal --homozyg-density 60 --homozyg-gap 500 --hom
 plink --bfile custom_kaz9_autosomal --genome --out ibd_kaz
 plink --bfile all14 --genome --out ibd_all
 ./average_ibd.py ibd_all.genome ethnic_final.tsv
+cat ibd_all_average.txt | grep Kazakh | sort -gk 3,3 > average_ibd_kazakh.tsv
 ```
 
 # IGNORE! Work in progress notes 
