@@ -123,8 +123,9 @@ cat ethnic_final.tsv | awk '{print $1 "\t" $1 "\t" $2 "\t" $3}' > ethnic2_fst.tx
 plink2 --bfile all13 --fst CATPHENO --within ethnic2_fst.txt --double-id --out fst_output
 ./plot_fst_heatmap.py fst_output.fst.summary sorting_order.tsv
 ```
-```bash
+
 # Getting docs and graphs for publication:
+```bash
 # autosomal, mitochnodrial, y-chr
 awk '{ if ($1 >= 1 && $1 <= 22) print $2 }' custom_kaz9.bim > snp_1_22.txt
 plink --bfile custom_kaz9 --extract snp_1_22.txt --make-bed --out custom_kaz9_autosomal
@@ -157,6 +158,7 @@ plink --bfile custom_kaz9_autosomal --homozyg-density 60 --homozyg-gap 500 --hom
 
 # IBD between kazakhs only
 plink --bfile custom_kaz9_autosomal --genome --out ibd_kaz
+plink --bfile all14 --genome --out ibd_all
 ```
 
 # IGNORE! Work in progress notes 
