@@ -123,6 +123,15 @@ python plot_eigenvec.py all_pca.eigenvec ethnic_final.tsv
 cat ethnic_final.tsv | awk '{print $1 "\t" $1 "\t" $2 "\t" $3}' > ethnic2_fst.txt
 plink2 --bfile all13 --fst CATPHENO --within ethnic2_fst.txt --double-id --out fst_output
 ./plot_fst_heatmap.py fst_output.fst.summary sorting_order.tsv
+
+# admixture
+plink --bfile all14 --indep-pairwise 1000 150 0.4 --out pruned_data
+plink --bfile all14 --extract pruned_data.prune.in --make-bed --out all15
+awk '{print $1}' all15.fam | grep -Fwf - ethnic2.txt > ethnic3.txt
+for K in 8; do admixture --cv all15.bed -j8 $K | tee log${K}.out; done
+ln -s ~/tools/AncestryPainter_v5/AncestryPainter.pl ./
+cat ethnic3.txt | awk '{print $2"\t" $1}'  > ethnic3.ind 
+perl AncestryPainter.pl -i ethnic3.ind -q ./all14.8.Q -t Kazakh -o Kazakh -f png
 ```
 
 # Getting docs and graphs for publication:
@@ -157,9 +166,10 @@ bcftools view -h custom_kaz9_autosomal.vcf > kaz_a1.vcf && bcftools view -H cust
 # ROH
 plink --bfile custom_kaz9_autosomal --homozyg-density 60 --homozyg-gap 500 --homozyg-window-snp 100 --homozyg-window-het 0
 
-# IBD between kazakhs only
+# IBD between kazakhs only and between different ethnicities
 plink --bfile custom_kaz9_autosomal --genome --out ibd_kaz
 plink --bfile all14 --genome --out ibd_all
+./average_ibd.py ibd_all.genome ethnic_final.tsv
 ```
 
 # IGNORE! Work in progress notes 
